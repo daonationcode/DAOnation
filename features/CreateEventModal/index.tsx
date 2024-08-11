@@ -12,15 +12,14 @@ import Required from '../../components/components/Required';
 
 import { toast } from 'react-toastify';
 import useEnvironment from '../../services/useEnvironment';
-import { useUniqueVaraContext } from '../../contexts/UniqueVaraContext';
- declare let window;
+
+declare let window;
 let addedDate = false;
 export default function CreateEventModal({ open, onClose, daoId }) {
   const [EventImage, setEventImage] = useState([]);
   const [creating, setCreating] = useState(false);
   const { sendTransaction } = useContract();
   const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
-  const {createEventInVara,VaraLoggedIn} = useUniqueVaraContext();
   const { isServer } = useEnvironment();
 
   //Storage API for images and videos
@@ -130,46 +129,6 @@ export default function CreateEventModal({ open, onClose, daoId }) {
       eventid: null,
       budget: Budget
     };
-
-    async function onSuccess() {
-      setCreating(false);
-      onClose({ success: true });
-      window.location.reload();
-    }
-    if (VaraLoggedIn) {
-      // let eventid = Number(await api._query.events.eventIds());
-      // feed.eventid = 'p_' + eventid;
-      // const txs = [api._extrinsics.events.createEvent(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'event', new Date().valueOf())];
-      // const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
-      //   showToast(status, ToastId, 'Created successfully!', () => {
-      //     onSuccess();
-      //   });
-      // });
-      await createEventInVara();
-    } else {
-      try {
-        const eventid = Number(await window.contractUnique._event_ids());
-        feed.eventid = eventid;
-
-        // Creating Event in Smart contract
-        await sendTransaction(await window.contractUnique.populateTransaction.create_event(JSON.stringify(createdObject),window.selectedAddress, daoId, Number(window.userid), JSON.stringify(feed)));
-        toast.update(ToastId, {
-          render: 'Created Successfully!',
-          type: 'success',
-          isLoading: false,
-          autoClose: 1000,
-          closeButton: true,
-          closeOnClick: true,
-          draggable: true
-        });
-        onSuccess();
-      } catch (error) {
-        setCreating(false);
-        console.error(error);
-
-        return;
-      }
-    }
   }
 
   function FilehandleChange(event) {

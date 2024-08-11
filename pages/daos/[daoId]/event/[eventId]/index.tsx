@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { usePolkadotContext } from '../../../../../contexts/PolkadotContext';
-import { useUniqueVaraContext } from '../../../../../contexts/UniqueVaraContext';
 import DonateCoinToEventModal from '../../../../../features/DonateCoinToEventModal';
 import useContract from '../../../../../services/useContract';
 import useEnvironment from '../../../../../services/useEnvironment';
@@ -24,7 +23,6 @@ export default function Events() {
   //Variables
   const [nfts, setNfts] = useState([]);
   const { api, getUserInfoById, GetAllDaos } = usePolkadotContext();
-  const { GetAllNfts, GetAllEvents } = useUniqueVaraContext();
   const [eventIdTxt, setEventTxtID] = useState('');
   const { contract } = useContract();
   const [showCreateGoalModal, setShowDonateNFTModal] = useState(false);
@@ -57,7 +55,7 @@ export default function Events() {
     wallet: '',
     logo: '',
     isOwner: true,
-    status: ""
+    status: ''
   });
 
   const mockInfo = {
@@ -104,12 +102,10 @@ export default function Events() {
 
   useEffect(() => {
     getEventID();
-    fetchData()
+    fetchData();
   }, [contract, api, router]);
 
   async function fetchData() {
-    ;
-
     if (router.query.daoId) {
       fetchContractDataFull();
     }
@@ -130,27 +126,26 @@ export default function Events() {
       if (api && EventID !== undefined && EventID !== null) {
         //Load everything-----------
 
-        let allEvents = await GetAllEvents();
-        let eventURIFull = allEvents.filter((e) => e?.eventId == eventIdTxt.toString())[0];
+        // let allEvents = await GetAllEvents();
+        // let eventURIFull = allEvents.filter((e) => e?.eventId == eventIdTxt.toString())[0];
 
-        let allNfts = await GetAllNfts();
-        let eventNFTs = allNfts.filter((e) => e.eventid == eventIdTxt.toString());
-        console.log(eventNFTs);
-        setNfts(eventNFTs);
+        // let allNfts = await GetAllNfts();
+        // let eventNFTs = allNfts.filter((e) => e.eventid == eventIdTxt.toString());
+        // console.log(eventNFTs);
+        // setNfts(eventNFTs);
 
-        let allDaos = await GetAllDaos();
-        let eventDAO = allDaos.filter((e) => e.daoId == eventURIFull.daoId)[0];
-        setEventDAOURI(eventDAO);
+        // let allDaos = await GetAllDaos();
+        // let eventDAO = allDaos.filter((e) => e.daoId == eventURIFull.daoId)[0];
+        // setEventDAOURI(eventDAO);
 
-        let user_info = await getUserInfoById(Number(eventURIFull.UserId));
-        eventURIFull.user_info = user_info;
-        eventURIFull.isOwner = eventURIFull.UserId == Number(window.userid);
+        // let user_info = await getUserInfoById(Number(eventURIFull.UserId));
+        // eventURIFull.user_info = user_info;
+        // eventURIFull.isOwner = eventURIFull.UserId == Number(window.userid);
 
-
-        setEventURI(eventURIFull);
+        // setEventURI(eventURIFull);
         setLoading(false);
       }
-    } catch (error) { }
+    } catch (error) {}
     setLoading(false);
   }
 
@@ -181,7 +176,6 @@ export default function Events() {
     const ToastId = toast.loading('Distributing NFT ...');
 
     try {
-
       // Creating Event in Smart contract
       await sendTransaction(await window.contractUnique.populateTransaction.distribute_nft_to_highest_bidder(Number(EventID)));
       toast.update(ToastId, {
@@ -193,13 +187,11 @@ export default function Events() {
         closeOnClick: true,
         draggable: true
       });
-    }
-    catch (e) {
+    } catch (e) {
       console.error(e);
     }
     setDistributing(false);
     window.location.reload();
-
   }
 
   return (
@@ -231,7 +223,7 @@ export default function Events() {
                 width={770}
                 element={
                   <h3 className="flex gap-2 whitespace-nowrap">
-                    <div>{EventURI.status == "ended"?"Ended":""}</div>
+                    <div>{EventURI.status == 'ended' ? 'Ended' : ''}</div>
                     <div>•</div>
                     <div className="flex">
                       Created by &nbsp;
@@ -244,16 +236,18 @@ export default function Events() {
               />
             </div>
             <div className="flex flex-col gap-2 absolute top-0 right-0">
-            {EventURI.status == "ended" ? <></>:<>
-            <Button iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
-                Donate NFT
-              </Button>
-              <Button iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
-                Donate Coin
-              </Button>
-            </>}
-            
-            
+              {EventURI.status == 'ended' ? (
+                <></>
+              ) : (
+                <>
+                  <Button iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
+                    Donate NFT
+                  </Button>
+                  <Button iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
+                    Donate Coin
+                  </Button>
+                </>
+              )}
             </div>
           </div>
           <div className="container">
@@ -275,20 +269,27 @@ export default function Events() {
               <div className="font-bold text-moon-20">
                 Raised {getCurrency()} {EventURI.reached} of {EventURI.Budget}
               </div>
-              {EventURI.status == "ended" ? <>
-                <div className="text-chichi text-center">Auction Ended</div>
-              </> : <>
-               {EventURI.isOwner?<>
-                <div className="text-trunks text-center">NFT donations are put up for bidding at the event</div>
-                <Button animation={isDistributing ? 'progress' : false} disabled={isDistributing} className="font-bold" onClick={distributeNFTs}>
-                  Distribute NFTs to highest bidder
-                </Button>
-                <div className="flex flex-1 flex-col justify-end text-center text-trunks text-moon-12">
-                  99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to DAOnation.
-                </div>
-               </>:<></>} 
-              </>}
-
+              {EventURI.status == 'ended' ? (
+                <>
+                  <div className="text-chichi text-center">Auction Ended</div>
+                </>
+              ) : (
+                <>
+                  {EventURI.isOwner ? (
+                    <>
+                      <div className="text-trunks text-center">NFT donations are put up for bidding at the event</div>
+                      <Button animation={isDistributing ? 'progress' : false} disabled={isDistributing} className="font-bold" onClick={distributeNFTs}>
+                        Distribute NFTs to highest bidder
+                      </Button>
+                      <div className="flex flex-1 flex-col justify-end text-center text-trunks text-moon-12">
+                        99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to DAOnation.
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              )}
             </div>
           </div>
         )}
@@ -308,4 +309,3 @@ export default function Events() {
     </>
   );
 }
-
