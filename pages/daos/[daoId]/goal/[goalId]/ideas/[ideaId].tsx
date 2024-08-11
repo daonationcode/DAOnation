@@ -6,7 +6,6 @@ import CommentBox from '../../../../../../components/components/CommentBox';
 import SlideShow from '../../../../../../components/components/Slideshow';
 import UseFormTextArea from '../../../../../../components/components/UseFormTextArea';
 import DonateCoinModal from '../../../../../../features/DonateCoinModal';
-import useContract from '../../../../../../services/useContract';
 import Image from 'next/legacy/image';
 import Loader from '../../../../../../components/components/Loader';
 import { usePolkadotContext } from '../../../../../../contexts/PolkadotContext';
@@ -34,7 +33,6 @@ export default function GrantIdeas() {
   const [loading, setLoading] = useState(false);
   const [voting, setVoting] = useState(false);
   const [commenting, setCommenting] = useState(false);
-  const { contract, signerAddress, sendTransaction, saveReadMessage } = useContract();
   const { getCurrency } = useEnvironment();
 
   const router = useRouter();
@@ -76,7 +74,7 @@ export default function GrantIdeas() {
     Goalid = router.query.goalId as string;
 
     fetchContractData();
-  }, [contract, api]);
+  }, [api]);
 
   useEffect(() => {
     DesignSlide();
@@ -86,7 +84,7 @@ export default function GrantIdeas() {
     setLoading(true);
 
     try {
-      if (contract && id != '' && Goalid != '' && api) {
+      if (id != '' && Goalid != '' && api) {
         let allIdeas = await GetAllIdeas();
         let currentIdea = allIdeas.filter((e) => e.ideasId == id)[0];
 
@@ -128,49 +126,6 @@ export default function GrantIdeas() {
         setLoading(false);
 
         let totalComments = [];
-        try {
-          // Comments and Replies
-          totalComments = await contract.getMsgIDs(id); //Getting total comments (Number) of this idea
-
-          totalComments.forEach(async (comment) => {
-            //total comments number Iteration
-            const commentId = Number(comment);
-            let commentInfo = await contract.all_messages(commentId);
-
-            const object = JSON.parse(commentInfo.message);
-            let newComment = {
-              address: object.address,
-              user_info: object?.userid != undefined ? await getUserInfoById(object?.userid) : { fullName: object.address, imgIpfs: '' },
-
-              message: object.message,
-              date: object.date,
-              id: object.id,
-              replies: []
-            };
-
-            const totalReplies = await contract.getReplyIDs(Number(commentId)); //Getting total replies (Number) of this comment
-
-            totalReplies.forEach(async (reply) => {
-              const replyId = Number(reply);
-              let replyInfo = await contract.all_replies(replyId);
-              const object = JSON.parse(replyInfo.message);
-              let newReply = {
-                id: object.id,
-                user_info: object?.userid != undefined ? await getUserInfoById(object?.userid) : { fullName: object.address, imgIpfs: '' },
-                message: object.message,
-                address: object.address,
-                date: object.date
-              };
-              newComment.replies.push(newReply);
-            });
-
-            CommentsList.push(newComment as any);
-            removeElementFromArrayBYID(emptydata, 0, setemptydata);
-          });
-          setCommentsList(CommentsList);
-        } catch (e) {
-          setCommentsList(totalComments);
-        }
       }
     } catch (error) {
       console.error(error);
@@ -228,7 +183,6 @@ export default function GrantIdeas() {
       });
     } else {
       try {
-        await sendTransaction(await window.contract.populateTransaction.create_goal_ideas_vote(goalId, ideaId, Number(window.userid), feed, shouldAdd));
         toast.update(ToastId, {
           render: 'Voted Successfully!',
           type: 'success',
@@ -268,13 +222,12 @@ export default function GrantIdeas() {
   async function PostComment(e) {
     e.preventDefault();
     setCommenting(true);
-    let messLatestId = Number(await contract._message_ids());
     let newComment = {
       userid: Number(window.userid),
       address: window?.signerAddress.toLocaleUpperCase().toString(),
       message: Comment,
       date: new Date().toISOString(),
-      id: messLatestId,
+      id: '',
       replies: [],
       user_info: {}
     };
@@ -288,21 +241,10 @@ export default function GrantIdeas() {
   }
 
   async function saveMessage(newComment) {
-    await sendTransaction(await window.contract.populateTransaction.sendMsg(ideaId, JSON.stringify(newComment), window?.signerAddress.toLocaleUpperCase(), Number(window.userid)));
     removeElementFromArrayBYID(emptydata, 0, setemptydata);
   }
 
   async function sendReply(replyText, MessageId, MessageIndex) {
-    let replyLatestId = Number(await contract._reply_ids());
-    let newReply = {
-      id: replyLatestId,
-      message: replyText,
-      userid: Number(window.userid),
-      address: window?.signerAddress.toLocaleUpperCase().toString(),
-      date: new Date().toISOString()
-    };
-    CommentsList[MessageIndex].replies.push(newReply);
-    await sendTransaction(await window.contract.populateTransaction.sendReply(Number(MessageId), JSON.stringify(newReply), ideaId, Number(window.userid)));
     removeElementFromArrayBYID(emptydata, 0, setemptydata);
   }
 

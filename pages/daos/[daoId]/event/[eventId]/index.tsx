@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { usePolkadotContext } from '../../../../../contexts/PolkadotContext';
 import DonateCoinToEventModal from '../../../../../features/DonateCoinToEventModal';
-import useContract from '../../../../../services/useContract';
 import useEnvironment from '../../../../../services/useEnvironment';
 import DonateNFTModal from '../../../../../features/DonateNFTModal';
 import Loader from '../../../../../components/components/Loader';
@@ -24,7 +23,6 @@ export default function Events() {
   const [nfts, setNfts] = useState([]);
   const { api, getUserInfoById, GetAllDaos } = usePolkadotContext();
   const [eventIdTxt, setEventTxtID] = useState('');
-  const { contract } = useContract();
   const [showCreateGoalModal, setShowDonateNFTModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
   const [showPlaceHigherBidModal, setShowPlaceHigherBidModal] = useState<NFT | null>(null);
@@ -32,7 +30,6 @@ export default function Events() {
   const [loading, setLoading] = useState(true);
   const [isDistributing, setDistributing] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
-  const { sendTransaction } = useContract();
 
   const [EventDAOURI, setEventDAOURI] = useState({} as Dao);
   const [eventType, setEventType] = useState('polkadot');
@@ -103,7 +100,7 @@ export default function Events() {
   useEffect(() => {
     getEventID();
     fetchData();
-  }, [contract, api, router]);
+  }, [api, router]);
 
   async function fetchData() {
     if (router.query.daoId) {
@@ -177,7 +174,7 @@ export default function Events() {
 
     try {
       // Creating Event in Smart contract
-      await sendTransaction(await window.contractUnique.populateTransaction.distribute_nft_to_highest_bidder(Number(EventID)));
+
       toast.update(ToastId, {
         render: 'Distributed NFTs!',
         type: 'success',

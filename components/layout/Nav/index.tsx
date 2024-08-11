@@ -1,6 +1,5 @@
 import { Avatar, Button, Dropdown, MenuItem } from '@heathmont/moon-core-tw';
 import { useEffect, useState } from 'react';
-import { getChain } from '../../../services/useContract';
 import NavItem from '../../components/NavItem';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -9,7 +8,6 @@ import { usePolkadotContext } from '../../../contexts/PolkadotContext';
 import useEnvironment from '../../../services/useEnvironment';
 import { GenericUser } from '@heathmont/moon-icons-tw';
 
-declare let window: any;
 let running = false;
 let changedPath = true;
 
@@ -17,7 +15,7 @@ export function Nav(): JSX.Element {
   const { api, userInfo } = usePolkadotContext();
   const [acc, setAcc] = useState('');
   const [logo, setLogo] = useState('');
-  const [user_id, setUser_id] = useState(-1);
+  const [user_id, setUser_id] = useState('-1');
   const [Balance, setBalance] = useState('');
   const [count, setCount] = useState(0);
   const [isSigned, setSigned] = useState(false);
@@ -28,47 +26,7 @@ export function Nav(): JSX.Element {
   const router = useRouter();
 
   async function fetchInfo() {
-    if (typeof window.ethereum === 'undefined' && typeof window.injectedWeb3 === 'undefined') {
-      running = false;
-      changedPath = false;
-      return;
-    }
-    if (window.localStorage.getItem('login-type') === 'metamask' && (await window.ethereum._metamask.isUnlocked())) {
-      if (window?.ethereum?.selectedAddress != null && api && userInfo?.fullName) {
-        try {
-          const Web3 = require('web3');
-          const web3 = new Web3(window.ethereum);
-          let Balance = await web3.eth.getBalance(window?.ethereum?.selectedAddress?.toLocaleUpperCase());
-
-          let token = ' ' + getChain(Number(window.ethereum.networkVersion)).nativeCurrency.symbol;
-
-          setCurrency(token);
-
-          setAcc(userInfo.fullName?.toString());
-          setLogo(userInfo.imgIpfs?.toString());
-          setUser_id(window.userid);
-
-          setBalance(Balance / 1e18 + token);
-
-          if (!isSigned) setSigned(true);
-
-          window.document.getElementById('withoutSign').style.display = 'none';
-          window.document.getElementById('withSign').style.display = '';
-          running = false;
-          changedPath = false;
-          return;
-        } catch (error) {
-          console.error(error);
-          running = false;
-          changedPath = false;
-          return;
-        }
-      } else {
-        running = false;
-        changedPath = false;
-        return;
-      }
-    } else if (window.localStorage.getItem('login-type') === 'polkadot') {
+    if (window.localStorage.getItem('login-type') === 'polkadot') {
       const { web3Accounts, web3Enable } = require('@polkadot/extension-dapp');
       try {
         let wallet = (await web3Accounts())[0];

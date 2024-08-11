@@ -1,6 +1,5 @@
 import ActivityCard from '../../components/components/ActivityCard';
 import { useEffect, useState } from 'react';
-import useContract from '../../services/useContract';
 import { sortDateDesc } from '../../utils/sort-date';
 import AddPostCard from '../../components/components/AddPostCard';
 import CreatePostModal from '../CreatePostModal';
@@ -14,7 +13,6 @@ const CommunityFeed = ({ communityName, daoId }) => {
   const [Items, setItems] = useState([]);
   const [avatarUrl, setAvatarUrl] = useState('');
   const [userName, setUserName] = useState('');
-  const { contract } = useContract();
   const [showPostModal, setShowPostModal] = useState(false);
   const { api, userInfo, GetAllFeeds } = usePolkadotContext();
 
@@ -54,7 +52,7 @@ const CommunityFeed = ({ communityName, daoId }) => {
 
   useEffect(() => {
     fetchContractData();
-  }, [api,daoId]);
+  }, [api, daoId]);
 
   return (
     <div className="flex flex-col gap-2 w-full items-center pb-10 min-w-[540px]">

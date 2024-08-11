@@ -2,7 +2,6 @@ import { Dropdown, MenuItem } from '@heathmont/moon-core-tw';
 import { Dao } from '../../data-model/dao';
 import { useEffect, useState } from 'react';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import useContract from '../../services/useContract';
 import { JOINED } from '../../data-model/joined';
 import { ControlsChevronDown } from '@heathmont/moon-icons-tw';
 
@@ -10,15 +9,13 @@ const CommunitySwitcher = ({ title, daoId }: { title: string; daoId: string }) =
   const { api, GetAllDaos, GetAllJoined } = usePolkadotContext();
   const [list, setList] = useState([]);
 
-  const { contract } = useContract();
-
   useEffect(() => {
     fetchContractData();
-  }, [contract, api]);
+  }, [api]);
 
   async function fetchContractData() {
     try {
-      if (contract && api) {
+      if (api) {
         let allDaos = (await GetAllDaos()) as any as Dao[];
         let allJoined = (await GetAllJoined()) as any as JOINED[];
 

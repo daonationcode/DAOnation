@@ -4,7 +4,6 @@ import { NFTStorage } from 'nft.storage';
 import { useEffect, useState } from 'react';
 import UseFormInput from '../../components/components/UseFormInput';
 import UseFormTextArea from '../../components/components/UseFormTextArea';
-import useContract from '../../services/useContract';
 import AddImageInput from '../../components/components/AddImageInput';
 import ImageListDisplay from '../../components/components/ImageListDisplay';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
@@ -17,7 +16,6 @@ let addedDate = false;
 export default function CreateGoalModal({ open, onClose, daoId }) {
   const [GoalImage, setGoalImage] = useState([]);
   const [creating, setCreating] = useState(false);
-  const { sendTransaction } = useContract();
   const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
   const { isServer } = useEnvironment();
 
@@ -144,29 +142,6 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
           onSuccess();
         });
       });
-    } else {
-      try {
-        const goalid = Number(await window.contract._goal_ids());
-        feed.goalid = 'm_' + goalid;
-
-        // Creating Goal in Smart contract
-        await sendTransaction(await window.contract.populateTransaction.create_goal(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)));
-        toast.update(ToastId, {
-          render: 'Created Successfully!',
-          type: 'success',
-          isLoading: false,
-          autoClose: 1000,
-          closeButton: true,
-          closeOnClick: true,
-          draggable: true
-        });
-        onSuccess();
-      } catch (error) {
-        setCreating(false);
-        console.error(error);
-
-        return;
-      }
     }
   }
 

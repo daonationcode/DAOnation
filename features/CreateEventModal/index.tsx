@@ -4,7 +4,6 @@ import { NFTStorage } from 'nft.storage';
 import { useEffect, useState } from 'react';
 import UseFormInput from '../../components/components/UseFormInput';
 import UseFormTextArea from '../../components/components/UseFormTextArea';
-import useContract from '../../services/useContract';
 import AddImageInput from '../../components/components/AddImageInput';
 import ImageListDisplay from '../../components/components/ImageListDisplay';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
@@ -18,7 +17,6 @@ let addedDate = false;
 export default function CreateEventModal({ open, onClose, daoId }) {
   const [EventImage, setEventImage] = useState([]);
   const [creating, setCreating] = useState(false);
-  const { sendTransaction } = useContract();
   const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
   const { isServer } = useEnvironment();
 

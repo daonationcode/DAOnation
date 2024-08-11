@@ -8,12 +8,10 @@ import Required from '../../components/components/Required';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import useContract from '../../services/useContract';
 declare let window;
 
 export default function DonateNFTModal({ open, onClose, eventName, eventid }) {
   const { userInfo, PolkadotLoggedIn } = usePolkadotContext();
-  const { sendTransaction } = useContract();
   const [RecieveType, setRecieveType] = useState('Unqiue');
 
   const [Balance, setBalance] = useState();
@@ -59,46 +57,20 @@ export default function DonateNFTModal({ open, onClose, eventName, eventid }) {
     console.log('======================>Donating NFT');
     const ToastId = toast.loading('Donating NFT ...');
 
-
-
     async function onSuccess() {
       setIsLoading(false);
       onClose({ success: true });
       window.location.reload();
     }
+
     let feed = {
       name: userInfo?.fullName,
       eventid: eventid,
-      nftid: null,
+      nftid: null
     };
-    try {
-      const nftid = Number(await window.contractUnique._nft_ids());
-      feed.nftid = 'm_' + nftid;
-
-      // Creating Event in Smart contract
-      await sendTransaction(await window.contractUnique.populateTransaction.donate_nft(eventid, name, link, description, window.selectedAddress, new Date().toLocaleDateString(), (price * 1e18).toString(), Number(window.userid), userInfo?.fullName?.toString(), JSON.stringify(feed)));
-      toast.update(ToastId, {
-        render: 'Donated Successfully!',
-        type: 'success',
-        isLoading: false,
-        autoClose: 1000,
-        closeButton: true,
-        closeOnClick: true,
-        draggable: true
-      });
-      onSuccess();
-    } catch (error) {
-      setIsLoading(false);
-      console.error(error);
-
-      return;
-    }
-
-
-
   }
 
-  async function LoadData() { }
+  async function LoadData() {}
 
   useEffect(() => {
     LoadData();
@@ -146,7 +118,6 @@ export default function DonateNFTModal({ open, onClose, eventName, eventid }) {
                 {PriceInput}
                 {price && <span className="text-moon-12 text-trunks">Equal to {price * 0.006938}$</span>}
               </div>
-              
             </div>
           </form>
 

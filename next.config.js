@@ -11,21 +11,5 @@ module.exports = withBundleAnalyzer({
         hostname: '**'
       }
     ]
-  },
-  webpack: (config) => {
-    config.resolve.fallback = {
-      http: require.resolve('stream-http'),
-      https: require.resolve('https-browserify'),
-      fs: false,
-      tls: false,
-      net: false,
-      path: false,
-      zlib: false,
-      os: false,
-      stream: require.resolve('stream-browserify'),
-      buffer: require.resolve('buffer')
-    };
-
-    return config;
   }
 });

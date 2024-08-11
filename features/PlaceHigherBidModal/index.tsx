@@ -4,20 +4,15 @@ import { ControlsClose } from '@heathmont/moon-icons-tw';
 import UseFormInput from '../../components/components/UseFormInput';
 import useEnvironment from '../../services/useEnvironment';
 import { NFT } from '../../data-model/nft';
-import { useUtilsContext } from '../../contexts/UtilsContext';
 import { toast } from 'react-toastify';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import useContract from '../../services/useContract';
 
 declare let window;
 export default function PlaceHigherBidModal({ open, onClose, item }: { open: boolean; onClose: () => void; item: NFT }) {
-  const { sendTransaction } = useContract();
-
   const { userInfo, PolkadotLoggedIn } = usePolkadotContext();
   const [BalanceAmount, setBalanceAmount] = useState(0);
   const [Coin, setCoin] = useState('UNQ');
   const [isLoading, setIsLoading] = useState(false);
-  const { switchNetworkByToken }: { switchNetworkByToken: Function } = useUtilsContext();
 
   const { getCurrency } = useEnvironment();
 
@@ -57,7 +52,7 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
           ...methodWithSignature,
           value: (Amount * 1e18).toString()
         };
-        await (await window.signer.sendTransaction(tx)).wait();
+
         toast.update(ToastId, {
           render: 'Bid Successful!',
           type: 'success',
@@ -83,10 +78,7 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
     if (currencyChanged == false && Coin == '') {
       setPolkadotVara();
     } else if (currencyChanged == true && Coin == 'VARA') {
-      switchNetworkByToken('VARA');
       setPolkadotVara();
-    } else if (Coin !== 'VARA' && Coin !== '') {
-      switchNetworkByToken('UNQ');
     }
   }
 

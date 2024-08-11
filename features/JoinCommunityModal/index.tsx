@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import useContract from '../../services/useContract';
-import { useUtilsContext } from '../../contexts/UtilsContext';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import vTokenAbi from '../../services/json/vTokenABI.json';
-import { sendTransfer } from '../../services/wormhole/useSwap';
 import { Button, IconButton, Dropdown, MenuItem, Modal } from '@heathmont/moon-core-tw';
 import { ControlsClose } from '@heathmont/moon-icons-tw';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
-import { ethers } from 'ethers';
+
 declare let window;
 
 export default function JoinCommunityModal({ SubsPrice, show, onHide, address, recieveWallet, recievetype, title, daoId }) {
@@ -17,7 +13,6 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
   const [isLoading, setisLoading] = useState(false);
   const [Amount, setAmount] = useState(0);
   const [Coin, setCoin] = useState('');
-  const { sendTransaction } = useContract();
   const router = useRouter();
 
   let alertBox = null;
@@ -26,7 +21,6 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
     token: ''
   });
 
-  const { BatchJoin, getUSDPriceForChain, switchNetworkByToken, getUSDPriceForDot }: { BatchJoin: Function; getUSDPriceForChain: Function; switchNetworkByToken: Function; getUSDPriceForDot: Function } = useUtilsContext();
   const { userInfo, PolkadotLoggedIn, userWalletPolkadot, userSigner, showToast, api } = usePolkadotContext();
 
   function ShowAlert(type = 'default', message) {
@@ -86,76 +80,22 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
           onSuccess();
         });
       });
-    } else {
-      let recipient = recievetype == 'Polkadot' ? address : recieveWallet;
-      if (Number(window.ethereum.networkVersion) === 1287) {
-        toast.update(id, {
-          render: 'Sending Batch Transaction....'
-        });
-
-        await BatchJoin(Amount, recipient, daoId, feed);
-        toast.update(id, {
-          render: 'Purchased Subscription successfully!',
-          type: 'success',
-          isLoading: false,
-          autoClose: 1000,
-          closeButton: true,
-          closeOnClick: true,
-          draggable: true
-        });
-        onSuccess();
-      } else {
-        let output = await sendTransfer(Number(window.ethereum.networkVersion), `${Number(Amount)}`, recipient, ShowAlert);
-        setTransaction({
-          link: output.transaction,
-          token: output?.wrappedAsset
-        });
-
-        // Saving Joined Person on smart contract
-        await sendTransaction(await window.contract.populateTransaction.join_community(daoId, Number(window.userid), new Date().toLocaleDateString(), feed));
-        onSuccess();
-      }
     }
   }
 
   async function LoadData(currencyChanged = false) {
     async function setPolkadot() {
-      let usdPerDot = await getUSDPriceForDot();
       setToken('DOT');
       setCoin('DOT');
-      let amount = SubsPrice / Number(usdPerDot);
-      setAmount(Number(amount.toPrecision(5)));
+
       const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
       setBalance(Number(balance.free.toString()) / 1e12);
-    }
-    async function setMetamask() {
-      const Web3 = require('web3');
-      const web3 = new Web3(window.ethereum);
-      let Balance = await web3.eth.getBalance(window?.selectedAddress);
-
-      if (Coin == 'xcvGLMR') {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-        const tokenInst = new ethers.Contract(vTokenAbi.address, vTokenAbi.abi, provider);
-
-        Balance = await tokenInst.balanceOf(window?.selectedAddress);
-      }
-
-      setBalance(Number((Balance / 1000000000000000000).toPrecision(5)));
-      let UsdEchangePrice = await getUSDPriceForChain();
-      let amount = SubsPrice / Number(UsdEchangePrice);
-      setAmount(Number(amount.toPrecision(5)));
     }
 
     if (PolkadotLoggedIn && currencyChanged == false) {
       setPolkadot();
     } else if (currencyChanged == true && Coin == 'DOT') {
-      await switchNetworkByToken(Coin);
       setPolkadot();
-    } else if (currencyChanged == true && Coin !== 'DOT') {
-      await window.ethereum.enable();
-      await switchNetworkByToken(Coin);
-      setMetamask();
     }
   }
   useEffect(() => {

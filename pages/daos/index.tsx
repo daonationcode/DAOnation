@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import DAOCard from '../../components/components/DaoCard';
 import Loader from '../../components/components/Loader';
 import EmptyState from '../../components/components/EmptyState';
-import useContract from '../../services/useContract';
 import { Button } from '@heathmont/moon-core-tw';
 import { ControlsPlus, GenericUsers } from '@heathmont/moon-icons-tw';
 import CreateDaoModal from '../../features/CreateDaoModal';
@@ -20,14 +19,12 @@ export default function DAOs() {
   const [joinedDaosList, setJoinedDaosList] = useState([]);
   const [communityToJoin, setCommunityToJoin] = useState({} as Dao);
 
-  const { contract } = useContract();
-
   useEffect(() => {
     fetchData();
-  }, [contract, api]);
+  }, [api]);
 
   async function fetchData() {
-    if (contract && api) {
+    if (api) {
       setLoading(true);
       let allDaos = await GetAllDaos();
       let allJoined = await GetAllJoined();

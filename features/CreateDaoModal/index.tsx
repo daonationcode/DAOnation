@@ -4,7 +4,6 @@ import { NFTStorage } from 'nft.storage';
 import React, { useEffect, useState } from 'react';
 import UseFormInput from '../../components/components/UseFormInput';
 import UseFormTextArea from '../../components/components/UseFormTextArea';
-import useContract from '../../services/useContract';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
 
 import AddImageInput from '../../components/components/AddImageInput';
@@ -20,7 +19,6 @@ export default function CreateDaoModal({ open, onClose }) {
   const [RecieveType, setRecieveType] = useState('EVM');
 
   const { api, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
-  const { sendTransaction, formatTemplate } = useContract();
   const { isServer } = useEnvironment();
 
   //Storage API for images and videos
@@ -147,7 +145,6 @@ export default function CreateDaoModal({ open, onClose }) {
         value: allFiles[0].url
       }
     ];
-    let formatted_template = formatTemplate(template, changings);
 
     toast.update(id, { render: 'Creating Dao...', isLoading: true });
 
@@ -159,13 +156,11 @@ export default function CreateDaoModal({ open, onClose }) {
       }, 1000);
     }
     if (PolkadotLoggedIn) {
-      await api._extrinsics.daos.createDao(userWalletPolkadot, JSON.stringify(createdObject), formatted_template).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+      await api._extrinsics.daos.createDao(userWalletPolkadot, JSON.stringify(createdObject)).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
         showToast(status, id, 'Created Successfully!', onSuccess);
       });
     } else {
       try {
-        // Creating Dao in Smart contract from metamask chain
-        await sendTransaction(await window.contract.populateTransaction.create_dao(window.signerAddress, JSON.stringify(createdObject), formatted_template, Number(window.userid)));
         await toast.update(id, {
           render: 'Created Successfully!',
           type: 'success',

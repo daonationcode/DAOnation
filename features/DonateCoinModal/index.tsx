@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import { ethers } from 'ethers';
-import { useUtilsContext } from '../../contexts/UtilsContext';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import vTokenAbi from '../../services/json/vTokenABI.json';
-import useContract, { getChain } from '../../services/useContract';
 
-import { sendTransfer } from '../../services/wormhole/useSwap';
 import { Button, Dropdown, IconButton, MenuItem, Modal } from '@heathmont/moon-core-tw';
 import { ControlsClose } from '@heathmont/moon-icons-tw';
 import UseFormInput from '../../components/components/UseFormInput';
-import { Alert } from '@mui/material';
+
 declare let window;
 
 export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide, address, recieveWallet, recievetype }) {
@@ -22,15 +17,11 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
   const [Coin, setCoin] = useState('');
   const [isLoading, setisLoading] = useState(false);
   const [isSent, setisSent] = useState(false);
-  const { sendTransaction } = useContract();
 
-  let alertBox = null;
   const [transaction, setTransaction] = useState({
     link: '',
     token: ''
   });
-
-  const { BatchDonate, switchNetworkByToken }: { BatchDonate: Function; switchNetworkByToken: Function } = useUtilsContext();
 
   const [Amount, AmountInput] = UseFormInput({
     defaultValue: '',
@@ -40,36 +31,12 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
     className: 'max-w-[140px]'
   });
 
-  function ShowAlert(type = 'default', message) {
-    const pendingAlert = alertBox.querySelector('#pendingAlert');
-    const successAlert = alertBox.querySelector('#successAlert');
-    const errorAlert = alertBox.querySelector('#errorAlert');
-
-    alertBox.style.display = 'block';
-    pendingAlert.style.display = 'none';
-    successAlert.style.display = 'none';
-    errorAlert.style.display = 'none';
-    switch (type) {
-      case 'pending':
-        pendingAlert.querySelector('.MuiAlert-message').innerText = message;
-        pendingAlert.style.display = 'flex';
-        break;
-      case 'success':
-        successAlert.querySelector('.MuiAlert-message').innerText = message;
-        successAlert.style.display = 'flex';
-        break;
-      case 'error':
-        errorAlert.querySelector('.MuiAlert-message').innerText = message;
-        errorAlert.style.display = 'flex';
-        break;
-    }
-  }
+  function ShowAlert(type = 'default', message) {}
 
   async function DonateCoinSubmission(e) {
     e.preventDefault();
     console.clear();
     setisSent(false);
-    alertBox = e.target.querySelector('#alertbox');
     setisLoading(true);
     ShowAlert('pending', 'Donating ...');
 
@@ -110,28 +77,6 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
           true
         );
       });
-    } else {
-      let recipient = recievetype == 'Polkadot' ? address : recieveWallet;
-      if (Number(window.ethereum.networkVersion) === 1287) {
-        //If it is sending from Moonbase so it will use batch precompiles
-        ShowAlert('pending', 'Sending Batch Transaction....');
-        await BatchDonate(Amount, recipient, ideasid, Coin, feed1, feed2);
-
-        ShowAlert('success', 'Donation success!');
-        onSuccess();
-      } else {
-        let output = await sendTransfer(Number(window.ethereum.networkVersion), Amount, recipient, ShowAlert);
-        setTransaction({
-          link: output.transaction,
-          token: output?.wrappedAsset
-        });
-
-        // Saving Donation count on smart contract
-        ShowAlert('pending', 'Saving information....');
-        await sendTransaction(await window.contract.populateTransaction.add_donation(ideasid, `${Amount * 1e18}`, Number(window.userid), feed1, feed2));
-        ShowAlert('success', 'Success!');
-        onSuccess();
-      }
     }
   }
 
@@ -142,35 +87,10 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
       setBalance((Number(balance.free.toString()) / 1e12).toString());
     }
 
-    async function setMetamask() {
-      const Web3 = require('web3');
-      const web3 = new Web3(window.ethereum);
-      let Balance = await web3.eth.getBalance(window?.selectedAddress);
-
-      if (Coin == 'xcvGLMR' ) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-        const tokenInst = new ethers.Contract(vTokenAbi.address, vTokenAbi.abi, provider);
-
-        Balance = await tokenInst.balanceOf(window?.selectedAddress);
-      }
-
-      setBalance((Balance / 1000000000000000000).toFixed(5));
-      setCurrentChain(getChain(Number(window.ethereum.networkVersion)).name);
-      setCurrentChainNetwork(Number(window.ethereum.networkVersion));
-      setCurrentAddress(window?.selectedAddress);
-    }
-
     if (PolkadotLoggedIn && currencyChanged == false && Coin == '') {
       setPolkadot();
     } else if (currencyChanged == true && Coin == 'DOT') {
-      await switchNetworkByToken(Coin);
       setPolkadot();
-    } else if (currencyChanged == true && Coin !== 'DOT' && Coin !== '') {
-      await switchNetworkByToken(Coin);
-      
-      await window.ethereum.enable();
-      setMetamask();
     }
   }
 
@@ -196,18 +116,6 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
           </div>
           <div className="flex flex-col gap-6 w-full max-h-[calc(90vh-162px)]">
             <form id="doanteForm" onSubmit={DonateCoinSubmission} autoComplete="off">
-              <div id="alertbox" hidden>
-                <Alert variant="filled" sx={{ my: 1 }} id="pendingAlert" severity="info">
-                  Pending....
-                </Alert>
-                <Alert variant="filled" sx={{ my: 1 }} id="successAlert" severity="success">
-                  Success....
-                </Alert>
-                <Alert variant="filled" sx={{ my: 1 }} id="errorAlert" severity="error">
-                  Error....
-                </Alert>
-              </div>
-
               <div className="flex flex-col gap-2 py-16 px-6">
                 <div className="flex items-center ">
                   <span className="font-semibold flex-1">Total</span>

@@ -6,8 +6,8 @@ import UseFormInput from '../UseFormInput';
 import { usePolkadotContext } from '../../../contexts/PolkadotContext';
 import { toast } from 'react-toastify';
 
-const LoginCard = ({ step, onConnectMetamask, onConnectPolkadot, setStep }) => {
-  const { api, deriveAcc, showToast, EasyToast } = usePolkadotContext();
+const LoginCard = ({ step, onConnectPolkadot, setStep }) => {
+  const { api, EasyToast } = usePolkadotContext();
 
   const [Email, EmailInput] = UseFormInput({
     defaultValue: '',
@@ -73,24 +73,6 @@ const LoginCard = ({ step, onConnectMetamask, onConnectPolkadot, setStep }) => {
     </Card>
   );
 
-  const ConnectMetamaskButton = () => (
-    <Card className="max-w-[480px]">
-      <div className="flex w-full flex-col gap-10">
-        <div className="flex items-center w-full justify-between">
-          <div className="rounded-moon-s-md border border-beerus p-2 mr-6 min-w-[84px]">
-            <Image height={64} width={64} src="https://metamask.io/images/metamask-logo.png" alt="" />
-          </div>
-          <div className="flex flex-col justify-between xs:flex-row xs:w-full">
-            <p className="font-bold text-moon-20 flex-1">Metamask</p>
-            <Button className="min-w-[175px] xs:min-w-0" iconLeft={<SoftwareLogin />} onClick={onConnectMetamask}>
-              Connect
-            </Button>
-          </div>
-        </div>
-      </div>
-    </Card>
-  );
-
   const ConnectPolkadotButton = () => (
     <Card className="max-w-[480px] w-full">
       <div className="flex w-full flex-col gap-10">
@@ -133,8 +115,6 @@ const LoginCard = ({ step, onConnectMetamask, onConnectPolkadot, setStep }) => {
       {step == 2 && (
         <div className="flex flex-col gap-4 w-full items-center">
           {ConnectPolkadotButton()}
-          <div>Or</div>
-          {ConnectMetamaskButton()}
           <div>Or</div>
           {ConnectVaraButton()}
         </div>

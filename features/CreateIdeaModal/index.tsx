@@ -4,7 +4,6 @@ import { NFTStorage } from 'nft.storage';
 import React, { useState, useEffect } from 'react';
 import UseFormInput from '../../components/components/UseFormInput';
 import UseFormTextArea from '../../components/components/UseFormTextArea';
-import useContract from '../../services/useContract';
 import AddImageInput from '../../components/components/AddImageInput';
 import ImageListDisplay from '../../components/components/ImageListDisplay';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
@@ -18,7 +17,6 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
   const [creating, setCreating] = useState(false);
   const [RecieveType, setRecieveType] = useState('EVM');
 
-  const { contract, sendTransaction } = useContract();
   const { userInfo, PolkadotLoggedIn, userWalletPolkadot, showToast, userSigner, api } = usePolkadotContext();
   const { isServer } = useEnvironment();
 
@@ -186,32 +184,6 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
           onSuccess();
         });
       });
-    } else {
-      try {
-        const ideasid = Number(await contract._ideas_ids());
-        feed.ideasid = 'm_' + ideasid;
-
-        // Creating Ideas in Smart contract
-        await sendTransaction(await window.contract.populateTransaction.create_ideas(JSON.stringify(createdObject), goalId, smart_contracts, Number(window.userid), JSON.stringify(feed)));
-        toast.update(ToastId, {
-          render: 'Created Successfully!',
-          type: 'success',
-          isLoading: false,
-          autoClose: 1000,
-          closeButton: true,
-          closeOnClick: true,
-          draggable: true
-        });
-        setCreating(false);
-        onClose({ success: true });
-
-        window.location.reload();
-      } catch (error) {
-        console.error(error);
-        setCreating(false);
-
-        return;
-      }
     }
   }
 

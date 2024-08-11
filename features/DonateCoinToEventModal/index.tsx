@@ -4,7 +4,6 @@ import { ControlsClose } from '@heathmont/moon-icons-tw';
 import UseFormInput from '../../components/components/UseFormInput';
 import useEnvironment from '../../services/useEnvironment';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import { useUtilsContext } from '../../contexts/UtilsContext';
 import { toast } from 'react-toastify';
 
 declare let window;
@@ -14,7 +13,6 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
   const [Coin, setCoin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { PolkadotLoggedIn, userWalletPolkadot } = usePolkadotContext();
-  const { switchNetworkByToken }: { switchNetworkByToken: Function } = useUtilsContext();
 
   const { getCurrency } = useEnvironment();
 
@@ -55,7 +53,6 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
       ...methodWithSignature,
       value: `${Amount * 1e18}`
     };
-    await (await window.signer.sendTransaction(tx)).wait();
 
     toast.update(ToastId, { render: 'Success!', isLoading: false, type: 'success' });
 
@@ -67,25 +64,10 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
       if (Coin !== 'VARA') setCoin('VARA');
     }
 
-    async function setMetamask() {
-      try {
-        const Web3 = require('web3');
-        const web3 = new Web3(window.ethereum);
-        let Balance = await web3.eth.getBalance(window?.selectedAddress);
-
-        setBalance((Balance / 1e18).toFixed(5));
-        setBalanceAmount(Number(Balance) / 1e18);
-      } catch (error) {}
-    }
-
     if (currencyChanged == false && Coin == '') {
       setPolkadotVara();
     } else if (currencyChanged == true && Coin == 'VARA') {
-      switchNetworkByToken('VARA');
       setPolkadotVara();
-    } else if (currencyChanged == true && Coin !== 'VARA' && Coin !== '') {
-      switchNetworkByToken('UNQ');
-      setMetamask();
     }
   }
   function isInvalid() {

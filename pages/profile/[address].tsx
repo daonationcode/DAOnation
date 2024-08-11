@@ -4,8 +4,7 @@ import { Avatar, Button, IconButton, Tabs } from '@heathmont/moon-core-tw';
 import { ControlsExpandAlt, FilesGeneric, SoftwareLogOut } from '@heathmont/moon-icons-tw';
 import Head from 'next/head';
 import SummaryPanel from '../../features/SummaryPanel';
-import useContract from '../../services/useContract';
-import PolkadotConfig from '../../contexts/json/polkadot-config.json' 
+import PolkadotConfig from '../../contexts/json/polkadot-config.json';
 import { useRouter } from 'next/router';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import { ProfileStats } from '../../features/SummaryPanel/Stats';
@@ -14,8 +13,6 @@ import BadgesPanel from '../../features/BadgesPanel';
 import CollectiblesPanel from '../../features/CollectiblesPanel';
 
 export default function Profile() {
-  const { contract } = useContract();
-
   const { api, getUserInfoById, GetAllDaos, GetAllIdeas, GetAllGoals, GetAllJoined, GetAllVotes, GetAllUserDonations, PolkadotLoggedIn } = usePolkadotContext();
   const [Goals, setGoals] = useState([]);
   const [Ideas, setIdeas] = useState([]);
@@ -42,13 +39,13 @@ export default function Profile() {
 
   useEffect(() => {
     fetchContractData();
-  }, [contract, api, router]);
+  }, [api, router]);
 
   async function fetchContractData() {
     let user_id = router.query.address;
     setSignerAddress(window.signerAddress);
 
-    if (!contract || !api) return false;
+    if (!api) return false;
     setLoading(true);
     if (user_id == window.userid) setLoggedUser(true);
     let user_info = (await getUserInfoById(user_id)) as any;
@@ -63,15 +60,6 @@ export default function Profile() {
 
     // let donated = Number(await contract._donated(Number(user_id))) / 1e18;
     let allBadges = UserBadges;
-
-    let total_read = 0;
-    let _message_read_ids = await contract._message_read_ids();
-    for (let i = 0; i < _message_read_ids; i++) {
-      let ReadURI = await contract.all_read_messages(i);
-      if (ReadURI.wallet == user_id) {
-        total_read += 1;
-      }
-    }
 
     let founddao = [];
     for (let i = 0; i < allDaos.length; i++) {
@@ -108,14 +96,6 @@ export default function Profile() {
     foundidea.forEach((e) => (totalDonationsRecieved += e.donation));
 
     let ideasReplied = 0;
-    let _message_ids = await window.contract._message_ids();
-    for (let i = 0; i < _message_ids; i++) {
-      let messageURI = await window.contract.all_messages(i);
-
-      if (JSON.parse(messageURI.message).userid == user_id) {
-        ideasReplied += 1;
-      }
-    }
 
     // let _reply_ids = await contract._reply_ids();
     // for (let i = 0; i < _reply_ids; i++) {

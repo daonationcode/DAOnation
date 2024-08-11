@@ -1,6 +1,5 @@
 import { Dropdown, MenuItem } from '@heathmont/moon-core-tw';
 import Card from '../../components/components/Card';
-import useContract from '../../services/useContract';
 import { useEffect, useState } from 'react';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import useEnvironment from '../../services/useEnvironment';

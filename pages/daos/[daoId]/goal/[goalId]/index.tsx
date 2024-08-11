@@ -214,7 +214,6 @@ export default function Goal() {
       });
     } else {
       try {
-        await window.sendTransaction(await window.contract.populateTransaction.create_goal_ideas_vote(goalIdTxt, ideas_id, Number(window.userid), feed, shouldAdd));
         toast.update(ToastId, {
           render: 'Voted Successfully!',
           type: 'success',

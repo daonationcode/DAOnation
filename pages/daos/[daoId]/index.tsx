@@ -13,7 +13,6 @@ import CommunityFeed from '../../../features/CommunityFeed';
 import CreateGoalModal from '../../../features/CreateGoalModal';
 import MembersTable from '../../../features/MembersTable';
 import TopCommunityMembers from '../../../features/TopCommunityMembers';
-import useContract from '../../../services/useContract';
 import CommunitySwitcher from '../../../features/CommunitySwitcher';
 import EventCard from '../../../components/components/EventCard';
 import CreateEventModal from '../../../features/CreateEventModal';
@@ -26,7 +25,6 @@ export default function DAO() {
   const [DaoURI, setDaoURI] = useState({ Title: '', Description: '', SubsPrice: null, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', allFiles: [], isOwner: false, daoId: null, user_id: null, user_info: null } as Dao);
   const [daoIdTxt, setDaoTxtID] = useState('');
   const [daoId, setDaoID] = useState(-1);
-  const { contract } = useContract();
   const [showCreateGoalModal, setShowCreateGoalModal] = useState(false);
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
@@ -50,7 +48,7 @@ export default function DAO() {
   useEffect(() => {
     getDaoID();
     fetchData();
-  }, [contract, api, router]);
+  }, [api, router]);
 
   useEffect(() => {
     (async function () {
@@ -103,9 +101,6 @@ export default function DAO() {
     setLeaving(true);
 
     try {
-      // Leaving charity in Smart contract
-      await window.sendTransaction(await window.contract.populateTransaction.leave_community(Number(JoinedID)));
-
       router.push('/joined');
 
       setLeaving(false);
@@ -163,13 +158,6 @@ export default function DAO() {
           let template_html = (await api._query.daos.templateById(daoId)).toString();
           updateDaoData(daoURI, template_html);
         } catch (e) {}
-      }
-      if (contract && daoType == 'metamask') {
-        //Load everything-----------
-        const daoURI = await contract.dao_uri(Number(daoId)); //Getting dao URI
-        const template_html = await contract._template_uris(daoId);
-
-        updateDaoData(daoURI, template_html);
       }
     }
 

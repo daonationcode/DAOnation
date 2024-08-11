@@ -6,7 +6,6 @@ import Loader from '../../components/components/Loader';
 import DAOCard from '../../components/components/DaoCard';
 import EmptyState from '../../components/components/EmptyState';
 import CreateDaoModal from '../../features/CreateDaoModal';
-import useContract from '../../services/useContract';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import { Dao } from '../../data-model/dao';
 import { useRouter } from 'next/router';
@@ -19,18 +18,17 @@ export const Joined = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateDaoModal, setShowCreateDaoModal] = useState(false);
 
-  const { contract } = useContract();
   const router = useRouter();
 
   useEffect(() => {
     fetchContractData();
-  }, [contract, api]);
+  }, [api]);
 
   async function fetchContractData() {
     setLoading(true);
 
     try {
-      if (contract && api) {
+      if (api) {
         let allDaos = (await GetAllDaos()) as any as Dao[];
         let allJoined = (await GetAllJoined()) as any as JOINED[];
 
