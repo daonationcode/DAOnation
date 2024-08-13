@@ -6,14 +6,12 @@
     "dev": "next dev -p 3001",
     "build": "npm run css:build && next build",
     "start": "next start",
-    "lint": "next lint",
-    "css:watch": "npx tailwindcss -i ./styles/globals.css -o ./public/output.css -w",
-    "css:build": "npx tailwindcss -i ./styles/globals.css -o ./public/output.css"
+    "lint": "next lint"
   },
   "dependencies": {
     "@heathmont/moon-core-tw": "10.16.0",
     "@heathmont/moon-icons-tw": "9.29.3",
-    "@heathmont/moon-table-tw": "10.13.4",
+    "@heathmont/moon-table-tw": "^10.13.4",
     "@heathmont/moon-themes-tw": "10.15.0",
     "@polkadot/api": "10.13.1",
     "@polkadot/extension-dapp": "0.46.5",
@@ -29,7 +27,6 @@
     "validator": "13.11.0"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "14.2.2",
     "@types/node": "20.14.14",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",

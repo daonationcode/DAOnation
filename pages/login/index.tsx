@@ -21,6 +21,10 @@ export default function Login() {
   }, [hasMetamask, hasPolkadot, isConnected, router]); // Dependency array
 
   const setConnectionStatus = () => {
+    if (window.injectedWeb3) {
+      setHasPolkadot(true);
+    }
+
     if (window.localStorage.getItem('login-type') === 'polkadot') {
       setIsConnected(true);
     } else {

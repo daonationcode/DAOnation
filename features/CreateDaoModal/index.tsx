@@ -11,12 +11,15 @@ import ImageListDisplay from '../../components/components/ImageListDisplay';
 import { toast } from 'react-toastify';
 import Required from '../../components/components/Required';
 import useEnvironment from '../../services/useEnvironment';
+import ColorPicker from '../../components/components/ColorPicker';
 
 let addedDate = false;
 export default function CreateDaoModal({ open, onClose }) {
   const [DaoImage, setDaoImage] = useState([]);
   const [creating, setCreating] = useState(false);
-  const [RecieveType, setRecieveType] = useState('EVM');
+  const [RecieveType, setRecieveType] = useState('DOT');
+  const [brandingColor, setBrandingColor] = useState('');
+  const [charityLogo, setCharityLogo] = useState([] as any[]);
 
   const { api, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
   const { isServer } = useEnvironment();
@@ -38,6 +41,13 @@ export default function CreateDaoModal({ open, onClose }) {
     placeholder: 'Add Description',
     id: '',
     rows: 4
+  });
+
+  const [CustomUrl, CustomUrlInput] = UseFormInput({
+    defaultValue: '',
+    type: 'text',
+    placeholder: 'your-custom',
+    id: ''
   });
 
   const [StartDate, StartDateInput, setStartDate] = UseFormInput({
@@ -181,7 +191,7 @@ export default function CreateDaoModal({ open, onClose }) {
     }
   }
 
-  function FilehandleChange(dao) {
+  function logoHandleChange(dao) {
     var allNames = [];
     for (let index = 0; index < dao.target.files.length; index++) {
       const element = dao.target.files[index].name;
@@ -193,15 +203,15 @@ export default function CreateDaoModal({ open, onClose }) {
   }
 
   function isInvalid() {
-    return !(DaoTitle && DaoDescription && RecieveWallet && StartDate && SubsPrice && DaoImage.length > 0);
+    return !(DaoTitle && DaoDescription && RecieveWallet && StartDate && SubsPrice && brandingColor);
   }
 
-  function AddBTNClick() {
-    var DaoImagePic = document.getElementById('DaoImage');
-    DaoImagePic.click();
+  function addLogo() {
+    const charityLogo = document.getElementById('charityLogo') as HTMLElement;
+    charityLogo.click();
   }
 
-  function DeleteSelectedImages(idImage) {
+  function deleteSelectedLogoImages(idImage) {
     var newImages = [];
     var allUploadedImages = document.getElementsByName('deleteBTN');
     for (let index = 0; index < DaoImage.length; index++) {
@@ -218,13 +228,13 @@ export default function CreateDaoModal({ open, onClose }) {
   return (
     <Modal open={open} onClose={onClose}>
       <Modal.Backdrop />
-      <Modal.Panel className="bg-gohan absolute top-0 left-0 w-screen h-screen max-h-none max-w-none sm:relative sm:h-auto sm:w-[90%] sm:max-w-[600px] sm:max-h-[95vh] rounded-none sm:rounded-xl">
-        <div className="flex items-center justify-center flex-col">
+      <Modal.Panel className="bg-gohan max-w-none w-screen h-screen absolute left-0 sm:relative sm:h-auto sm:w-[90%] sm:max-w-[600px] sm:max-h-[90vh] !rounded-none sm:!rounded-xl">
+        <div className={`flex items-center justify-center flex-col`}>
           <div className="flex justify-between items-center w-full border-b border-beerus py-4 px-6">
-            {<h1 className="text-moon-20 font-semibold">Create charity</h1>}
-            <IconButton className="text-trunks" variant="ghost" icon={<ControlsClose />} onClick={onClose} />
+            <h1 className="text-moon-20 font-semibold">Create charity</h1>
+            <IconButton className="text-trunks" variant="ghost" icon={<ControlsClose />} onClick={() => onClose()} />
           </div>
-          <div className="flex flex-col gap-6 w-full p-6 max-h-[calc(100vh-170px)] sm:max-h-[calc(90vh-162px)] overflow-auto">
+          <div className="flex flex-col gap-6 w-full p-6  max-h-[calc(95vh-220px)] overflow-auto">
             <div className="flex flex-col gap-2">
               <h6>
                 Charity name
@@ -235,47 +245,69 @@ export default function CreateDaoModal({ open, onClose }) {
 
             <div className="flex flex-col gap-2">
               <h6>
-                Description
+                Your custom URL
                 <Required />
               </h6>
-              {DaoDescriptionInput}
+              <div className="flex gap-4 w-full items-center">
+                <span className="flex-1">{CustomUrlInput}</span>
+                <span className="flex-1">.daonation.org</span>
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <h6>
-                Recipeint
-                <Required />
-              </h6>
-              {RecieveWalletInput}
-            </div>
-            <div className="flex flex-col gap-2">
-              <h6>
-                Start Date
-                <Required />
-              </h6>
-              {StartDateInput}
+
+            <div className="flex gap-8 w-full">
+              <div className="flex flex-col gap-2 w-full">
+                <h6>
+                  Subscription Price
+                  <Required />
+                </h6>
+                {SubsPriceInput}
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
               <h6>
-                Monthly subscription in USD
+                Your charity logo
                 <Required />
               </h6>
-              {SubsPriceInput}
+              <div className="content-start flex flex-row flex-wrap gap-4 justify-start overflow-auto relative text-center text-white w-full">
+                <input className="file-input" hidden onChange={logoHandleChange} accept="image/*" id="charityLogo" name="charityLogo" type="file" />
+                <div className="flex flex-col">
+                  {charityLogo.length < 1 && <AddImageInput onClick={addLogo} />}
+                  <ImageListDisplay images={charityLogo} onDeleteImage={deleteSelectedLogoImages} />
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
+              <h6>
+                Your charity color
+                <Required />
+              </h6>
+              <ColorPicker brandingColor={brandingColor} setBrandingColor={setBrandingColor} />
+            </div>
+
+            {/* <div className="flex gap-8 w-full">
+              <div className="flex-1">
+                <h6>
+                  Start Date
+                  <Required />
+                </h6>
+                {StartDateInput}
+              </div>
+            </div> */}
+            {/* <div className="flex flex-col gap-2">
               <h6>
                 Image
                 <Required />
               </h6>
-              <div className="flex gap-4">
-                <input className="file-input" hidden onChange={FilehandleChange} accept="image/*" id="DaoImage" name="DaoImage" type="file" />
+              <div className="content-start flex flex-row flex-wrap gap-4 justify-start overflow-auto relative text-center text-white w-full">
+                <input className="file-input" hidden onChange={filehandleChange} accept="image/*" id="communityImage" name="communityImage" type="file" />
                 <div className="flex flex-col">
-                  {DaoImage.length < 1 && <AddImageInput onClick={AddBTNClick} />}
-                  <ImageListDisplay images={DaoImage} onDeleteImage={DeleteSelectedImages} />
+                  {communityImage.length < 1 && <AddImageInput onClick={addImage} />}
+                  <ImageListDisplay images={communityImage} onDeleteImage={deleteSelectedImages} />
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="flex flex-col gap-1">
               <h6>Vote power distribution</h6>
               <div className="flex gap-8">
@@ -299,15 +331,16 @@ export default function CreateDaoModal({ open, onClose }) {
               </div>
             </div>
           </div>
-          <div className="flex gap-3 justify-between border-t border-beerus w-full p-6">
-            <Button variant="ghost" onClick={onClose} className="flex-1 h-12 sm:h-10 sm:flex-none">
-              Cancel
-            </Button>
-            <Button className="flex-1 h-12 sm:h-10 sm:flex-none" animation={creating ? 'progress' : false} disabled={creating || isInvalid()} onClick={createDao}>
-              <ControlsPlus className="text-moon-24" />
-              Create <span className="hidden ">Charity</span>
-            </Button>
-          </div>
+        </div>
+
+        <div className="flex justify-between border-t border-beerus w-full p-6 gap-4 absolute sm:relative bottom-0">
+          <Button variant="ghost" onClick={() => onClose()} className="flex-1 sm:flex-none">
+            Cancel
+          </Button>
+          <Button className="flex-1 sm:flex-none" animation={creating ? 'progress' : false} disabled={creating || isInvalid()} onClick={createDao}>
+            <ControlsPlus className="text-moon-24" />
+            Create charity
+          </Button>
         </div>
       </Modal.Panel>
     </Modal>
