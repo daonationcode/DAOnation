@@ -1,6 +1,7 @@
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import {IPFSProvider} from '../contexts/IPFSContext';
 import { PolkadotProvider } from '../contexts/PolkadotContext';
 import { EnvironmentProvider } from '../contexts/EnvironmentContext';
 import Header from '../components/layout/Header';
@@ -11,13 +12,16 @@ import '../public/theme.css';
 
 function MyApp({ Component, pageProps }) {
   return (
-    <PolkadotProvider>
+    <IPFSProvider>
+  <PolkadotProvider>
       <EnvironmentProvider>
         <Header />
         <Component {...pageProps} />
         <ToastContainer hideProgressBar={false} position="top-right" autoClose={3000} newestOnTop={false} closeOnClick rtl={false} draggable pauseOnHover theme="light" />
       </EnvironmentProvider>
     </PolkadotProvider>
+    </IPFSProvider>
+  
   );
 }
 

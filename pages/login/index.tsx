@@ -1,31 +1,68 @@
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import LoginCard from '../../components/components/LoginCard';
 import { useRouter } from 'next/router';
 
+import Onboard, { WalletState } from "@subwallet-connect/core";
+import injectedModule from "@subwallet-connect/injected-wallets";
+import subwalletPolkadotModule from '@subwallet-connect/subwallet-polkadot';
+import { ProviderLabel, WalletFilters } from '@subwallet-connect/injected-wallets/dist/types';
+import {ApiPromise, WsProvider} from "@polkadot/api";
+import { getWalletBySource } from '@subwallet/wallet-connect/dotsama/wallets';
+import { Chain } from '@subwallet-connect/common';
+
+
+
+// Initialize the provider
+const filter:WalletFilters = {
+  "Polkadot{.js}":true,
+  "Detected Wallet":false,
+  "MetaMask":false,
+
+}
+const injected = injectedModule({filter:filter});
+const subWalletP = subwalletPolkadotModule();
+const polkadotInfo:Chain = {
+  "namespace": "substrate",
+  "id": "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+  "label": "Polkadot",
+  "token": "DOT",
+  "decimal": 10,
+  "rpcUrl": "wss://daonation.snapminds.dev"
+};
+
+const onboard = Onboard({
+  wallets: [ injected, subWalletP],
+  chains: [  
+  ],
+  
+  chainsPolkadot: [
+    polkadotInfo
+  ],
+});
+
 export default function Login() {
   const [isConnected, setIsConnected] = useState(false);
-  const [hasMetamask, setHasMetamask] = useState(false);
-  const [hasPolkadot, setHasPolkadot] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(2);
+
+  const [wallets, setWallets] = useState<WalletState[]>([]);
+
+  
+
 
   const router = useRouter();
   useEffect(() => {
     setConnectionStatus();
   }, []);
 
-  useEffect(() => {
-    if ((hasMetamask || hasPolkadot) && isConnected) {
-      window.location.href = '/joined';
-    }
-  }, [hasMetamask, hasPolkadot, isConnected, router]); // Dependency array
+  // useEffect(() => {
+  //   if ((hasMetamask || hasPolkadot) && isConnected) {
+  //     window.location.href = '/joined';
+  //   }
+  // }, [hasMetamask, hasPolkadot, isConnected, router]); // Dependency array
 
   const setConnectionStatus = () => {
-    if (window.injectedWeb3) {
-      setHasPolkadot(true);
-    }
-
-    if (window.localStorage.getItem('login-type') === 'polkadot') {
+    if (window.localStorage.getItem('loggedin') === 'true') {
       setIsConnected(true);
     } else {
       setIsConnected(false);
@@ -33,16 +70,11 @@ export default function Login() {
   };
 
   async function onConnectPolkadot() {
-    if (!hasPolkadot) {
-      window.open('https://chromewebstore.google.com/detail/polkadot%7Bjs%7D-extension/mopnmbcafieddcagagdcbnhejhlodfdd', '_blank');
-      return;
-    }
-    const { web3Enable } = require('@polkadot/extension-dapp');
-    await web3Enable('DAOnation');
+   let walletList =  await onboard.connectWallet();
+   console.log(walletList);
     window.localStorage.setItem('loggedin', 'true');
-    window.localStorage.setItem('login-type', 'polkadot');
     setIsConnected(true);
-    setHasPolkadot(true);
+    // setHasPolkadot(true);
   }
 
   return (

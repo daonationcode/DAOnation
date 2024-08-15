@@ -6,6 +6,7 @@ import Card from '../../components/components/Card';
 import { Avatar, Button, IconButton } from '@heathmont/moon-core-tw';
 import { useState } from 'react';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
+import { useIPFSContext } from '../../contexts/IPFSContext';
 import { toast } from 'react-toastify';
 import validator from 'validator';
 import Required from '../../components/components/Required';
@@ -13,8 +14,7 @@ import { useRouter } from 'next/router';
 
 export default function Register() {
   const { api, deriveAcc, showToast } = usePolkadotContext();
-  const NFT_STORAGE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDJDMDBFOGEzZEEwNzA5ZkI5MUQ1MDVmNDVGNUUwY0Q4YUYyRTMwN0MiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY1NDQ3MTgxOTY2NSwibmFtZSI6IlplbmNvbiJ9.6znEiSkiLKZX-a9q-CKvr4x7HS675EDdaXP622VmYs8';
-  const client = new NFTStorage({ token: NFT_STORAGE_TOKEN });
+ const {UploadBlob} = useIPFSContext();
   const router = useRouter();
 
   //Input fields
@@ -53,8 +53,7 @@ export default function Register() {
 
   async function registerAccount() {
     const id = toast.loading('Uploading IPFS ...');
-    const metadata = image.type ? await client.storeBlob(image) : '';
-
+    const metadata = image.type ? await UploadBlob(image) : '';
     toast.update(id, { render: 'Registering User...', isLoading: true });
 
     const doAfter = () => {
