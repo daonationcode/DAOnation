@@ -5,6 +5,8 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import polkadotConfig from './json/polkadot-config.json';
 import { toast } from 'react-toastify';
 
+import { useConnectWallet, useNotifications, useSetChain } from "@subwallet-connect/react";
+
 const AppContext = createContext({
   api: null,
   deriveAcc: null,
@@ -33,6 +35,8 @@ export function PolkadotProvider({ children }) {
   const [userInfo, setUserInfo] = useState({});
   const [userWalletPolkadot, setUserWalletPolkadot] = useState('');
   const [userSigner, setUserSigner] = useState('');
+  const [{ wallet},] = useConnectWallet();
+
 
   async function showToast(status, IdOrShowAlert, FinalizedText, doAfter, callToastSuccess = true, events, ShowToast = false) {
     if (status.isInBlock) {
@@ -88,19 +92,21 @@ export function PolkadotProvider({ children }) {
   }
 
   async function updateCurrentUser() {
-    const { web3Enable, web3Accounts, web3FromAddress } = require('@polkadot/extension-dapp');
 
-    setPolkadotLoggedIn(true);
-    await web3Enable('DAOnation');
-    let wallet = (await web3Accounts())[0];
-    const injector = await web3FromAddress(wallet.address);
+    if (wallet?.accounts){
+      
+      setUserWalletPolkadot(wallet.accounts[0].address);
+      window.signerAddress = wallet.accounts[0].address;
+      setPolkadotLoggedIn(true);
+  
+      setUserSigner(wallet.signer);
+    }
 
-    setUserSigner(injector.signer);
-
-    setUserWalletPolkadot(wallet.address);
-    window.signerAddress = wallet.address;
   }
 
+  useEffect(()=>{
+    updateCurrentUser();
+  },[wallet])
   useEffect(() => {
     (async function () {
       try {
@@ -120,9 +126,7 @@ export function PolkadotProvider({ children }) {
           const userInformation = await _api.query.users.userById(userid);
           setUserInfo(userInformation);
 
-          if (window.localStorage.getItem('login-type') == 'polkadot') {
-            updateCurrentUser();
-          }
+        
         }
         console.log('Done');
       } catch (e) { }

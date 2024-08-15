@@ -12,7 +12,7 @@ let running = false;
 let changedPath = true;
 
 export function Nav(): JSX.Element {
-  const { api, userInfo } = usePolkadotContext();
+  const { api, userInfo,userWalletPolkadot } = usePolkadotContext();
   const [acc, setAcc] = useState('');
   const [logo, setLogo] = useState('');
   const [user_id, setUser_id] = useState('-1');
@@ -26,12 +26,10 @@ export function Nav(): JSX.Element {
   const router = useRouter();
 
   async function fetchInfo() {
-    if (window.localStorage.getItem('login-type') === 'polkadot') {
-      const { web3Accounts, web3Enable } = require('@polkadot/extension-dapp');
+    if (window.localStorage.getItem('loggedin') === 'true') {
       try {
-        let wallet = (await web3Accounts())[0];
-        if (wallet && api && userInfo?.fullName) {
-          const { nonce, data: balance } = await api.query.system.account(wallet.address);
+        if (userWalletPolkadot && api && userInfo?.fullName) {
+          const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
 
           setCurrency('DOT');
 
@@ -58,13 +56,7 @@ export function Nav(): JSX.Element {
         return;
       }
     } else {
-      setSigned(false);
-      window.document.getElementById('withoutSign').style.display = '';
-      window.document.getElementById('withSign').style.display = 'none';
-
-      window.localStorage.setItem('loggedin', '');
-      window.localStorage.setItem('login-type', '');
-
+  
       if (location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register') {
         window.location.href = '/';
       }

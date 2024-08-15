@@ -6,7 +6,7 @@ import UseFormInput from '../UseFormInput';
 import { usePolkadotContext } from '../../../contexts/PolkadotContext';
 import { toast } from 'react-toastify';
 
-const LoginCard = ({ step, onConnectPolkadot, setStep }) => {
+const LoginCard = ({ step, onConnectPolkadot,isConnected, setStep }) => {
   const { api, EasyToast } = usePolkadotContext();
 
   const [Email, EmailInput] = UseFormInput({
