@@ -139,11 +139,7 @@ export default function Profile() {
   }
 
   function goToFaucet() {
-    if (localStorage.getItem('login-type') === 'polkadot') {
-      window.open(`https://polkadot.js.org/apps/?rpc=${PolkadotConfig.chain_rpc}#/accounts`, '_ blank');
-    } else if (localStorage.getItem('login-type') == 'metamask') {
-      window.open('https://faucet.moonbeam.network/', '_ blank');
-    }
+    window.open(`https://polkadot.js.org/apps/?rpc=${PolkadotConfig.chain_rpc}#/accounts`, '_ blank');
   }
 
   function logout() {
