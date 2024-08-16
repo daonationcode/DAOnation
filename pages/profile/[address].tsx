@@ -144,7 +144,6 @@ export default function Profile() {
 
   function logout() {
     window.localStorage.setItem('loggedin', '');
-    window.localStorage.setItem('login-type', '');
     window.location.href = '/';
   }
 

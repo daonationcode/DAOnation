@@ -9,7 +9,7 @@ export default function Welcome() {
   const router = useRouter();
 
   useEffect(() => {
-    if (localStorage.getItem('loggedin') && localStorage.getItem('login-type')) {
+    if (localStorage.getItem('loggedin') == 'true') {
       router.push('/joined');
     }
   }, [router]);
