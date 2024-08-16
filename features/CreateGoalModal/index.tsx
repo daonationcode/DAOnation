@@ -132,7 +132,11 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
     }
     if (PolkadotLoggedIn) {
       let goalid = Number(await api._query.goals.goalIds());
-      feed.goalid = 'p_' + goalid;
+      feed.goalid = goalid;
+      console.log(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed))
+      console.log(JSON.stringify(feed), 'goal', new Date().valueOf())
+
+      return;
       const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {

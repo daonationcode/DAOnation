@@ -57,7 +57,7 @@ export function Nav(): JSX.Element {
       }
     } else {
   
-      if (location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register') {
+      if (location.pathname !== '/' && location.pathname !== '/add-data' && location.pathname !== '/login' && location.pathname !== '/register') {
         window.location.href = '/';
       }
     }

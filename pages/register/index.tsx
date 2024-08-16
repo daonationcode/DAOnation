@@ -52,9 +52,9 @@ export default function Register() {
   }
 
   async function registerAccount() {
-    const id = toast.loading('Uploading IPFS ...');
+    const ToastId = toast.loading('Uploading IPFS ...');
     const metadata = image.type ? await UploadBlob(image) : '';
-    toast.update(id, { render: 'Registering User...', isLoading: true });
+    toast.update(ToastId, { render: 'Registering User...', isLoading: true });
 
     const doAfter = () => {
       setTimeout(() => {
@@ -62,7 +62,7 @@ export default function Register() {
       }, 1000);
     };
     await api._extrinsics.users.registerUser(Fullname, Email, Password, metadata).signAndSend(deriveAcc, ({ status }) => {
-      showToast(status, id, 'Registered Successfully!', doAfter);
+      showToast(status, ToastId, 'Registered Successfully!', doAfter);
     });
   }
 

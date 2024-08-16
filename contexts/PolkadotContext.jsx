@@ -15,7 +15,7 @@ const AppContext = createContext({
   userWalletPolkadot: '',
   userSigner: null,
   PolkadotLoggedIn: false,
-  EasyToast: (message, type, UpdateType = false, ToastId = '') => { },
+  EasyToast: (message, type, UpdateType = false, ToastId = '',isLoading=false) => { },
   GetAllDaos: async () => [],
   GetAllJoined: async () => [],
   GetAllGoals: async () => [],
@@ -78,12 +78,12 @@ export function PolkadotProvider({ children }) {
       return {};
     }
   }
-  async function EasyToast(message, type, UpdateType = false, ToastId = '') {
+  async function EasyToast(message, type, UpdateType = false, ToastId = '',isLoading = false) {
     if (UpdateType) {
       toast.update(ToastId, {
         render: message,
         type: type,
-        isLoading: false,
+        isLoading: isLoading,
         autoClose: 1000,
         closeButton: true,
         closeOnClick: true,
@@ -141,26 +141,22 @@ export function PolkadotProvider({ children }) {
   let allIdeas = [];
   let allDaos = [];
 
-  async function InsertData(totalDAOCount, allDAOs, prefix) {
+  async function InsertData(totalDAOCount, allDAOs) {
     const arr = [];
     for (let i = 0; i < totalDAOCount; i++) {
       let object = '';
       let originalwallet = '';
-      if (prefix == 'm_') {
-        object = JSON.parse(allDAOs[i]);
-      } else {
-        if (allDAOs[i]?.daoUri) {
+    
+      if (allDAOs[i]?.daoUri) {
           object = JSON.parse(allDAOs[i].daoUri?.toString());
           originalwallet = allDAOs[i].daoWallet?.toString();
         }
-      }
-
       if (object) {
         let user_info = await getUserInfoById(object.properties?.user_id?.description);
         arr.push({
           //Pushing all data into array
           id: i,
-          daoId: prefix + i,
+          daoId: Number(i),
           Title: object.properties.Title.description,
           Start_Date: object.properties.Start_Date.description,
           user_info: user_info,
@@ -168,7 +164,7 @@ export function PolkadotProvider({ children }) {
           logo: object.properties.logo.description?.url,
           wallet:originalwallet,
           recievewallet:  object.properties.wallet.description,
-          recievetype: prefix == 'm_' ? 'Polkadot' : 'EVM',
+          recievetype: 'Polkadot',
           SubsPrice: object.properties?.SubsPrice?.description,
           Created_Date: object.properties?.Created_Date?.description,
         });
@@ -193,29 +189,16 @@ export function PolkadotProvider({ children }) {
           return arr;
         };
 
-        let arr = InsertData(totalDAOCount, await totalDao(), 'p_');
+        let arr = InsertData(totalDAOCount, await totalDao());
         return arr;
       }
     } catch (error) { }
     return [];
   }
-  async function fetchContractDAOData() {
-    //Fetching data from Smart contract
-    try {
-      if (window.contract) {
-        const totalDao = await window.contract.get_all_daos(); //Getting total dao (Number)
-        let totalDAOCount = Object.keys(totalDao).length;
-        let arr = InsertData(totalDAOCount, totalDao, 'm_');
-        return arr;
-      }
-    } catch (error) { }
 
-    return [];
-  }
   async function GetAllDaos() {
     let arr = [];
     arr = arr.concat(await fetchPolkadotDAOData());
-    arr = arr.concat(await fetchContractDAOData());
     return arr;
   }
 
@@ -254,47 +237,24 @@ export function PolkadotProvider({ children }) {
     } catch (error) { console.error(error) }
     return [];
   }
-  async function fetchContractJoinedData() {
-    //Fetching data from Smart contract
-    try {
-      if (window.contract) {
-        const totalJoined = await contract._join_ids();
 
-        const arr = [];
-        for (let i = 0; i < Number(totalJoined); i++) {
-          const joined_dao = await contract._joined_person(i);
-          arr.push(joined_dao);
-        }
-
-        return arr;
-      }
-    } catch (error) { }
-
-    return [];
-  }
   async function GetAllJoined() {
     let arr = [];
     arr = arr.concat(await fetchPolkadotJoinedData());
-    arr = arr.concat(await fetchContractJoinedData());
     return arr;
   }
 
 
-  async function InsertGoalData(totalGoalCount, allGoals, prefix) {
+  async function InsertGoalData(totalGoalCount, allGoals) {
     const arr = [];
     for (let i = 0; i < totalGoalCount; i++) {
       let object = '';
-      let daoId = "";
-      if (prefix == 'm_') {
-        object = JSON.parse(allGoals[i].goal_uri);
-        daoId = allGoals[i].dao_id;
-      } else {
-        if (allGoals[i]?.goalUri) {
+      let daoId = -1;
+       if (allGoals[i]?.goalUri) {
           object = JSON.parse(allGoals[i].goalUri?.toString());
-          daoId = allGoals[i].daoId.toString();
+          daoId =Number(allGoals[i].daoId);
         }
-      }
-      let goalId = prefix + i;
+      let goalId = Number(i);
 
       let reached = 0;
       let currentGoalIdeas = allIdeas.filter((e) => e.goalId == goalId)
@@ -317,7 +277,7 @@ export function PolkadotProvider({ children }) {
           wallet: object.properties.wallet.description,
           UserId: object.properties?.user_id?.description,
           logo: object.properties.logo.description?.url,
-          type: prefix == 'm_' ? 'Polkadot' : 'EVM',
+          type: 'Polkadot',
           ideasCount: currentGoalIdeas.length,
           reached: reached,
         });
@@ -342,38 +302,17 @@ export function PolkadotProvider({ children }) {
           return arr;
         };
 
-        let arr = InsertGoalData(totalGoalCount, await totalGoal(), 'p_');
+        let arr = InsertGoalData(totalGoalCount, await totalGoal());
         return arr;
       }
     } catch (error) { }
     return [];
   }
-  async function fetchContractGoalData() {
-    //Fetching data from Smart contract
-    try {
-      if (window.contract) {
-        const totalGoalCount = Number(await contract._goal_ids());
-        let totalGoal = async () => {
-          const arr = [];
-          for (let i = 0; i < Number(totalGoalCount); i++) {
-            const goal_info = await contract._goal_uris(i);
-            arr.push(goal_info);
-          }
-          return arr;
-        }
-        let arr = InsertGoalData(totalGoalCount, await totalGoal(), 'm_');
-        return arr;
 
-      }
-    } catch (error) { }
-
-    return [];
-  }
   async function GetAllGoals() {
     allIdeas = await GetAllIdeas();
     let arr = [];
     arr = arr.concat(await fetchPolkadotGoalData());
-    arr = arr.concat(await fetchContractGoalData());
     return arr;
   }
   async function fetchPolkadotFeedsData() {
@@ -398,54 +337,26 @@ export function PolkadotProvider({ children }) {
     } catch (error) { console.error(error) }
     return [];
   }
-  async function fetchContractFeedsData() {
-    //Fetching data from Smart contract
-    try {
-      if (window.contract) {
-        const totalFeeds = await contract._feed_ids();
 
-        const arr = [];
-        for (let i = 0; i < Number(totalFeeds); i++) {
-          const feed = await contract._feeds(i);
-          let newElm = {
-            id: i,
-            date: Date(Number(feed.date)),
-            type: feed.Type,
-            data: JSON.parse(feed.data)
-          }
-          arr.push(newElm);
-        }
-
-        return arr;
-      }
-    } catch (error) { }
-
-    return [];
-  }
   async function GetAllFeeds() {
     let arr = [];
     arr = arr.concat(await fetchPolkadotFeedsData());
-    arr = arr.concat(await fetchContractFeedsData());
     return arr;
   }
 
 
 
-  async function InsertIdeaData(totalIdeaCount, allIdeas, prefix) {
+  async function InsertIdeaData(totalIdeaCount, allIdeas) {
     const arr = [];
     for (let i = 0; i < totalIdeaCount; i++) {
       let object = '';
-      let goalId = "";
-      if (prefix == 'm_') {
-        object = JSON.parse(allIdeas[i].ideas_uri);
-        goalId = allIdeas[i].goal_id;
-      } else {
-        if (allIdeas[i]?.ideasUri) {
-          object = JSON.parse(allIdeas[i].ideasUri?.toString());
-          goalId = allIdeas[i].goalId.toString();
-        }
+      let goalId = -1;
+      if (allIdeas[i]?.ideasUri) {
+        object = JSON.parse(allIdeas[i].ideasUri?.toString());
+        goalId = Number(allIdeas[i].goalId);
       }
-      let ideasId = prefix + i;
+
+      let ideasId = Number(i);
 
       let isvoted = false;
       let currentIdeasVotes = allVotes.filter((e) => e.ideasId == ideasId)
@@ -472,7 +383,7 @@ export function PolkadotProvider({ children }) {
           Title: object.properties.Title.description,
           Description: object.properties.Description.description,
           wallet: object.properties.wallet.description,
-          recievetype: prefix == 'm_' ? 'Polkadot' : 'EVM',
+          recievetype: 'Polkadot',
           logo: object.properties.logo.description?.url,
           user_id: Number(object.properties.user_id.description),
           allfiles: object.properties.allFiles,
@@ -481,7 +392,7 @@ export function PolkadotProvider({ children }) {
           isVoted: isvoted,
           isOwner: object.properties.user_id.description == Number(window.userid) ? true : false,
 
-          type: prefix == 'm_' ? 'Polkadot' : 'EVM',
+          type: 'Polkadot',
         });
       }
     }
@@ -504,40 +415,19 @@ export function PolkadotProvider({ children }) {
           return arr;
         };
 
-        let arr = InsertIdeaData(totalIdeaCount, await totalIdea(), 'p_');
+        let arr = InsertIdeaData(totalIdeaCount, await totalIdea());
         return arr;
       }
     } catch (error) { }
     return [];
   }
-  async function fetchContractIdeaData() {
-    //Fetching data from Smart contract
-    try {
-      if (window.contract) {
-        const totalIdeaCount = Number(await contract._ideas_ids());
-        let totalIdea = async () => {
-          const arr = [];
-          for (let i = 0; i < Number(totalIdeaCount); i++) {
-            const idea_info = await contract._ideas_uris(i);
-            arr.push(idea_info);
-          }
-          return arr;
-        }
-        let arr = InsertIdeaData(totalIdeaCount, await totalIdea(), 'm_');
-        return arr;
-
-      }
-    } catch (error) { }
-
-    return [];
-  }
+ 
   async function GetAllIdeas() {
     allVotes = await GetAllVotes();
     allDonations = await GetAllDonations();
 
     let arr = [];
     arr = arr.concat(await fetchPolkadotIdeaData());
-    arr = arr.concat(await fetchContractIdeaData());
     return arr;
   }
 
@@ -564,35 +454,11 @@ export function PolkadotProvider({ children }) {
     } catch (error) { console.error(error) }
     return [];
   }
-  async function fetchContractVotesData() {
-    //Fetching data from Smart contract
-    try {
-      if (window.contract) {
-        const totalVotes = await contract._ideas_vote_ids();
-
-        const arr = [];
-        for (let i = 0; i < Number(totalVotes); i++) {
-          const ideas_vote = await contract.all_goal_ideas_votes(i);
-          let newElm = {
-            id: i.toString(),
-            goalId: ideas_vote.goal_id.toString(),
-            ideasId: ideas_vote.ideas_id.toString(),
-            user_id: (ideas_vote.user_id).toString(),
-          };
-          arr.push(newElm);
-        }
-
-        return arr;
-      }
-    } catch (error) { }
-
-    return [];
-  }
+  
   async function GetAllVotes() {
 
     let arr = [];
     arr = arr.concat(await fetchPolkadotVotesData());
-    arr = arr.concat(await fetchContractVotesData());
     return arr;
   }
 
@@ -618,35 +484,11 @@ export function PolkadotProvider({ children }) {
     } catch (error) { console.error(error) }
     return [];
   }
-  async function fetchContractDonationsData() {
-    //Fetching data from Smart contract
-    try {
-      if (window.contract) {
-        const totalDonations = await contract._donations_ids();
-
-        const arr = [];
-        for (let i = 0; i < Number(totalDonations); i++) {
-          const ideas_donation = await contract._donations(i);
-          let newElm = {
-            id: i.toString(),
-            ideasId: ideas_donation.ideas_id.toString(),
-            userid: ideas_donation.userid.toString(),
-            donation: Number(ideas_donation.donation) / 1e18,
-          };
-          arr.push(newElm);
-        }
-
-        return arr;
-      }
-    } catch (error) { }
-
-    return [];
-  }
+ 
   async function GetAllDonations() {
 
     let arr = [];
     arr = arr.concat(await fetchPolkadotDonationsData());
-    arr = arr.concat(await fetchContractDonationsData());
     return arr;
   }
 

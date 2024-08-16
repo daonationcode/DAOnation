@@ -155,30 +155,11 @@ export default function CreateDaoModal({ open, onClose }) {
         window.location.reload();
       }, 1000);
     }
-
     if (PolkadotLoggedIn) {
       await api._extrinsics.daos.createDao(userWalletPolkadot, JSON.stringify(createdObject), {}).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
         showToast(status, toastId, 'Created Successfully!', onSuccess);
       });
-    } else {
-      try {
-        await toast.update(toastId, {
-          render: 'Created Successfully!',
-          type: 'success',
-          isLoading: false,
-          autoClose: 1000,
-          closeButton: true,
-          closeOnClick: true,
-          draggable: true
-        });
-
-        onSuccess();
-      } catch (error) {
-        console.error(error);
-        setCreating(false);
-
-        return;
-      }
+    
     }
   }
 

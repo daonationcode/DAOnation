@@ -1,5 +1,5 @@
 export interface Dao {
-  daoId: string;
+  daoId: number;
   Title: string;
   Start_Date: string;
   logo: string;

@@ -41,8 +41,6 @@ export default function Goal() {
   const [tabIndex, setTabIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isJoined, setIsJoined] = useState(false);
-  const [goalIdTxt, setGoalTxtID] = useState('');
-  const [goalType, setGoalType] = useState('polkadot');
   const [GoalDAOURI, setGoalDAOURI] = useState({} as Dao);
 
   const [showCreateIdeaModal, setShowCreateIdeaModal] = useState(false);
@@ -62,7 +60,7 @@ export default function Goal() {
 
   useEffect(() => {
     fetchContractData();
-  }, [api, goalIdTxt]);
+  }, [api, goalId]);
 
   function getGoalID() {
     const goalIdParam = router.query.goalId as string;
@@ -70,14 +68,7 @@ export default function Goal() {
     if (!goalIdParam) {
       return;
     }
-
-    const split = goalIdParam.split('_');
-    const type = goalIdParam.startsWith('m_') ? 'metamask' : 'polkadot';
-    const id = split[1];
-
-    setGoalType(type);
-    setGoalID(Number(id));
-    setGoalTxtID(goalIdParam);
+    setGoalID(Number(goalIdParam));
   }
 
   async function fetchContractData() {
@@ -86,7 +77,7 @@ export default function Goal() {
     try {
       if (goalId != -1 && api) {
         let allGoals = await GetAllGoals();
-        let goalURIFull = allGoals.filter((e) => e?.goalId == goalIdTxt.toString())[0];
+        let goalURIFull = allGoals.filter((e) => e?.goalId == goalId.toString())[0];
 
         let allDaos = await GetAllDaos();
         let goalDAO = allDaos.filter((e) => e.daoId == goalURIFull.daoId)[0];
@@ -107,7 +98,7 @@ export default function Goal() {
         // let totalIdeas = totalIdeasWithEmpty.filter((e) => e !== '');
         let arr = [];
         let allIdeas = await GetAllIdeas();
-        let GoalIdeas = allIdeas.filter((e) => e.goalId.toString() == goalIdTxt.toString());
+        let GoalIdeas = allIdeas.filter((e) => e.goalId.toString() == goalId.toString());
         arr = GoalIdeas;
         // let total_donated = 0;
         // for (let i = 0; i < Object.keys(totalIdeas).length; i++) {
@@ -202,7 +193,7 @@ export default function Goal() {
       window.location.reload();
     }
     if (PolkadotLoggedIn) {
-      const txs = [api._extrinsics.ideas.createVote(goalIdTxt, ideas_id, window.userid)];
+      const txs = [api._extrinsics.ideas.createVote(goalId, ideas_id, window.userid)];
       if (shouldAdd) {
         txs.push(api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'vote', new Date().valueOf()));
       }
@@ -347,7 +338,7 @@ export default function Goal() {
           </div>
         )}
       </div>
-      <CreateIdeaModal show={showCreateIdeaModal} onClose={closeCreateIdeaModal} goalId={goalIdTxt} daoId={GoalURI.daoId} goalTitle={GoalURI.Title} />
+      <CreateIdeaModal show={showCreateIdeaModal} onClose={closeCreateIdeaModal} goalId={goalId} daoId={GoalURI.daoId} goalTitle={GoalURI.Title} />
       <DonateCoinModal recievetype="" ideasid={selectedIdeasId} daoId={router.query.daoId} goalURI={GoalURI} show={DonatemodalShow} onHide={closeDonateModal} address={selectedIdeasWallet} recieveWallet={selectedIdeasRecieveWallet} />
     </>
   );

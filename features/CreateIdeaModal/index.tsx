@@ -98,7 +98,10 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
 
     if (PolkadotLoggedIn) {
       let ideasId = Number(await api._query.ideas.ideasIds());
-      feed.ideasid = 'p_' + ideasId;
+      feed.ideasid = ideasId;
+      console.log(JSON.stringify(createdObject), goalId, daoId, window.userid, JSON.stringify(feed));
+
+      return;
       const txs = [api._extrinsics.ideas.createIdeas(JSON.stringify(createdObject), goalId, daoId, window.userid, JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'idea', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {

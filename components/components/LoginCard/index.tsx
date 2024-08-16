@@ -91,6 +91,24 @@ const LoginCard = ({ step, onConnectPolkadot,isConnected, setStep }) => {
     </Card>
   );
 
+  const ConnectSubWalletButton = () => (
+    <Card className="max-w-[480px] w-full">
+      <div className="flex w-full flex-col gap-10">
+        <div className="flex items-center w-full justify-between">
+          <div className="rounded-moon-s-md border border-beerus p-2 mr-6 min-w-[84px]">
+            <Image height={64} width={64} src="/images/subwallet.webp" alt="" />
+          </div>
+          <div className="flex flex-col justify-between xs:flex-row xs:w-full">
+            <p className="font-bold text-moon-20 flex-1">Subwallet</p>
+            <Button className="min-w-[175px] xs:min-w-0" iconLeft={<SoftwareLogin />} onClick={onConnectPolkadot}>
+              Connect
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+
 
   return (
     <>
@@ -98,6 +116,8 @@ const LoginCard = ({ step, onConnectPolkadot,isConnected, setStep }) => {
       {step == 2 && (
         <div className="flex flex-col gap-4 w-full items-center">
           {ConnectPolkadotButton()}
+          {"Or"}
+          {ConnectSubWalletButton()}
         </div>
       )}
     </>

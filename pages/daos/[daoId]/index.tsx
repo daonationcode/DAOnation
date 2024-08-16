@@ -23,7 +23,7 @@ export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
   const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals } = usePolkadotContext();
   const [DaoURI, setDaoURI] = useState({ Title: '', Description: '', SubsPrice: null, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', allFiles: [], isOwner: false, daoId: null, user_id: null, user_info: null } as Dao);
-  const [daoIdTxt, setDaoTxtID] = useState('');
+
   const [daoId, setDaoID] = useState(-1);
   const [showCreateGoalModal, setShowCreateGoalModal] = useState(false);
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
@@ -36,7 +36,6 @@ export default function DAO() {
   const [loading, setLoading] = useState(true);
   const [aboutTemplate, setAboutTemplate] = useState('');
   const [tabIndex, setTabIndex] = useState(0);
-  const [daoType, setDaoType] = useState('polkadot');
   const [communityMembers, setCommunityMembers] = useState([]);
   const [AuctionEvents, setAuctionEvents] = useState([]);
   const [SelectedEventName, setSelectedEventName] = useState('Event');
@@ -48,7 +47,7 @@ export default function DAO() {
   useEffect(() => {
     getDaoID();
     fetchData();
-  }, [api, router]);
+  }, [api, router,daoId]);
 
   useEffect(() => {
     (async function () {
@@ -87,14 +86,7 @@ export default function DAO() {
     if (!daoIdParam) {
       return;
     }
-
-    const split = daoIdParam.split('_');
-    const type = daoIdParam.startsWith('m_') ? 'metamask' : 'polkadot';
-    const id = split[1];
-
-    setDaoType(type);
-    setDaoID(Number(id));
-    setDaoTxtID(daoIdParam);
+   setDaoID(Number(daoIdParam));
   }
 
   async function leaveCommunity() {
@@ -116,7 +108,7 @@ export default function DAO() {
     let user_info = await getUserInfoById(daoURI.properties?.user_id?.description);
 
     let allJoined = await GetAllJoined();
-    let currentJoined = allJoined.filter((e) => e?.daoId == daoIdTxt.toString());
+    let currentJoined = allJoined.filter((e) => e?.daoId == daoId.toString());
     let joinedInfo = currentJoined.filter((e) => e?.user_id.toString() == window.userid.toString());
 
     if (joinedInfo.length > 0) {
@@ -151,7 +143,7 @@ export default function DAO() {
 
     if (daoId !== undefined && daoId !== null && api && daoId != -1) {
       //Fetching data from Parachain
-      if (api && daoType == 'polkadot') {
+      if (api) {
         try {
           const element = await api._query.daos.daoById(Number(daoId));
           let daoURI = element['__internal__raw'].daoUri.toString();
@@ -172,7 +164,7 @@ export default function DAO() {
 
         let allGoals = await GetAllGoals();
 
-        let currentGoals = allGoals.filter((e) => e?.daoId == daoIdTxt.toString());
+        let currentGoals = allGoals.filter((e) => e?.daoId == daoId.toString());
 
         const arr = [];
         for (let i = 0; i < currentGoals.length; i++) {
@@ -192,7 +184,7 @@ export default function DAO() {
         setGoalsList(arr.reverse());
 
         // let allEvents = await GetAllEvents();
-        // let currentEvents = allEvents.filter((e) => e?.daoId == daoIdTxt.toString());
+        // let currentEvents = allEvents.filter((e) => e?.daoId == daoId.toString());
 
         let eventArr = [];
         // for (let i = 0; i < currentEvents.length; i++) {
@@ -257,7 +249,7 @@ export default function DAO() {
           <div className="container flex w-full justify-between relative">
             <div className="flex flex-col gap-1">
               <h5 className="font-semibold">Charity</h5>
-              <CommunitySwitcher title={DaoURI.Title} daoId={daoIdTxt} />
+              <CommunitySwitcher title={DaoURI.Title} daoId={daoId} />
               <h3 className="flex gap-2 whitespace-nowrap">
                 <div className="flex">
                   Managed by &nbsp;
@@ -290,7 +282,7 @@ export default function DAO() {
                   </Button>
                 )}
                 {isOwner && (
-                  <Link href={`/DesignDao?[${daoIdTxt}]`}>
+                  <Link href={`/DesignDao?[${daoId}]`}>
                     <Button iconLeft={<GenericEdit />} variant="secondary" className="w-full">
                       Edit
                     </Button>
@@ -318,7 +310,7 @@ export default function DAO() {
         </div>
         {tabIndex === 0 && (
           <div className="container flex gap-6">
-            <CommunityFeed communityName={DaoURI.Title} daoId={daoIdTxt} /> <TopCommunityMembers goals={goalsList} allJoined={communityMembers} daoId={daoIdTxt} />
+            <CommunityFeed communityName={DaoURI.Title} daoId={daoId} /> <TopCommunityMembers goals={goalsList} allJoined={communityMembers} daoId={daoId} />
           </div>
         )}
         {tabIndex === 1 && <div className="template-container mt-[-2rem] w-full"></div>}
@@ -339,8 +331,8 @@ export default function DAO() {
         )}
       </div>
 
-      <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} daoId={daoIdTxt} />
-      <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={daoIdTxt} />
+      <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} daoId={daoId} />
+      <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={daoId} />
       <DonateCoinToEventModal open={!!showDonateCoinModal} onClose={() => setShowDonateCoinModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} recieveWallet={SelectedEventRecieveWallet} />
       <DonateNFTModal open={!!showDonateNftModal} onClose={() => setShowDonateNFTModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} />
     </>

@@ -5,7 +5,7 @@ import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import { JOINED } from '../../data-model/joined';
 import { ControlsChevronDown } from '@heathmont/moon-icons-tw';
 
-const CommunitySwitcher = ({ title, daoId }: { title: string; daoId: string }) => {
+const CommunitySwitcher = ({ title, daoId }: { title: string; daoId: Number }) => {
   const { api, GetAllDaos, GetAllJoined } = usePolkadotContext();
   const [list, setList] = useState([]);
 

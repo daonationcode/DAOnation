@@ -23,7 +23,7 @@ const polkadotInfo:Chain = {
   "id": "9ce87712b99b3eb57396cc8621db8900ac983c712236f48fb70ad28760be3f6a",
   "label": "Polkadot",
   "token": "DOT",
-  "decimal": 10,
+  "decimal": 12,
   "rpcUrl": PolkadtConfig.chain_rpc
 };
 

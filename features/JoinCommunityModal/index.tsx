@@ -23,41 +23,14 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
 
   const { userInfo, PolkadotLoggedIn, userWalletPolkadot, userSigner, showToast, api } = usePolkadotContext();
 
-  function ShowAlert(type = 'default', message) {
-    alertBox = document.querySelector('[name=alertbox]');
-
-    const pendingAlert = alertBox.children['pendingAlert'];
-    const successAlert = alertBox.children['successAlert'];
-    const errorAlert = alertBox.children['errorAlert'];
-
-    alertBox.style.display = 'block';
-    pendingAlert.style.display = 'none';
-    successAlert.style.display = 'none';
-    errorAlert.style.display = 'none';
-    switch (type) {
-      case 'pending':
-        pendingAlert.querySelector('.MuiAlert-message').innerText = message;
-        pendingAlert.style.display = 'flex';
-        break;
-      case 'success':
-        successAlert.querySelector('.MuiAlert-message').innerText = message;
-        successAlert.style.display = 'flex';
-        break;
-      case 'error':
-        errorAlert.querySelector('.MuiAlert-message').innerText = message;
-        errorAlert.style.display = 'flex';
-        break;
-    }
-  }
 
   async function JoinSubmission(e) {
     e.preventDefault();
     console.clear();
 
-    const daoIdNumber = Number(daoId.split('_')[1]);
 
     setisLoading(true);
-    const id = toast.loading('Joining charity ...');
+    const ToastId = toast.loading('Joining charity ...');
     let feed = JSON.stringify({
       daoId: daoId,
       name: userInfo?.fullName?.toString()
@@ -69,14 +42,14 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
       onHide({ success: true });
     }
     if (Coin == 'DOT') {
-      toast.update(id, {
+      toast.update(ToastId, {
         render: 'Joining charity....'
       });
       let recipient = recievetype == 'Polkadot' ? recieveWallet : address;
       const txs = [api.tx.balances.transferAllowDeath(recipient, `${Amount * 1e12}`), api._extrinsics.daos.joinCommunity(daoId, Number(window.userid), new Date().toLocaleDateString(), feed), api._extrinsics.feeds.addFeed(feed, 'join', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
-        showToast(status, id, 'Joined successfully!', () => {
+        showToast(status, ToastId, 'Joined successfully!', () => {
           onSuccess();
         });
       });
@@ -141,24 +114,10 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
                 <Dropdown value={Coin} onChange={setCoin}>
                   <Dropdown.Select placeholder={'Select a Currency'}>{Coin}</Dropdown.Select>
                   <Dropdown.Options className="bg-gohan w-48 min-w-0 w-full">
-                    <Dropdown.Option value="DOT">
-                      <MenuItem>DOT</MenuItem>
+                    <Dropdown.Option  value="DOT">
+                      <MenuItem >DOT</MenuItem>
                     </Dropdown.Option>
-                    <Dropdown.Option value="DEV">
-                      <MenuItem>DEV</MenuItem>
-                    </Dropdown.Option>
-                    <Dropdown.Option value="xcvGLMR">
-                      <MenuItem>xcvGLMR</MenuItem>
-                    </Dropdown.Option>
-                    <Dropdown.Option value="tBNB">
-                      <MenuItem>BNB</MenuItem>
-                    </Dropdown.Option>
-                    <Dropdown.Option value="CELO">
-                      <MenuItem>CELO</MenuItem>
-                    </Dropdown.Option>
-                    <Dropdown.Option value="GoerliETH">
-                      <MenuItem>ETH</MenuItem>
-                    </Dropdown.Option>
+                    
                   </Dropdown.Options>
                 </Dropdown>
               </div>

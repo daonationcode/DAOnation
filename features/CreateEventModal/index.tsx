@@ -169,7 +169,7 @@ export default function CreateEventModal({ open, onClose, daoId }) {
       }, 1000);
     }
 
-    await api._extrinsics.events.createEvent(userWalletPolkadot, JSON.stringify(createdObject), JSON.stringify(feed), JSON.stringify(feed)).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+    await api._extrinsics.events.createEvent(JSON.stringify(createdObject),(daoId), userWalletPolkadot,  JSON.stringify(feed), JSON.stringify(feed)).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
       showToast(status, ToastId, 'Created Successfully!', onSuccess);
     });
   }
