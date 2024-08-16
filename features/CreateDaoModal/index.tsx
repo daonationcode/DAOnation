@@ -1,32 +1,26 @@
 import { Button, IconButton, Modal } from '@heathmont/moon-core-tw';
 import { ControlsClose, ControlsPlus } from '@heathmont/moon-icons-tw';
-import { NFTStorage } from 'nft.storage';
 import React, { useEffect, useState } from 'react';
 import UseFormInput from '../../components/components/UseFormInput';
 import UseFormTextArea from '../../components/components/UseFormTextArea';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
+import { useIPFSContext } from '../../contexts/IPFSContext';
 
 import AddImageInput from '../../components/components/AddImageInput';
 import ImageListDisplay from '../../components/components/ImageListDisplay';
 import { toast } from 'react-toastify';
 import Required from '../../components/components/Required';
-import useEnvironment from '../../services/useEnvironment';
 import ColorPicker from '../../components/components/ColorPicker';
 
 let addedDate = false;
 export default function CreateDaoModal({ open, onClose }) {
   const [DaoImage, setDaoImage] = useState([]);
   const [creating, setCreating] = useState(false);
-  const [RecieveType, setRecieveType] = useState('DOT');
   const [brandingColor, setBrandingColor] = useState('');
-  const [charityLogo, setCharityLogo] = useState([] as any[]);
 
   const { api, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
-  const { isServer } = useEnvironment();
 
-  //Storage API for images and videos
-  const NFT_STORAGE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDJDMDBFOGEzZEEwNzA5ZkI5MUQ1MDVmNDVGNUUwY0Q4YUYyRTMwN0MiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY1NDQ3MTgxOTY2NSwibmFtZSI6IlplbmNvbiJ9.6znEiSkiLKZX-a9q-CKvr4x7HS675EDdaXP622VmYs8';
-  const client = new NFTStorage({ token: NFT_STORAGE_TOKEN });
+  const { UploadBlob } = useIPFSContext();
 
   //Input fields
   const [DaoTitle, DaoTitleInput] = UseFormInput({
@@ -59,7 +53,7 @@ export default function CreateDaoModal({ open, onClose }) {
   const [RecieveWallet, RecieveWalletInput, setRecieveWallet] = UseFormInput({
     defaultValue: '',
     type: 'text',
-    placeholder: `Wallet Address (${RecieveType})`,
+    placeholder: `Wallet Address (Polkadot)`,
     id: 'recipient'
   });
 
@@ -72,11 +66,7 @@ export default function CreateDaoModal({ open, onClose }) {
 
   useEffect(() => {
     let dateTime = new Date();
-    if (!PolkadotLoggedIn) {
-      setRecieveType('Polkadot');
-    } else {
-      setRecieveType('EVM');
-    }
+
     if (!addedDate) setStartDate(dateTime.toISOString().split('T')[0]);
   }, [PolkadotLoggedIn]);
 
@@ -89,12 +79,12 @@ export default function CreateDaoModal({ open, onClose }) {
     for (let index = 0; index < DaoImage.length; index++) {
       //Gathering all files link
       const element = DaoImage[index];
-      const metadata = await client.storeBlob(element);
-      const urlImageDao = {
-        url: 'https://' + metadata + '.ipfs.nftstorage.link',
+      const url = element.type ? await UploadBlob(element) : '';
+      const image = {
+        url,
         type: element.type
       };
-      allFiles.push(urlImageDao);
+      allFiles.push(image);
     }
 
     //Creating an object of all information to store in EVM
@@ -108,11 +98,11 @@ export default function CreateDaoModal({ open, onClose }) {
         },
         Description: {
           type: 'string',
-          description: DaoDescription
+          description: 'Here goes the DAO description'
         },
         Start_Date: {
           type: 'string',
-          description: StartDate
+          description: new Date().toLocaleDateString()
         },
         logo: {
           type: 'string',
@@ -120,7 +110,7 @@ export default function CreateDaoModal({ open, onClose }) {
         },
         wallet: {
           type: 'string',
-          description: RecieveWallet
+          description: '5EEeMmY9B37Zwio7Q9t9EizBK5bCX9VgKRSA49zZB8zjsuXd'
         },
         user_id: {
           type: 'string',
@@ -143,18 +133,18 @@ export default function CreateDaoModal({ open, onClose }) {
     };
     console.log('======================>Creating Dao');
 
-    var template = await (await fetch(`/template/template.html`)).text();
+    // var template = await (await fetch(`/template/template.html`)).text();
 
-    let changings = [
-      {
-        key: 'dao-title',
-        value: DaoTitle
-      },
-      {
-        key: 'dao-image',
-        value: allFiles[0].url
-      }
-    ];
+    // let changings = [
+    //   {
+    //     key: 'dao-title',
+    //     value: DaoTitle
+    //   },
+    //   {
+    //     key: 'dao-image',
+    //     value: allFiles[0].url
+    //   }
+    // ];
 
     toast.update(id, { render: 'Creating Dao...', isLoading: true });
 
@@ -165,8 +155,9 @@ export default function CreateDaoModal({ open, onClose }) {
         window.location.reload();
       }, 1000);
     }
+
     if (PolkadotLoggedIn) {
-      await api._extrinsics.daos.createDao(userWalletPolkadot, JSON.stringify(createdObject)).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+      await api._extrinsics.daos.createDao(userWalletPolkadot, JSON.stringify(createdObject), {}).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
         showToast(status, id, 'Created Successfully!', onSuccess);
       });
     } else {
@@ -203,7 +194,7 @@ export default function CreateDaoModal({ open, onClose }) {
   }
 
   function isInvalid() {
-    return !(DaoTitle && DaoDescription && RecieveWallet && StartDate && SubsPrice && brandingColor);
+    return !(DaoTitle && SubsPrice);
   }
 
   function addLogo() {
@@ -272,8 +263,8 @@ export default function CreateDaoModal({ open, onClose }) {
               <div className="content-start flex flex-row flex-wrap gap-4 justify-start overflow-auto relative text-center text-white w-full">
                 <input className="file-input" hidden onChange={logoHandleChange} accept="image/*" id="charityLogo" name="charityLogo" type="file" />
                 <div className="flex flex-col">
-                  {charityLogo.length < 1 && <AddImageInput onClick={addLogo} />}
-                  <ImageListDisplay images={charityLogo} onDeleteImage={deleteSelectedLogoImages} />
+                  {DaoImage.length < 1 && <AddImageInput onClick={addLogo} />}
+                  <ImageListDisplay images={DaoImage} onDeleteImage={deleteSelectedLogoImages} />
                 </div>
               </div>
             </div>

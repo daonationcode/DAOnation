@@ -1,7 +1,6 @@
 import { Button, IconButton, Modal } from '@heathmont/moon-core-tw';
 import { ControlsClose, ControlsPlus } from '@heathmont/moon-icons-tw';
-import { NFTStorage } from 'nft.storage';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import UseFormInput from '../../components/components/UseFormInput';
 import UseFormTextArea from '../../components/components/UseFormTextArea';
 import AddImageInput from '../../components/components/AddImageInput';
@@ -11,28 +10,17 @@ import Required from '../../components/components/Required';
 
 import { toast } from 'react-toastify';
 import useEnvironment from '../../services/useEnvironment';
+import { useIPFSContext } from '../../contexts/IPFSContext';
 
 export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitle }) {
-  const [IdeasImage, setIdeasImage] = useState([]);
-  const [creating, setCreating] = useState(false);
-  const [RecieveType, setRecieveType] = useState('EVM');
+  const [ideaImage, setIdeaImage] = useState([]);
+  const [isCreating, setIsCreating] = useState(false);
 
   const { userInfo, PolkadotLoggedIn, userWalletPolkadot, showToast, userSigner, api } = usePolkadotContext();
+  const { UploadBlob } = useIPFSContext();
   const { isServer } = useEnvironment();
 
-  useEffect(() => {
-    if (!PolkadotLoggedIn) {
-      setRecieveType('Polkadot');
-    } else {
-      setRecieveType('EVM');
-    }
-  }, [PolkadotLoggedIn]);
-
   if (isServer()) return null;
-
-  //Storage API for images and videos
-  const NFT_STORAGE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDJDMDBFOGEzZEEwNzA5ZkI5MUQ1MDVmNDVGNUUwY0Q4YUYyRTMwN0MiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY1NDQ3MTgxOTY2NSwibmFtZSI6IlplbmNvbiJ9.6znEiSkiLKZX-a9q-CKvr4x7HS675EDdaXP622VmYs8';
-  const client = new NFTStorage({ token: NFT_STORAGE_TOKEN });
 
   //Input fields
   const [IdeasTitle, IdeasTitleInput] = UseFormInput({
@@ -42,18 +30,6 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
     id: ''
   });
 
-  const [RecieveWallet, RecieveWalletInput, setRecieveWallet] = UseFormInput({
-    defaultValue: '',
-    type: 'text',
-    placeholder: `Wallet Address (${RecieveType})`,
-    id: 'recipient'
-  });
-  const [Referenda, ReferendaInput] = UseFormInput({
-    defaultValue: '',
-    type: 'text',
-    placeholder: 'Referenda ID',
-    id: ''
-  });
   const [IdeasDescription, IdeasDescriptionInput] = UseFormTextArea({
     defaultValue: '',
     placeholder: 'Ideas Description',
@@ -61,55 +37,20 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
     rows: 4
   });
 
-  const [Qoutation1, Qoutation1Input] = UseFormInput({
-    defaultValue: '',
-    type: 'text',
-    placeholder: 'Give link to quotation ',
-    id: 'qoutation1'
-  });
-  const [Qoutation2, Qoutation2Input] = UseFormInput({
-    defaultValue: '',
-    type: 'text',
-    placeholder: 'Give total prize of the quatation',
-    id: 'qoutation2'
-  });
-
-  let StructureLeft = {
-    0: 'Representatives Berlin',
-    1: 'Community',
-    2: 'Children'
-  };
-  let StructureRight = {
-    0: '20%',
-    1: '70%',
-    2: '10%'
-  };
-
-  //Function after clicking Create Ideas Button
-  async function createIdeas() {
+  async function create() {
     const ToastId = toast.loading('Uploading IPFS ...');
-    setCreating(true);
+    setIsCreating(true);
 
-    var CreateIdeasBTN = document.getElementById('CreateIdeasBTN') as HTMLButtonElement;
-    CreateIdeasBTN.disabled = true;
     let allFiles = [];
-    for (let index = 0; index < IdeasImage.length; index++) {
-      //Gathering all files link
-      const element = IdeasImage[index];
-      const metadata = await client.storeBlob(element);
-      const urlImageIdeas = {
-        url: 'https://' + metadata + '.ipfs.nftstorage.link',
+    for (let index = 0; index < ideaImage.length; index++) {
+      const element = ideaImage[index];
+      const url = element.type ? await UploadBlob(element) : '';
+      const image = {
+        url,
         type: element.type
       };
-      allFiles.push(urlImageIdeas);
+      allFiles.push(image);
     }
-
-    var smart_contracts = [
-      JSON.stringify({
-        link: Qoutation1,
-        prize: Qoutation2
-      })
-    ];
 
     //Creating an object of all information to store in EVM
     const createdObject = {
@@ -124,29 +65,9 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
           type: 'string',
           description: IdeasDescription
         },
-        Referenda: {
-          type: 'number',
-          description: Number(Referenda)
-        },
-        StructureLeft: {
-          type: 'string',
-          description: Object.values(StructureLeft)
-        },
-        StructureRight: {
-          type: 'string',
-          description: Object.values(StructureRight)
-        },
-        Qoutation: {
-          link: Qoutation1,
-          prize: Qoutation2
-        },
         wallet: {
           type: 'string',
           description: window.signerAddress
-        },
-        recieve_wallet: {
-          type: 'string',
-          description: RecieveWallet
         },
         user_id: {
           type: 'string',
@@ -170,10 +91,11 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
     };
 
     async function onSuccess() {
-      setCreating(false);
+      setIsCreating(false);
       onClose({ success: true });
       window.location.reload();
     }
+
     if (PolkadotLoggedIn) {
       let ideasId = Number(await api._query.ideas.ideasIds());
       feed.ideasid = 'p_' + ideasId;
@@ -187,19 +109,7 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
     }
   }
 
-  function CreateIdeasBTN() {
-    return (
-      <>
-        <div className="flex gap-4 justify-end">
-          <Button id="CreateIdeasBTN" animation={creating ? 'progress' : false} disabled={creating || isInvalid()} onClick={createIdeas}>
-            <ControlsPlus className="text-moon-24" />
-            Create idea
-          </Button>
-        </div>
-      </>
-    );
-  }
-  function FilehandleChange(ideas) {
+  function filehandleChange(ideas) {
     // If user uploaded images/videos
     var allNames = [];
     for (let index = 0; index < ideas.target.files.length; index++) {
@@ -207,7 +117,7 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
       allNames.push(element);
     }
     for (let index2 = 0; index2 < ideas.target.files.length; index2++) {
-      setIdeasImage((pre) => [...pre, ideas.target.files[index2]]);
+      setIdeaImage((pre) => [...pre, ideas.target.files[index2]]);
     }
   }
 
@@ -220,34 +130,33 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
 
   CheckTransaction();
 
-  function AddBTNClick(ideas) {
-    //Clicking on +(Add) Function
-    var IdeasImagePic = document.getElementById('IdeasImage');
+  function addImage() {
+    var IdeasImagePic = document.getElementById('ideaImage');
     IdeasImagePic.click();
   }
 
-  function DeleteSelectedImages(idImage) {
+  function deleteSelectedImages(idImage) {
     var newImages = [];
     var allUploadedImages = document.getElementsByName('deleteBTN');
-    for (let index = 0; index < IdeasImage.length; index++) {
+    for (let index = 0; index < ideaImage.length; index++) {
       if (index != idImage) {
         const elementDeleteBTN = allUploadedImages[index];
         elementDeleteBTN.setAttribute('id', newImages.length.toString());
-        const element = IdeasImage[index];
+        const element = ideaImage[index];
         newImages.push(element);
       }
     }
-    setIdeasImage(newImages);
+    setIdeaImage(newImages);
   }
 
   function isInvalid() {
-    return !(IdeasTitle && IdeasDescription && IdeasImage.length > 0);
+    return !(IdeasTitle && IdeasDescription && ideaImage.length > 0);
   }
 
   return (
     <Modal open={show} onClose={onClose}>
       <Modal.Backdrop />
-      <Modal.Panel className="bg-gohan w-[90%] max-w-[600px] max-h-[90vh]">
+      <Modal.Panel className="bg-gohan max-w-none w-screen h-screen absolute left-0 sm:relative sm:h-auto sm:w-[90%] sm:max-w-[600px] sm:max-h-[90vh] !rounded-none sm:!rounded-xl">
         <div className="flex items-center justify-center flex-col">
           <div className="flex justify-between items-center w-full border-b border-beerus py-4 px-6">
             <h1 className="text-moon-20 font-semibold">Create idea</h1>
@@ -269,17 +178,6 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
               </h6>
               {IdeasDescriptionInput}
             </div>
-            <div className="flex flex-col gap-2">
-              <h6>
-                Recipeint
-                <Required />
-              </h6>
-              {RecieveWalletInput}
-            </div>
-            {/* <div className="flex flex-col gap-2">
-              <h6>Referenda (Optional)</h6>
-              {ReferendaInput}
-            </div> */}
 
             <div className="flex flex-col gap-2">
               <h6>
@@ -287,36 +185,23 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
                 <Required />
               </h6>
               <div className="content-start flex flex-row flex-wrap gap-4 justify-start overflow-auto p-1 relative text-center text-white w-full">
-                <input className="file-input" hidden onChange={FilehandleChange} accept="image/*" id="IdeasImage" name="IdeasImage" type="file" multiple />
+                <input className="file-input" hidden onChange={filehandleChange} accept="image/*" id="ideaImage" name="ideaImage" type="file" multiple />
                 <div className="flex flex-col gap-4">
-                  {!IdeasImage.length && <AddImageInput onClick={AddBTNClick} />}
-                  <ImageListDisplay images={IdeasImage} onDeleteImage={DeleteSelectedImages} />
+                  {!ideaImage.length && <AddImageInput onClick={addImage} />}
+                  <ImageListDisplay images={ideaImage} onDeleteImage={deleteSelectedImages} />
                 </div>
               </div>
             </div>
-
-            {/* <div className="flex flex-col gap-2">
-              <h6>Rules</h6>
-
-              <div className="content-start gap-8 flex flex-row flex-wrap h-full justify-start ">
-                <div className="flex gap-8 w-full">
-                  <div className="flex-1">{Qoutation1Input}</div>
-                  <div className="flex-1">{Qoutation2Input}</div>
-                </div>
-
-                <Button>
-                  <ControlsPlus className="text-moon-24" />
-                  Add smart contract
-                </Button>
-              </div>
-            </div> */}
           </div>
         </div>
-        <div className="flex justify-between border-t border-beerus w-full p-6">
-          <Button variant="ghost" onClick={onClose}>
+        <div className="flex justify-between border-t border-beerus w-full p-6 gap-4 absolute bottom-0 sm:relative">
+          <Button variant="ghost" onClick={onClose} className="flex-1 sm:flex-none">
             Cancel
           </Button>
-          <CreateIdeasBTN />
+          <Button animation={isCreating ? 'progress' : false} disabled={isCreating || isInvalid()} onClick={create} className="flex-1 sm:flex-none">
+            <ControlsPlus className="text-moon-24" />
+            Create idea
+          </Button>
         </div>
       </Modal.Panel>
     </Modal>

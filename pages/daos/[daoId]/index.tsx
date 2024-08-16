@@ -248,7 +248,7 @@ export default function DAO() {
   return (
     <>
       <Head>
-        <title>DAO</title>
+        <title>Charity - {DaoURI.Title}</title>
         <meta name="description" content="DAO" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

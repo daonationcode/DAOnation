@@ -1,6 +1,5 @@
 import { Button, IconButton, Modal } from '@heathmont/moon-core-tw';
 import { ControlsClose, ControlsPlus } from '@heathmont/moon-icons-tw';
-import { NFTStorage } from 'nft.storage';
 import { useEffect, useState } from 'react';
 import UseFormInput from '../../components/components/UseFormInput';
 import UseFormTextArea from '../../components/components/UseFormTextArea';
@@ -11,17 +10,16 @@ import Required from '../../components/components/Required';
 
 import { toast } from 'react-toastify';
 import useEnvironment from '../../services/useEnvironment';
+import { useIPFSContext } from '../../contexts/IPFSContext';
 
 let addedDate = false;
 export default function CreateGoalModal({ open, onClose, daoId }) {
-  const [GoalImage, setGoalImage] = useState([]);
-  const [creating, setCreating] = useState(false);
+  const [goalImage, setGoalImage] = useState([]);
+  const [isCreating, setIsCreating] = useState(false);
   const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
   const { isServer } = useEnvironment();
 
-  //Storage API for images and videos
-  const NFT_STORAGE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDJDMDBFOGEzZEEwNzA5ZkI5MUQ1MDVmNDVGNUUwY0Q4YUYyRTMwN0MiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY1NDQ3MTgxOTY2NSwibmFtZSI6IlplbmNvbiJ9.6znEiSkiLKZX-a9q-CKvr4x7HS675EDdaXP622VmYs8';
-  const client = new NFTStorage({ token: NFT_STORAGE_TOKEN });
+  const { UploadBlob } = useIPFSContext();
 
   //Input fields
   const [GoalTitle, GoalTitleInput] = UseFormInput({
@@ -65,20 +63,20 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
   }
 
   //Function after clicking Create Goal Button
-  async function createGoal() {
-    setCreating(true);
+  async function create() {
+    setIsCreating(true);
 
     const ToastId = toast.loading('Uploading IPFS ...');
     let allFiles = [];
-    for (let index = 0; index < GoalImage.length; index++) {
+    for (let index = 0; index < goalImage.length; index++) {
       //Gathering all files link
-      const element = GoalImage[index];
-      const metadata = await client.storeBlob(element);
-      const urlImageGoal = {
-        url: 'https://' + metadata + '.ipfs.nftstorage.link',
+      const element = goalImage[index];
+      const url = element.type ? await UploadBlob(element) : '';
+      const image = {
+        url,
         type: element.type
       };
-      allFiles.push(urlImageGoal);
+      allFiles.push(image);
     }
 
     //Creating an object of all information to store in EVM
@@ -128,7 +126,7 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
     };
 
     async function onSuccess() {
-      setCreating(false);
+      setIsCreating(false);
       onClose({ success: true });
       window.location.reload();
     }
@@ -145,7 +143,7 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
     }
   }
 
-  function FilehandleChange(goal) {
+  function filehandleChange(goal) {
     // If user uploaded images/videos
     var allNames = [];
     for (let index = 0; index < goal.target.files.length; index++) {
@@ -157,21 +155,20 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
     }
   }
 
-  function AddBTNClick(goal) {
-    //Clicking on +(Add) Function
-    var GoalImagePic = document.getElementById('GoalImage');
+  function addImage() {
+    var GoalImagePic = document.getElementById('goalImage');
     GoalImagePic.click();
   }
 
-  function DeleteSelectedImages(imageId) {
+  function deleteSelectedImages(imageId) {
     //Deleting the selected image
     var newImages = [];
     var allUploadedImages = document.getElementsByName('deleteBTN');
-    for (let index = 0; index < GoalImage.length; index++) {
+    for (let index = 0; index < goalImage.length; index++) {
       if (index != imageId) {
         const elementDeleteBTN = allUploadedImages[index];
         elementDeleteBTN.setAttribute('id', newImages.length.toString());
-        const element = GoalImage[index];
+        const element = goalImage[index];
         newImages.push(element);
       }
     }
@@ -179,7 +176,7 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
   }
 
   function isInvalid() {
-    return !(GoalTitle && GoalDescription && Budget && EndDate && GoalImage.length > 0);
+    return !(GoalTitle && GoalDescription && Budget && EndDate && goalImage.length > 0);
   }
 
   useEffect(() => {
@@ -190,7 +187,7 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
   return (
     <Modal open={open} onClose={onClose}>
       <Modal.Backdrop />
-      <Modal.Panel className="bg-gohan w-[90%] max-w-[600px] max-h-[90vh]">
+      <Modal.Panel className="bg-gohan max-w-none w-screen h-screen absolute left-0 sm:relative sm:h-auto sm:w-[90%] sm:max-w-[600px] sm:max-h-[90vh] !rounded-none sm:!rounded-xl">
         <div className={`flex items-center justify-center flex-col`}>
           <div className="flex justify-between items-center w-full border-b border-beerus py-4 px-6">
             <h1 className="text-moon-20 font-semibold">Create goal</h1>
@@ -215,7 +212,7 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
             <div className="flex gap-8 w-full">
               <div className="flex flex-col gap-2 w-full">
                 <h6>
-                  Goal amount in USD
+                  Goal amount in DOT
                   <Required />
                 </h6>
                 {BudgetInput}
@@ -236,20 +233,20 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
                 <Required />
               </h6>
               <div className="content-start flex flex-row flex-wrap gap-4 justify-start overflow-auto relative text-center text-white w-full">
-                <input className="file-input" hidden onChange={FilehandleChange} accept="image/*" id="GoalImage" name="GoalImage" type="file" />
+                <input className="file-input" hidden onChange={filehandleChange} accept="image/*" id="goalImage" name="goalImage" type="file" />
                 <div className="flex flex-col">
-                  {GoalImage.length < 1 && <AddImageInput onClick={AddBTNClick} />}
-                  <ImageListDisplay images={GoalImage} onDeleteImage={DeleteSelectedImages} />
+                  {goalImage.length < 1 && <AddImageInput onClick={addImage} />}
+                  <ImageListDisplay images={goalImage} onDeleteImage={deleteSelectedImages} />
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="flex justify-between border-t border-beerus w-full p-6">
-          <Button variant="ghost" onClick={onClose}>
+        <div className="flex justify-between border-t border-beerus w-full p-6 gap-4 absolute sm:relative bottom-0">
+          <Button variant="ghost" onClick={onClose} className="flex-1 sm:flex-none">
             Cancel
           </Button>
-          <Button id="CreateGoalBTN" animation={creating ? 'progress' : false} disabled={creating || isInvalid()} onClick={createGoal}>
+          <Button animation={isCreating ? 'progress' : false} disabled={isCreating || isInvalid()} onClick={create} className="flex-1 sm:flex-none">
             <ControlsPlus className="text-moon-24" />
             Create goal
           </Button>

@@ -51,9 +51,7 @@ export default function DAOs() {
   }
 
   function closeModal(event) {
-    if (event) {
-      setShowCreateDaoModal(false);
-    }
+    setShowCreateDaoModal(false);
   }
 
   function openCreateDaoModal() {

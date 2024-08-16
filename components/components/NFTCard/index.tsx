@@ -6,7 +6,7 @@ import { Button } from '@heathmont/moon-core-tw';
 import { ControlsPlus, TimeClock } from '@heathmont/moon-icons-tw';
 import { MouseEventHandler } from 'react';
 
-const NFTCard = ({ item, eventStatus, className, onShowBidHistory, onShowPlaceHigherBid, display = false }: { item: NFT; eventStatus?:string; className?: string; onShowBidHistory?: MouseEventHandler; onShowPlaceHigherBid?: MouseEventHandler; display?: boolean }) => {
+const NFTCard = ({ item, eventStatus, className, onShowBidHistory, onShowPlaceHigherBid, display = false }: { item: NFT; eventStatus?: string; className?: string; onShowBidHistory?: MouseEventHandler; onShowPlaceHigherBid?: MouseEventHandler; display?: boolean }) => {
   const { getCurrency } = useEnvironment();
 
   return (
@@ -25,7 +25,7 @@ const NFTCard = ({ item, eventStatus, className, onShowBidHistory, onShowPlaceHi
             <p>
               Highest bid is{' '}
               <span className="font-bold">
-                {getCurrency()} {Number(item.highest_amount) }
+                {getCurrency()} {Number(item.highest_amount)}
               </span>
             </p>
             <p>
@@ -33,11 +33,15 @@ const NFTCard = ({ item, eventStatus, className, onShowBidHistory, onShowPlaceHi
             </p>
           </div>
           <div className="flex flex-col gap-2 w-full items-center">
-           {eventStatus !== "ended"?<>
-           <Button className="w-full max-w-[250px]" iconLeft={<ControlsPlus />} onClick={onShowPlaceHigherBid}>
-              Place higher bid
-            </Button>
-           </>:<></>} 
+            {eventStatus !== 'ended' ? (
+              <>
+                <Button className="w-full max-w-[250px]" iconLeft={<ControlsPlus />} onClick={onShowPlaceHigherBid}>
+                  Place higher bid
+                </Button>
+              </>
+            ) : (
+              <></>
+            )}
             <Button className="w-full max-w-[250px]" variant="secondary" iconLeft={<TimeClock />} onClick={onShowBidHistory}>
               View bid history
             </Button>

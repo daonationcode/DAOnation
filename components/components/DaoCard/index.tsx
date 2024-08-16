@@ -12,24 +12,7 @@ const DAOCard = ({ item, onJoinCommunity, hasJoined, className }: { item: Dao; o
 
   // Format the duration
   let formattedDuration = '';
-  const todayISO = new Date().toISOString().split('T')[0];
-  const startDate = new Date(todayISO);
-  let hasAlreadyPast = false;
-
-  if (item.Start_Date) {
-    const endDate = new Date(item.Start_Date);
-
-    const duration = intervalToDuration({ start: startDate, end: endDate });
-
-    formattedDuration += duration.days > 0 ? `${duration.days} days ` : '';
-    formattedDuration += duration.hours > 0 ? `${duration.hours} hours ` : '';
-    formattedDuration += duration.minutes > 0 ? `and ${duration.minutes} min` : '';
-    formattedDuration = formattedDuration.trim();
-
-    hasAlreadyPast = isPast(parseISO(item.Start_Date)) || endDate.toISOString().split('T')[0] === todayISO;
-  } else {
-    hasAlreadyPast = true;
-  }
+  let hasAlreadyPast = true;
 
   return (
     <Card className={`${className} max-w-[720px] flex flex-col gap-4 relative`}>

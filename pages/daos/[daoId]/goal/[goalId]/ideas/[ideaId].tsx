@@ -355,7 +355,7 @@ export default function GrantIdeas() {
               height={500}
             />
           </div>{' '}
-          <div className="full-w">
+          {/* <div className="full-w">
             <form onSubmit={PostComment} className="full-w flex flex-col gap-2">
               {CommentInput}
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -365,7 +365,7 @@ export default function GrantIdeas() {
               </div>
             </form>
           </div>
-          <div className="flex flex-col gap-6 pb-8">{uniqueAndSort(CommentsList).map((listItem: any, index) => (listItem.address !== '' ? <CommentBox user_info={listItem.user_info} address={listItem.address} MessageID={listItem.id} MessageIndex={index} date={listItem.date} sendReply={sendReply} message={listItem.message} replies={listItem.replies} key={listItem.id} /> : <></>))}</div>
+          <div className="flex flex-col gap-6 pb-8">{uniqueAndSort(CommentsList).map((listItem: any, index) => (listItem.address !== '' ? <CommentBox user_info={listItem.user_info} address={listItem.address} MessageID={listItem.id} MessageIndex={index} date={listItem.date} sendReply={sendReply} message={listItem.message} replies={listItem.replies} key={listItem.id} /> : <></>))}</div> */}
         </div>
       </div>
 
