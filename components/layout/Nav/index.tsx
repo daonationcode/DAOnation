@@ -133,7 +133,7 @@ export function Nav(): JSX.Element {
                   <Dropdown value={null} onChange={null}>
                     <Dropdown.Trigger>
                       {logo ? (
-                        <Avatar imageUrl={'https://' + logo + '.ipfs.nftstorage.link'} size="lg" className="rounded-full border-2 border-piccolo"></Avatar>
+                        <Avatar imageUrl={logo} size="lg" className="rounded-full border-2 border-piccolo"></Avatar>
                       ) : (
                         <Avatar size="lg" className="rounded-full border-2 border-piccolo">
                           {' '}

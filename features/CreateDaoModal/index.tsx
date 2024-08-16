@@ -72,7 +72,7 @@ export default function CreateDaoModal({ open, onClose }) {
 
   //Function after clicking Create Dao Button
   async function createDao() {
-    const id = toast.loading('Uploading IPFS ...');
+    const toastId = toast.loading('Uploading IPFS ...');
     setCreating(true);
 
     let allFiles = [];
@@ -146,7 +146,7 @@ export default function CreateDaoModal({ open, onClose }) {
     //   }
     // ];
 
-    toast.update(id, { render: 'Creating Dao...', isLoading: true });
+    toast.update(toastId, { render: 'Creating Dao...', isLoading: true });
 
     async function onSuccess() {
       setCreating(false);
@@ -158,11 +158,11 @@ export default function CreateDaoModal({ open, onClose }) {
 
     if (PolkadotLoggedIn) {
       await api._extrinsics.daos.createDao(userWalletPolkadot, JSON.stringify(createdObject), {}).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
-        showToast(status, id, 'Created Successfully!', onSuccess);
+        showToast(status, toastId, 'Created Successfully!', onSuccess);
       });
     } else {
       try {
-        await toast.update(id, {
+        await toast.update(toastId, {
           render: 'Created Successfully!',
           type: 'success',
           isLoading: false,

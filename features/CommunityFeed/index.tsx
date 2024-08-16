@@ -46,7 +46,7 @@ const CommunityFeed = ({ communityName, daoId }) => {
   }
 
   useEffect(() => {
-    setAvatarUrl('https://' + userInfo.imgIpfs + '.ipfs.nftstorage.link');
+    setAvatarUrl(userInfo.imgIpfs);
     setUserName(userInfo.fullName);
   }, [userInfo]);
 

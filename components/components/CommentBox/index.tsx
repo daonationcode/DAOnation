@@ -33,7 +33,7 @@ const CommentBox = ({ address, user_info, date, message, replies = [], sendReply
       <div className="flex justify-between items-center">
         <div className="flex gap-1 items-center">
           {user_info?.imgIpfs !== '' ? (
-            <img src={'https://' + user_info?.imgIpfs + '.ipfs.nftstorage.link'} alt="" className="rounded-full border-2 w-12 h-12 object-cover border-piccolo" />
+            <img src={user_info?.imgIpfs} alt="" className="rounded-full border-2 w-12 h-12 object-cover border-piccolo" />
           ) : (
             <Avatar size="sm" className="rounded-full border border-piccolo bg-gohan">
               <GenericUser className="text-moon-24" />
