@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { usePolkadotContext } from '../../../../../contexts/PolkadotContext';
 import DonateCoinToEventModal from '../../../../../features/DonateCoinToEventModal';
-import useEnvironment from '../../../../../services/useEnvironment';
 import DonateNFTModal from '../../../../../features/DonateNFTModal';
 import Loader from '../../../../../components/components/Loader';
 import Link from 'next/link';
@@ -16,6 +15,7 @@ import BidHistoryModal from '../../../../../features/BidHistoryModal';
 import PlaceHigherBidModal from '../../../../../features/PlaceHigherBidModal';
 import { Dao } from '../../../../../data-model/dao';
 import { toast } from 'react-toastify';
+import BuyTicketModal from '../../../../../features/BuyTicketModal';
 
 declare let window;
 export default function Events() {
@@ -24,6 +24,7 @@ export default function Events() {
   const { api, getUserInfoById, GetAllDaos } = usePolkadotContext();
   const [eventIdTxt, setEventTxtID] = useState('');
   const [showCreateGoalModal, setShowDonateNFTModal] = useState(false);
+  const [showBuyTicketModal, setShowBuyTicketModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
   const [showPlaceHigherBidModal, setShowPlaceHigherBidModal] = useState<NFT | null>(null);
   const [EventID, setEventID] = useState(-1);
@@ -32,11 +33,9 @@ export default function Events() {
   const [tabIndex, setTabIndex] = useState(0);
 
   const [EventDAOURI, setEventDAOURI] = useState({} as Dao);
-  const [eventType, setEventType] = useState('polkadot');
   const [showBidHistoryModal, setShowBidHistoryModal] = useState<NFT | null>(null);
 
   const router = useRouter();
-  const { getCurrency } = useEnvironment();
   const [EventURI, setEventURI] = useState({
     EventId: '',
     daoId: '',
@@ -52,18 +51,32 @@ export default function Events() {
     wallet: '',
     logo: '',
     isOwner: true,
+    eventType: '',
+    ticketPrice: 0,
+    participantsCount: 0,
     status: ''
   });
 
   const mockInfo = {
-    title: 'Annual Food Drive',
-    date: 'Annual Food Drive',
-    image: 'https://marketplace.canva.com/EAFG5wKTkFk/1/0/1131w/canva-pastel-food-drive-a4-flyer-tBm19VC3AKU.jpg',
-    userInfo: { fullName: 'Thomas Goethals', id: 1 },
-    eventTarget: 50,
-    eventRaised: 75,
-    status: 'Ended',
-    charity: { title: 'Feeding America' }
+    EventId: '0',
+    daoId: '0',
+    Title: 'Concert with Kendrick Martins',
+    Description: 'A description about the Event and what it is all about is written here. It may be longer or shorter depending on what the creator added.',
+    Budget: '10',
+    End_Date: '2024-10-',
+    user_info: {
+      fullName: 'Thomas Goethals',
+      id: '0'
+    },
+    reached: false,
+    wallet: '',
+    logo: '',
+    isOwner: true,
+    eventType: 'livestream',
+    ticketPrice: 10,
+    startDate: '20 Nov 2024 01:15PM',
+    participantsCount: 30,
+    status: ''
   };
 
   const mockNFTs: NFT[] = [
@@ -102,6 +115,14 @@ export default function Events() {
     fetchData();
   }, [api, router]);
 
+  const isAuction = () => {
+    return EventURI.eventType === 'auction';
+  };
+
+  const isLivestream = () => {
+    return EventURI.eventType === 'livestream';
+  };
+
   async function fetchData() {
     if (router.query.daoId) {
       fetchContractDataFull();
@@ -129,17 +150,16 @@ export default function Events() {
         // let allNfts = await GetAllNfts();
         // let eventNFTs = allNfts.filter((e) => e.eventid == eventIdTxt.toString());
         // console.log(eventNFTs);
-        // setNfts(eventNFTs);
-
-        // let allDaos = await GetAllDaos();
-        // let eventDAO = allDaos.filter((e) => e.daoId == eventURIFull.daoId)[0];
-        // setEventDAOURI(eventDAO);
+        // setNfts(eventNFTs);-$$$$$$$$$$$$$$$$$$
+        let allDaos = await GetAllDaos();
+        let eventDAO = allDaos.filter((e) => e.daoId == mockInfo.daoId)[0];
+        setEventDAOURI(eventDAO);
 
         // let user_info = await getUserInfoById(Number(eventURIFull.UserId));
         // eventURIFull.user_info = user_info;
         // eventURIFull.isOwner = eventURIFull.UserId == Number(window.userid);
 
-        // setEventURI(eventURIFull);
+        setEventURI(mockInfo);
         setLoading(false);
       }
     } catch (error) {}
@@ -164,6 +184,10 @@ export default function Events() {
 
   function openDonateNFTModal() {
     setShowDonateNFTModal(true);
+  }
+
+  function openBuyTicketModal() {
+    setShowBuyTicketModal(true);
   }
 
   async function distributeNFTs() {
@@ -199,7 +223,7 @@ export default function Events() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={`flex items-center flex-col gap-8`}>
-        <div className={`gap-8 flex flex-col w-full bg-gohan pt-10 border-beerus border`}>
+        <div className={`gap-8 flex flex-col w-full bg-gohan pt-10 border-beerus border ${isLivestream() && 'pb-10'}`}>
           <div className="container flex w-full justify-between relative">
             <div className="flex flex-col gap-1">
               <Loader
@@ -210,7 +234,7 @@ export default function Events() {
                     <Link className="text-piccolo" href={`../../${router.query.daoId}`}>
                       {EventDAOURI?.Title}
                     </Link>{' '}
-                    &gt; Event
+                    &gt; {EventURI.eventType === 'auction' ? 'Event' : 'Live event'}
                   </h5>
                 }
               />
@@ -220,7 +244,8 @@ export default function Events() {
                 width={770}
                 element={
                   <h3 className="flex gap-2 whitespace-nowrap">
-                    <div>{EventURI.status == 'ended' ? 'Ended' : ''}</div>
+                    {isAuction() && <div className="font-bold">{EventURI.status == 'ended' ? 'Ended' : 'In progress'}</div>}
+                    {isLivestream() && <div>{EventURI.participantsCount} participants</div>}
                     <div>•</div>
                     <div className="flex">
                       Created by &nbsp;
@@ -237,26 +262,36 @@ export default function Events() {
                 <></>
               ) : (
                 <>
-                  <Button iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
-                    Donate NFT
-                  </Button>
-                  <Button iconLeft={<ShopWallet />} onClick={openDonateCoinModal}>
+                  {isAuction() && (
+                    <Button iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
+                      Donate NFT
+                    </Button>
+                  )}
+                  {isLivestream() && (
+                    <Button iconLeft={<ShopWallet />} onClick={openBuyTicketModal}>
+                      Buy ticket
+                    </Button>
+                  )}
+                  <Button iconLeft={<ShopWallet />} variant="secondary" onClick={openDonateCoinModal}>
                     Donate Coin
                   </Button>
                 </>
               )}
             </div>
           </div>
-          <div className="container">
-            <Tabs selectedIndex={tabIndex} onChange={setTabIndex}>
-              <Tabs.List>
-                <Tabs.Tab>Description</Tabs.Tab>
-                <Tabs.Tab>NFT's on auction ({nfts.length})</Tabs.Tab>
-              </Tabs.List>
-            </Tabs>
-          </div>
+          {isAuction() && (
+            <div className="container">
+              <Tabs selectedIndex={tabIndex} onChange={setTabIndex}>
+                <Tabs.List>
+                  <Tabs.Tab>Description</Tabs.Tab>
+                  <Tabs.Tab>NFT's on auction ({nfts.length})</Tabs.Tab>
+                </Tabs.List>
+              </Tabs>
+            </div>
+          )}
         </div>
-        {tabIndex === 0 && (
+        <p className="container">{EventURI.Description}</p>
+        {isAuction() && tabIndex === 0 && (
           <div className="container mt-[-2rem] w-full flex gap-6">
             <div className="w-full max-w-[476px] h-[476px] overflow-hidden relative">
               <Image unoptimized={true} objectFit="cover" layout="fill" className="rounded-xl object-cover" src={EventURI.logo} alt="" />
@@ -264,7 +299,7 @@ export default function Events() {
             <div className="flex flex-col gap-5 bg-gohan rounded-xl w-full max-w-[300px] items-center p-6 pt-10 shadow-moon-lg">
               <GenericLoyalty className="text-hit text-moon-48" />
               <div className="font-bold text-moon-20">
-                Raised {getCurrency()} {EventURI.reached} of {EventURI.Budget}
+                Raised DOT {EventURI.reached} of {EventURI.Budget}
               </div>
               {EventURI.status == 'ended' ? (
                 <>
@@ -290,7 +325,7 @@ export default function Events() {
             </div>
           </div>
         )}
-        {tabIndex === 1 && (
+        {isAuction() && tabIndex === 1 && (
           <div className="container mt-[-2rem] w-full flex flex-wrap gap-6">
             {nfts.map((item, i) => (
               <NFTCard className="w-2/4" item={item} key={i} onShowBidHistory={() => setShowBidHistoryModal(item)} eventStatus={EventURI.status} onShowPlaceHigherBid={() => setShowPlaceHigherBidModal(item)} />
@@ -303,6 +338,7 @@ export default function Events() {
       <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} eventid={EventID} recieveWallet={EventURI.wallet} />
       <PlaceHigherBidModal open={!!showPlaceHigherBidModal} onClose={() => setShowPlaceHigherBidModal(null)} item={showPlaceHigherBidModal} />
       <BidHistoryModal open={!!showBidHistoryModal} onClose={() => setShowBidHistoryModal(null)} item={showBidHistoryModal} />
+      <BuyTicketModal open={!!showBuyTicketModal} onClose={() => setShowBuyTicketModal(null)} eventName={EventURI.Title} ticketPrice={EventURI.ticketPrice} />
     </>
   );
 }

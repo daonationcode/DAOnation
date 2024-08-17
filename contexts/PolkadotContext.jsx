@@ -95,11 +95,11 @@ export function PolkadotProvider({ children }) {
   async function updateCurrentUser() {
 
     if (wallet?.accounts){
-      
+
       setUserWalletPolkadot(wallet.accounts[0].address);
       window.signerAddress = wallet.accounts[0].address;
       setPolkadotLoggedIn(true);
-  
+
       setUserSigner(wallet.signer);
     }
 
@@ -127,7 +127,7 @@ export function PolkadotProvider({ children }) {
           const userInformation = await _api.query.users.userById(userid);
           setUserInfo(userInformation);
 
-        
+
         }
         console.log('Done');
       } catch (e) { }
@@ -146,7 +146,7 @@ export function PolkadotProvider({ children }) {
     for (let i = 0; i < totalDAOCount; i++) {
       let object = '';
       let originalwallet = '';
-    
+
       if (allDAOs[i]?.daoUri) {
           object = JSON.parse(allDAOs[i].daoUri?.toString());
           originalwallet = allDAOs[i].daoWallet?.toString();
@@ -167,6 +167,8 @@ export function PolkadotProvider({ children }) {
           recievetype: 'Polkadot',
           SubsPrice: object.properties?.SubsPrice?.description,
           Created_Date: object.properties?.Created_Date?.description,
+          brandingColor: object.properties?.brandingColor?.description,
+          customUrl: object.properties?.customUrl?.description
         });
       }
     }
@@ -421,7 +423,7 @@ export function PolkadotProvider({ children }) {
     } catch (error) { }
     return [];
   }
- 
+
   async function GetAllIdeas() {
     allVotes = await GetAllVotes();
     allDonations = await GetAllDonations();
@@ -454,7 +456,7 @@ export function PolkadotProvider({ children }) {
     } catch (error) { console.error(error) }
     return [];
   }
-  
+
   async function GetAllVotes() {
 
     let arr = [];
@@ -484,7 +486,7 @@ export function PolkadotProvider({ children }) {
     } catch (error) { console.error(error) }
     return [];
   }
- 
+
   async function GetAllDonations() {
 
     let arr = [];

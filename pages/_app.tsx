@@ -9,15 +9,13 @@ import '../public/css/daos.css';
 import '../public/css/ideas.css';
 import '../public/output.css';
 import '../public/theme.css';
-import web3Onboard from './web3-onboard'
-import { Web3OnboardProvider } from '@subwallet-connect/react'
-
+import web3Onboard from '../contexts/web3-onboard';
+import { Web3OnboardProvider } from '@subwallet-connect/react';
 
 function MyApp({ Component, pageProps }) {
   return (
     <IPFSProvider>
       <Web3OnboardProvider web3Onboard={web3Onboard}>
-
         <PolkadotProvider>
           <EnvironmentProvider>
             <Header />
@@ -27,7 +25,6 @@ function MyApp({ Component, pageProps }) {
         </PolkadotProvider>
       </Web3OnboardProvider>
     </IPFSProvider>
-
   );
 }
 

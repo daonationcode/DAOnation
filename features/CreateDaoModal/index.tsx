@@ -128,6 +128,11 @@ export default function CreateDaoModal({ open, onClose }) {
           type: 'string',
           description: new Date().toLocaleDateString()
         },
+        brandingColor: { type: 'string', description: brandingColor },
+        customUrl: {
+          type: 'string',
+          description: CustomUrl
+        },
         allFiles
       }
     };
@@ -159,7 +164,6 @@ export default function CreateDaoModal({ open, onClose }) {
       await api._extrinsics.daos.createDao(userWalletPolkadot, JSON.stringify(createdObject), {}).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
         showToast(status, toastId, 'Created Successfully!', onSuccess);
       });
-    
     }
   }
 
