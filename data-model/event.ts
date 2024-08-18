@@ -1,13 +1,13 @@
 export interface CharityEvent {
-  id: string;
-  eventId: string;
-  daoId: string;
+  id: Number;
+  eventId: Number;
+  daoId: Number;
   Title: string;
   Description: string;
   Budget: number;
   End_Date: Date;
   wallet: string;
-  UserId: string;
+  UserId: Number;
   logo: string;
   type: string;
   reached: number;

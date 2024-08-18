@@ -47,7 +47,7 @@ function VoteActivity({ data }) {
 
   async function fetchContractData() {
     if (api) {
-      let allIdeas = (await GetAllIdeas()) as Idea[];
+      let allIdeas = (await GetAllIdeas(true)) as Idea[];
       let currentIdea = allIdeas.filter((e) => e.ideasId == data.ideasid)[0];
       setIdeaURI(currentIdea);
     }
@@ -88,7 +88,7 @@ function GoalActivity({ data }) {
 
   async function fetchContractData() {
     if (api) {
-      let allGoals = await GetAllGoals();
+      let allGoals = await GetAllGoals(true);
       let currentGoal = allGoals.filter((e) => e.goalId == data.goalid)[0];
       setGoalURI(currentGoal);
     }
@@ -115,50 +115,51 @@ function GoalActivity({ data }) {
 
 
 function AuctionActivity({ data }) {
-  // const { api, GetAllEvents } = usePolkadotContext();
+  const { api, GetAllEvents } = usePolkadotContext();
 
-  // const [eventURI, setEventURI] = useState({
-  //   id: "",
-  //   eventId: "",
-  //   daoId: "",
-  //   Title: "",
-  //   Description: "",
-  //   Budget: 0,
-  //   End_Date: new Date(),
-  //   wallet: "",
-  //   UserId: "",
-  //   logo: "",
-  //   type: "",
-  //   reached: 0,
-  //   amountOfNFTs:0,
-  // });
+  const [eventURI, setEventURI] = useState({
+    id: 0,
+    eventId: 0,
+    daoId: 0,
+    Title: "",
+    Description: "",
+    Budget: 0,
+    End_Date: new Date(),
+    wallet: "",
+    UserId: 0,
+    logo: "",
+    type: "",
+    reached: 0,
+    amountOfNFTs:0,
+    status:""
+  });
 
-  // async function fetchContractData() {
-  //   if (api) {
-  //     let allEvent = await GetAllEvents();
-  //     let currentEvent = allEvent.filter((e) => e.eventId == data.eventId)[0];
-  //     setEventURI(currentEvent);
-  //   }
-  // }
+  async function fetchContractData() {
+    if (api) {
+      let allEvent = await GetAllEvents(true);
+      let currentEvent = allEvent.filter((e) => e.eventId == data.eventid)[0];
+      setEventURI(currentEvent);
+    }
+  }
 
-  // useEffect(() => {
-  //   fetchContractData();
-  // }, [api]);
+  useEffect(() => {
+    fetchContractData();
+  }, [api]);
 
-  // return (
-  //   <div className="flex flex-col gap-3">
-  //     <div className="flex gap-4 w-full items-center">
-  //       <Avatar size="lg" className="rounded-full bg-jiren text-bulma shrink-0">
-  //         <SportDarts className="text-moon-32" />
-  //       </Avatar>
-  //       <p>
-  //         <span className="text-piccolo">{data.name}</span> just created an event
-  //       </p>
-  //     </div>
-  //     <EventCard item={eventURI} className="shadow-none !bg-goku border border-beerus" />
-  //   </div>
-  // );
-  return <></>
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex gap-4 w-full items-center">
+        <Avatar size="lg" className="rounded-full bg-jiren text-bulma shrink-0">
+          <SportDarts className="text-moon-32" />
+        </Avatar>
+        <p>
+          <span className="text-piccolo">{data.name}</span> just created an event
+        </p>
+      </div>
+      <EventCard item={eventURI} className="shadow-none !bg-goku border border-beerus" />
+    </div>
+  );
+  // return <></>
 }
 
 function DonationActivity({ data }) {
@@ -176,7 +177,7 @@ function DonationActivity({ data }) {
 
   async function fetchContractData() {
     if (api) {
-      let allIdeas = await GetAllIdeas();
+      let allIdeas = await GetAllIdeas(true);
       let currentIdea = allIdeas.filter((e) => e.ideasId == data.ideasid)[0];
       setIdeaURI(currentIdea);
     }
@@ -221,7 +222,7 @@ function IdeaActivity({ data, hideGoToButton }) {
 
   async function fetchContractData() {
     if (api) {
-      let allIdeas = await GetAllIdeas();
+      let allIdeas = await GetAllIdeas(true);
       let currentIdea = allIdeas.filter((e) => e.ideasId == data.ideasid)[0];
       setIdeaURI(currentIdea);
     }

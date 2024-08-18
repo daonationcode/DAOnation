@@ -18,10 +18,10 @@ const AppContext = createContext({
   EasyToast: (message, type, UpdateType = false, ToastId = '',isLoading=false) => { },
   GetAllDaos: async () => [],
   GetAllJoined: async () => [],
-  GetAllGoals: async () => [],
-  GetAllEvents: async() => {},
+  GetAllGoals: async (cache = false) => [],
+  GetAllEvents: async(cache = false) => [],
   GetAllFeeds: async () => [],
-  GetAllIdeas: async () => [],
+  GetAllIdeas: async (cache = false) => [],
   GetAllVotes: async () => [],
   GetAllDonations: async () => [],
   GetAllUserDonations: async () => [],
@@ -139,6 +139,8 @@ export function PolkadotProvider({ children }) {
   let allVotes = [];
   let allDonations = [];
   let allIdeas = [];
+  let allGoals = [];
+  let allEvents = [];
   let allDaos = [];
 
   async function InsertData(totalDAOCount, allDAOs) {
@@ -311,11 +313,12 @@ export function PolkadotProvider({ children }) {
     return [];
   }
 
-  async function GetAllGoals() {
+  async function GetAllGoals(cache = false) {
+    if (cache && allGoals.length >0) return allGoals;
     allIdeas = await GetAllIdeas();
     let arr = [];
-    arr = arr.concat(await fetchPolkadotGoalData());
-    return arr;
+    allGoals = arr.concat(await fetchPolkadotGoalData());
+    return allGoals;
   }
   async function fetchPolkadotFeedsData() {
     //Fetching data from Parachain
@@ -423,14 +426,14 @@ export function PolkadotProvider({ children }) {
     } catch (error) { }
     return [];
   }
-
-  async function GetAllIdeas() {
+ 
+  async function GetAllIdeas(cache = false) {
+    if (cache && allIdeas.length >0) return allIdeas;
     allVotes = await GetAllVotes();
     allDonations = await GetAllDonations();
 
-    let arr = [];
-    arr = arr.concat(await fetchPolkadotIdeaData());
-    return arr;
+    allIdeas = (await fetchPolkadotIdeaData());
+    return allIdeas;
   }
 
 
@@ -504,7 +507,55 @@ export function PolkadotProvider({ children }) {
     return users;
   }
 
-  return <AppContext.Provider value={{ api: api, deriveAcc: deriveAcc, GetAllGoals: GetAllGoals, GetAllIdeas: GetAllIdeas, GetAllVotes: GetAllVotes, GetAllFeeds: GetAllFeeds,GetAllDonations:GetAllDonations,GetAllUserDonations:GetAllUserDonations, updateCurrentUser: updateCurrentUser, GetAllDaos: GetAllDaos, GetAllJoined: GetAllJoined, showToast: showToast, EasyToast: EasyToast, getUserInfoById: getUserInfoById, userWalletPolkadot: userWalletPolkadot, userSigner: userSigner, PolkadotLoggedIn: PolkadotLoggedIn, userInfo: userInfo }}>{children}</AppContext.Provider>;
+
+  
+  async function fetchPolkadotEventData() {
+    //Fetching data from Parachain
+    try {
+      if (api) {
+        let totalEventCount = Number(await api._query.events.eventIds());
+        let arr = [];
+        for (let i = 0; i < totalEventCount; i++) {
+          const element = await api._query.events.eventById(i);
+          const object = JSON.parse(element['__internal__raw'].eventUri.toString())
+
+          let newElm = {
+            id: Number(element['__internal__raw'].id),
+            eventId: Number(element['__internal__raw'].id),
+            daoId: Number(element['__internal__raw'].daoId),
+            Title: object.properties.Title.description,
+            Description: object.properties.description,
+            Budget: object.properties.Budget.description,
+            End_Date: object.properties.End_Date.description,
+            wallet: object.properties.wallet.description,
+            logo: object.properties.logo.description.url,
+            eventType: object.properties.eventType.description,
+            reached: object.properties.reached?.description,
+            amountOfNFTs: object.properties.amountOfNFTs?.description,
+            status: "test",
+            UserId: Number(element['__internal__raw'].userId)
+          };
+          arr.push(newElm);
+        }
+      
+
+
+        return arr;
+      }
+    } catch (error) { console.error(error) }
+    return [];
+  }
+
+  async function GetAllEvents(cache = false) {
+    if (cache && allEvents.length >0) return allEvents;
+    let arr = [];
+    arr = arr.concat(await fetchPolkadotEventData());
+    return arr;
+  }
+
+
+
+  return <AppContext.Provider value={{ api: api, deriveAcc: deriveAcc, GetAllEvents:GetAllEvents, GetAllGoals: GetAllGoals, GetAllIdeas: GetAllIdeas, GetAllVotes: GetAllVotes, GetAllFeeds: GetAllFeeds,GetAllDonations:GetAllDonations,GetAllUserDonations:GetAllUserDonations, updateCurrentUser: updateCurrentUser, GetAllDaos: GetAllDaos, GetAllJoined: GetAllJoined, showToast: showToast, EasyToast: EasyToast, getUserInfoById: getUserInfoById, userWalletPolkadot: userWalletPolkadot, userSigner: userSigner, PolkadotLoggedIn: PolkadotLoggedIn, userInfo: userInfo }}>{children}</AppContext.Provider>;
 }
 
 export const usePolkadotContext = () => useContext(AppContext);

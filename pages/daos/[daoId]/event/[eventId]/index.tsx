@@ -21,7 +21,7 @@ declare let window;
 export default function Events() {
   //Variables
   const [nfts, setNfts] = useState([]);
-  const { api, getUserInfoById, GetAllDaos } = usePolkadotContext();
+  const { api, getUserInfoById,GetAllDaos, GetAllEvents } = usePolkadotContext();
   const [eventIdTxt, setEventTxtID] = useState('');
   const [showCreateGoalModal, setShowDonateNFTModal] = useState(false);
   const [showBuyTicketModal, setShowBuyTicketModal] = useState(false);
@@ -124,7 +124,7 @@ export default function Events() {
   };
 
   async function fetchData() {
-    if (router.query.daoId) {
+    if (router.query.eventId) {
       fetchContractDataFull();
     }
   }
@@ -144,22 +144,23 @@ export default function Events() {
       if (api && EventID !== undefined && EventID !== null) {
         //Load everything-----------
 
-        // let allEvents = await GetAllEvents();
-        // let eventURIFull = allEvents.filter((e) => e?.eventId == eventIdTxt.toString())[0];
+        let allEvents = await GetAllEvents();
+        let eventURIFull = allEvents.filter((e) => e?.eventId == eventIdTxt.toString())[0];
 
         // let allNfts = await GetAllNfts();
         // let eventNFTs = allNfts.filter((e) => e.eventid == eventIdTxt.toString());
         // console.log(eventNFTs);
-        // setNfts(eventNFTs);-$$$$$$$$$$$$$$$$$$
+        // setNfts(eventNFTs);
+
         let allDaos = await GetAllDaos();
-        let eventDAO = allDaos.filter((e) => e.daoId == mockInfo.daoId)[0];
+        let eventDAO = allDaos.filter((e) => e.daoId == eventURIFull.daoId)[0];
         setEventDAOURI(eventDAO);
 
-        // let user_info = await getUserInfoById(Number(eventURIFull.UserId));
-        // eventURIFull.user_info = user_info;
-        // eventURIFull.isOwner = eventURIFull.UserId == Number(window.userid);
+        let user_info = await getUserInfoById(Number(eventURIFull.UserId));
+        eventURIFull.user_info = user_info;
+        eventURIFull.isOwner = eventURIFull.UserId == Number(window.userid);
 
-        setEventURI(mockInfo);
+        setEventURI(eventURIFull);
         setLoading(false);
       }
     } catch (error) {}

@@ -168,8 +168,14 @@ export default function CreateEventModal({ open, onClose, daoId }) {
         window.location.reload();
       }, 1000);
     }
+    
+    let eventid = Number(await api._query.events.eventIds());
+    feed.eventid = eventid;
 
-    await api._extrinsics.events.createEvent(JSON.stringify(createdObject), daoId, userWalletPolkadot).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+    const txs = [api._extrinsics.events.createEvent(JSON.stringify(createdObject),Number(daoId), Number(window.userid)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'event', new Date().valueOf())];
+
+
+    await api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
       showToast(status, ToastId, 'Created Successfully!', onSuccess);
     });
   }

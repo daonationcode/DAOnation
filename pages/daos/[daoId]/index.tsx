@@ -21,7 +21,7 @@ import DonateNFTModal from '../../../features/DonateNFTModal';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
-  const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals } = usePolkadotContext();
+  const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals,GetAllEvents  } = usePolkadotContext();
   const [DaoURI, setDaoURI] = useState({ Title: '', Description: '', SubsPrice: null, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', allFiles: [], isOwner: false, daoId: null, user_id: null, user_info: null } as Dao);
 
   const [daoId, setDaoID] = useState(-1);
@@ -183,14 +183,14 @@ export default function DAO() {
         }
         setGoalsList(arr.reverse());
 
-        // let allEvents = await GetAllEvents();
-        // let currentEvents = allEvents.filter((e) => e?.daoId == daoId.toString());
+        let allEvents = await GetAllEvents();
+        let currentEvents = allEvents.filter((e) => e?.daoId == daoId);
 
         let eventArr = [];
-        // for (let i = 0; i < currentEvents.length; i++) {
-        //   const elmEvent = currentEvents[i];
-        //   eventArr.push(elmEvent);
-        // }
+        for (let i = 0; i < currentEvents.length; i++) {
+          const elmEvent = currentEvents[i];
+          eventArr.push(elmEvent);
+        }
         setAuctionEvents(eventArr.reverse());
 
         setLoading(false);
@@ -316,7 +316,7 @@ export default function DAO() {
         {tabIndex === 1 && <div className="template-container mt-[-2rem] w-full"></div>}
         {tabIndex === 2 && (
           <div className="flex flex-col gap-8 container items-center pb-10">
-            <Loader element={AuctionEvents.length > 0 ? AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={() => openDonateNFTModal} openDonateCoinModal={() => openDonateCoinModal} />) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />} width={768} height={236} many={3} loading={false} />{' '}
+            <Loader element={AuctionEvents.length > 0 ? AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={() => openDonateNFTModal} openDonateCoinModal={() => openDonateCoinModal} />) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />} width={768} height={236} many={3} loading={loading} />{' '}
           </div>
         )}
         {tabIndex === 3 && (
