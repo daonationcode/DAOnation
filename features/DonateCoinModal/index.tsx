@@ -5,15 +5,13 @@ import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import { Button, Dropdown, IconButton, MenuItem, Modal } from '@heathmont/moon-core-tw';
 import { ControlsClose } from '@heathmont/moon-icons-tw';
 import UseFormInput from '../../components/components/UseFormInput';
+import { toast } from 'react-toastify';
 
 declare let window;
 
 export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide, address, recieveWallet, recievetype }) {
   const [Balance, setBalance] = useState('');
   const { userInfo, PolkadotLoggedIn, userWalletPolkadot, userSigner, showToast, api } = usePolkadotContext();
-  const [CurrentChain, setCurrentChain] = useState('');
-  const [CurrentChainNetwork, setCurrentChainNetwork] = useState(0);
-  const [CurrentAddress, setCurrentAddress] = useState('');
   const [Coin, setCoin] = useState('');
   const [isLoading, setisLoading] = useState(false);
   const [isSent, setisSent] = useState(false);
@@ -31,14 +29,13 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
     className: 'max-w-[140px]'
   });
 
-  function ShowAlert(type = 'default', message) {}
 
   async function DonateCoinSubmission(e) {
     e.preventDefault();
     console.clear();
     setisSent(false);
     setisLoading(true);
-    ShowAlert('pending', 'Donating ...');
+    const ToastId = toast.loading('Donating....');
 
     let feed1 = JSON.stringify({
       name: userInfo?.fullName?.toString(),
@@ -65,17 +62,7 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
       const txs = [api.tx.balances.transferAllowDeath(recipient, `${Amount * 1e12}`), api._extrinsics.ideas.addDonation(ideasid, `${Amount * 1e12}`, Number(window.userid)), api._extrinsics.feeds.addFeed(feed2, 'donation', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
-        showToast(
-          status,
-          ShowAlert,
-          'Donation successful!',
-          () => {
-            onSuccess();
-          },
-          true,
-          null,
-          true
-        );
+        showToast(status, ToastId, 'Donation Successful!', onSuccess);
       });
     }
   }
@@ -125,21 +112,6 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
                     <Dropdown.Options className="bg-gohan w-48 min-w-0">
                       <Dropdown.Option value="DOT">
                         <MenuItem>DOT</MenuItem>
-                      </Dropdown.Option>
-                      <Dropdown.Option value="DEV">
-                        <MenuItem>DEV</MenuItem>
-                      </Dropdown.Option>
-                      <Dropdown.Option value="xcvGLMR">
-                        <MenuItem>xcvGLMR</MenuItem>
-                      </Dropdown.Option>
-                      <Dropdown.Option value="tBNB">
-                        <MenuItem>BNB</MenuItem>
-                      </Dropdown.Option>
-                      <Dropdown.Option value="CELO">
-                        <MenuItem>CELO</MenuItem>
-                      </Dropdown.Option>
-                      <Dropdown.Option value="GoerliETH">
-                        <MenuItem>ETH</MenuItem>
                       </Dropdown.Option>
                     </Dropdown.Options>
                   </Dropdown>

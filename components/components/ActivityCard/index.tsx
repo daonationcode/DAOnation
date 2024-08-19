@@ -114,7 +114,7 @@ function GoalActivity({ data }) {
 }
 
 
-function AuctionActivity({ data }) {
+function AuctionActivity({ data,openDonateCoinModal, openDonateNFTModal }) {
   const { api, GetAllEvents } = usePolkadotContext();
 
   const [eventURI, setEventURI] = useState({
@@ -156,7 +156,7 @@ function AuctionActivity({ data }) {
           <span className="text-piccolo">{data.name}</span> just created an event
         </p>
       </div>
-      <EventCard item={eventURI} className="shadow-none !bg-goku border border-beerus" />
+      <EventCard item={eventURI} openDonateCoinModal={openDonateCoinModal} openDonateNFTModal={openDonateNFTModal} className="shadow-none !bg-goku border border-beerus" />
     </div>
   );
   // return <></>
@@ -247,7 +247,7 @@ function IdeaActivity({ data, hideGoToButton }) {
   );
 }
 
-const ActivityCard = ({ old_date, type, data, className = '', hideGoToButton = false }) => {
+const ActivityCard = ({ old_date, type, data, className = '', hideGoToButton = false,openDonateCoinModal, openDonateNFTModal }) => {
   const [formattedDuration, SetformattedDuration] = useState('');
 
   useEffect(() => {
@@ -273,7 +273,7 @@ const ActivityCard = ({ old_date, type, data, className = '', hideGoToButton = f
       {type === 'badge' && <BadgeActivity data={data} />}
       {type === 'vote' && <VoteActivity data={data} />}
       {type === 'goal' && <GoalActivity data={data} />}
-      {type === 'event' && <AuctionActivity data={data} />}
+      {type === 'event' && <AuctionActivity openDonateCoinModal={ openDonateCoinModal} openDonateNFTModal={openDonateNFTModal} data={data} />}
       {type === 'donation' && <DonationActivity data={data} />}
       {type === 'idea' && <IdeaActivity data={data} hideGoToButton={hideGoToButton} />}
     </Card>

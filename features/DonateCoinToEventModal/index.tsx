@@ -9,10 +9,9 @@ import { toast } from 'react-toastify';
 declare let window;
 export default function DonateCoinToEventModal({ open, onClose, eventName, eventid, recieveWallet }) {
   const [Balance, setBalance] = useState('');
-  const [BalanceAmount, setBalanceAmount] = useState(0);
-  const [Coin, setCoin] = useState('');
+  const [Coin, setCoin] = useState('DOT');
   const [isLoading, setIsLoading] = useState(false);
-  const { PolkadotLoggedIn, userWalletPolkadot } = usePolkadotContext();
+  const { userInfo, PolkadotLoggedIn, userWalletPolkadot, userSigner, showToast, api } = usePolkadotContext();
 
   const { getCurrency } = useEnvironment();
 
@@ -48,38 +47,35 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
 
     toast.update(ToastId, { render: 'Sending Transaction...', isLoading: true });
 
-    let methodWithSignature = await window.contractUnique.populateTransaction.add_donation(eventid, `${Amount * 1e18}`, feed);
-    const tx = {
-      ...methodWithSignature,
-      value: `${Amount * 1e18}`
-    };
+    const txs = [api.tx.balances.transferAllowDeath(recieveWallet, `${Amount * 1e12}`), api._extrinsics.events.addDonation(eventid, `${Amount * 1e12}`, Number(window.userid)), api._extrinsics.feeds.addFeed(feed, 'donation', new Date().valueOf())];
 
-    toast.update(ToastId, { render: 'Success!', isLoading: false, type: 'success' });
+    const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+      showToast(status, ToastId, 'Donation Successful!', onSuccess);
+    });
 
-    onSuccess();
+
   }
 
-  async function LoadData(currencyChanged = false) {
-    async function setPolkadotVara() {
-      if (Coin !== 'VARA') setCoin('VARA');
+  async function LoadData() {
+    if (!api) return;
+    async function setPolkadot() {
+
+      const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
+
+      setBalance((Number(balance.free.toString()) / 1e12).toString());
     }
 
-    if (currencyChanged == false && Coin == '') {
-      setPolkadotVara();
-    } else if (currencyChanged == true && Coin == 'VARA') {
-      setPolkadotVara();
-    }
+    setPolkadot();
   }
+
   function isInvalid() {
     return !Amount;
   }
-  useEffect(() => {
-    if (Coin !== '') LoadData(true);
-  }, [Coin]);
+
 
   useEffect(() => {
     LoadData();
-  }, [open]);
+  }, [open, api]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -99,30 +95,23 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
                   <Dropdown value={Coin} onChange={setCoin} className="max-w-[100px] ">
                     <Dropdown.Select>{Coin}</Dropdown.Select>
                     <Dropdown.Options className="bg-gohan w-48 min-w-0">
-                      <Dropdown.Option value="UNQ">
-                        <MenuItem>UNQ</MenuItem>
-                      </Dropdown.Option>
-                      <Dropdown.Option value="VARA">
-                        <MenuItem>VARA</MenuItem>
+                      <Dropdown.Option value="DOT">
+                        <MenuItem >DOT</MenuItem>
                       </Dropdown.Option>
                     </Dropdown.Options>
                   </Dropdown>
                 </div>
-                {Coin == '' ? (
-                  <></>
-                ) : (
-                  <>
-                    {Number(BalanceAmount) - Amount < 1 ? (
-                      <>
-                        <p className=" w-full text-right text-chichi">Insufficent Balance </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-trunks w-full text-right">Your balance will be {Number(BalanceAmount) - Amount + ' ' + Coin} </p>
-                      </>
-                    )}
-                  </>
-                )}
+                <>
+                  {Number(Balance) - Amount < 1 ? (
+                    <>
+                      <p className=" w-full text-right text-chichi">Insufficent Balance </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-trunks w-full text-right">Your balance will be {Number(Balance) - Amount + ' ' + Coin} </p>
+                    </>
+                  )}
+                </>
               </div>
 
               <div className="flex justify-between border-t border-beerus w-full p-6">

@@ -23,7 +23,7 @@ export default function Events() {
   const [nfts, setNfts] = useState([]);
   const { api, getUserInfoById,GetAllDaos, GetAllEvents } = usePolkadotContext();
   const [eventIdTxt, setEventTxtID] = useState('');
-  const [showCreateGoalModal, setShowDonateNFTModal] = useState(false);
+  const [showDonateNftModal, setShowDonateNFTModal] = useState(false);
   const [showBuyTicketModal, setShowBuyTicketModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
   const [showPlaceHigherBidModal, setShowPlaceHigherBidModal] = useState<NFT | null>(null);
@@ -335,7 +335,7 @@ export default function Events() {
         )}
       </div>
 
-      <DonateNFTModal open={showCreateGoalModal} onClose={closeDonateNFTModal} eventid={eventIdTxt} eventName={EventURI.Title} />
+      <DonateNFTModal open={showDonateNftModal} onClose={closeDonateNFTModal} eventid={eventIdTxt} eventName={EventURI.Title} />
       <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} eventid={EventID} recieveWallet={EventURI.wallet} />
       <PlaceHigherBidModal open={!!showPlaceHigherBidModal} onClose={() => setShowPlaceHigherBidModal(null)} item={showPlaceHigherBidModal} />
       <BidHistoryModal open={!!showBidHistoryModal} onClose={() => setShowBidHistoryModal(null)} item={showBidHistoryModal} />

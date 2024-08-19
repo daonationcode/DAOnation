@@ -8,11 +8,11 @@ import Link from 'next/link';
 import { Button } from '@heathmont/moon-core-tw';
 import { useRouter } from 'next/router';
 
-const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal }: { item: CharityEvent; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) => {}; openDonateNFTModal?: (eventid, eventName, eventWallet) => {} }) => {
+const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal }: { item: CharityEvent; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) =>void; openDonateNFTModal?: (eventid, eventName, eventWallet) =>void }) => {
   const [showPlaceholder, setShowPlaceholder] = useState(false);
   const router = useRouter();
   const { getCurrency } = useEnvironment();
-
+  if (item?.Title == undefined || ( item?.Title ==="")  ) return <></>;
   return (
     <Card className={`max-w-[720px] ${className}`}>
       <div className="flex w-full">

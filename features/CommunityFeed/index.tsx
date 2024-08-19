@@ -7,14 +7,20 @@ import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import Loader from '../../components/components/Loader';
 import EmptyState from '../../components/components/EmptyState';
 import { SportDarts } from '@heathmont/moon-icons-tw';
+import DonateNFTModal from '../DonateNFTModal';
+import DonateCoinToEventModal from '../DonateCoinToEventModal';
 
 const CommunityFeed = ({ communityName, daoId }) => {
   const [loading, setLoading] = useState(false);
   const [Items, setItems] = useState([]);
   const [avatarUrl, setAvatarUrl] = useState('');
   const [userName, setUserName] = useState('');
+  const [showDonateNftModal, setShowDonateNFTModal] = useState(false);
+  const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const { api, userInfo, GetAllFeeds } = usePolkadotContext();
+  const [selectedAuctionEvent,setSelectedAuctionEvent] = useState({eventId:-1,eventName:"",wallet:""});
+
 
   async function fetchContractData() {
     setLoading(true);
@@ -44,6 +50,28 @@ const CommunityFeed = ({ communityName, daoId }) => {
       setShowPostModal(false);
     }
   }
+  function openDonateCoinModal(eventId, title, wallet) {
+    let obj = {eventId:eventId,eventName:title,wallet:wallet}
+    setSelectedAuctionEvent(obj);
+    setShowDonateCoinModal(true)
+  }
+  function openDonateNFTModal(eventId, title, wallet) {
+    let obj = {eventId:eventId,eventName:title,wallet:wallet}
+    setSelectedAuctionEvent(obj);
+    setShowDonateNFTModal(true);
+  }
+
+  function closeDonateNFTModal(event) {
+    if (event) {
+      setShowDonateNFTModal(false);
+    }
+  }
+  
+  function closeDonateCoinModal(event) {
+    if (event) {
+      setShowDonateCoinModal(false);
+    }
+  }
 
   useEffect(() => {
     setAvatarUrl(userInfo.imgIpfs);
@@ -57,9 +85,13 @@ const CommunityFeed = ({ communityName, daoId }) => {
   return (
     <div className="flex flex-col gap-2 w-full items-center pb-10 min-w-[540px]">
       <AddPostCard avatarUrl={avatarUrl} onClick={() => setShowPostModal(true)} />
-      <Loader element={Items.length > 0 ? Items.map((item, index) => <ActivityCard key={index} old_date={item.date} type={item.type} data={item.data}></ActivityCard>) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="There are no posts in the feed yet." />} width={540} height={120} many={3} loading={loading} />
+      <Loader element={Items.length > 0 ? Items.map((item, index) => <ActivityCard key={index} old_date={item.date} type={item.type} data={item.data} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} ></ActivityCard>) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="There are no posts in the feed yet." />} width={540} height={120} many={3} loading={loading} />
       <CreatePostModal onClose={closeShowPostModal} show={showPostModal} avatarUrl={avatarUrl} userName={userName} communityName={communityName} />
+      <DonateNFTModal open={showDonateNftModal} onClose={closeDonateNFTModal} eventid={selectedAuctionEvent.eventId} eventName={selectedAuctionEvent.eventName} />
+      <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={selectedAuctionEvent.eventName} eventid={selectedAuctionEvent.eventId} recieveWallet={selectedAuctionEvent.wallet} />
+  
     </div>
+    
   );
 };
 

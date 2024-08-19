@@ -138,6 +138,7 @@ export function PolkadotProvider({ children }) {
 
   let allVotes = [];
   let allDonations = [];
+  let allEventDonations = [];
   let allIdeas = [];
   let allGoals = [];
   let allEvents = [];
@@ -509,6 +510,36 @@ export function PolkadotProvider({ children }) {
 
 
   
+
+  
+  async function fetchPolkadotEventDonationsData() {
+    //Fetching data from Parachain
+    try {
+      if (api) {
+        let totalDonationsCount = Number(await api._query.events.donationsIds());
+        let arr = [];
+        for (let i = 0; i < totalDonationsCount; i++) {
+          const element = await api._query.events.donationsById(i);
+          let newElm = {
+            id: element['__internal__raw'].id.toString(),
+            eventId: element['__internal__raw'].eventId.toString(),
+            userid: element['__internal__raw'].userid.toString(),
+            donation: Number(element['__internal__raw'].donation.toString())/ 1e12,
+          };
+          arr.push(newElm);
+        }
+        return arr;
+      }
+    } catch (error) { console.error(error) }
+    return [];
+  }
+
+  async function GetAllEventDonations() {
+
+    let arr = [];
+    arr = arr.concat(await fetchPolkadotEventDonationsData());
+    return arr;
+  }
   async function fetchPolkadotEventData() {
     //Fetching data from Parachain
     try {
@@ -518,6 +549,13 @@ export function PolkadotProvider({ children }) {
         for (let i = 0; i < totalEventCount; i++) {
           const element = await api._query.events.eventById(i);
           const object = JSON.parse(element['__internal__raw'].eventUri.toString())
+
+          let totalDonation = 0;
+          let currentEventDonations = allEventDonations.filter((e) => e.eventId ==  Number(element['__internal__raw'].id))
+          for (let i = 0; i < currentEventDonations.length; i++) {
+            const element = (currentEventDonations[i]);
+            totalDonation += element.donation;
+          }
 
           let newElm = {
             id: Number(element['__internal__raw'].id),
@@ -530,7 +568,7 @@ export function PolkadotProvider({ children }) {
             wallet: object.properties.wallet.description,
             logo: object.properties.logo.description.url,
             eventType: object.properties.eventType.description,
-            reached: object.properties.reached?.description,
+            reached: totalDonation,
             amountOfNFTs: object.properties.amountOfNFTs?.description,
             status: "test",
             UserId: Number(element['__internal__raw'].userId)
@@ -548,6 +586,7 @@ export function PolkadotProvider({ children }) {
 
   async function GetAllEvents(cache = false) {
     if (cache && allEvents.length >0) return allEvents;
+    allEventDonations= await GetAllEventDonations();
     let arr = [];
     arr = arr.concat(await fetchPolkadotEventData());
     return arr;

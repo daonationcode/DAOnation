@@ -18,6 +18,7 @@ import EventCard from '../../../components/components/EventCard';
 import CreateEventModal from '../../../features/CreateEventModal';
 import DonateCoinToEventModal from '../../../features/DonateCoinToEventModal';
 import DonateNFTModal from '../../../features/DonateNFTModal';
+import { CharityEvent } from '../../../data-model/event';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
@@ -37,7 +38,7 @@ export default function DAO() {
   const [aboutTemplate, setAboutTemplate] = useState('');
   const [tabIndex, setTabIndex] = useState(0);
   const [communityMembers, setCommunityMembers] = useState([]);
-  const [AuctionEvents, setAuctionEvents] = useState([]);
+  const [AuctionEvents, setAuctionEvents] = useState<CharityEvent[]>([]);
   const [SelectedEventName, setSelectedEventName] = useState('Event');
   const [SelectedEventId, setSelectedEventId] = useState(0);
   const [SelectedEventRecieveWallet, setSelectedEventReceiveWallet] = useState('');
@@ -316,7 +317,7 @@ export default function DAO() {
         {tabIndex === 1 && <div className="template-container mt-[-2rem] w-full"></div>}
         {tabIndex === 2 && (
           <div className="flex flex-col gap-8 container items-center pb-10">
-            <Loader element={AuctionEvents.length > 0 ? AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={() => openDonateNFTModal} openDonateCoinModal={() => openDonateCoinModal} />) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />} width={768} height={236} many={3} loading={loading} />{' '}
+            <Loader element={AuctionEvents.length > 0 ? AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} />) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />} width={768} height={236} many={3} loading={loading} />{' '}
           </div>
         )}
         {tabIndex === 3 && (

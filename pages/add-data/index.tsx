@@ -19,6 +19,14 @@ const AllCharities = [
 
     }
 ]
+const AllEvents = [
+    {
+        metadata:{ "title": "Asset Metadata", "type": "object", "properties": { "Title": { "type": "string", "description": "Woodland Trust" }, "Description": { "type": "string", "description": "We protect. We fight to protect woods and trees, preventing the loss of irreplaceable habitat, nature and carbon stores for a healthier future for everyone." }, "Budget": { "type": "string", "description": "100" }, "End_Date": { "type": "string", "description": "2024-08-19" }, "user_id": { "type": "string", "description": "0" }, "wallet": { "type": "string", "description": "5HBgU6yBy49MT6FC2g8v2YFZnw4FmpQa2ER997gA5M4tJbWX" }, "logo": { "type": "string", "description": { "url": "https://aqua-dull-locust-679.mypinata.cloud/ipfs/bafkreic3bhlqzoctehlgoszwcgse54wiyal56zp2qv546jeandgrm3jmz4?pinataGatewayToken=v8BV9VKQs69NLLcVsQaw_fd_pcihpitKGBGpB13WTx40K9pHydzCcywsW0F1yAeL", "type": "image/jpeg" } }, "eventStreamUrl": { "type": "string", "description": "" }, "ticketPrice": { "type": "string", "description": "" }, "eventType": { "type": "string", "description": "auction" }, "allFiles": [ { "url": "https://aqua-dull-locust-679.mypinata.cloud/ipfs/bafkreic3bhlqzoctehlgoszwcgse54wiyal56zp2qv546jeandgrm3jmz4?pinataGatewayToken=v8BV9VKQs69NLLcVsQaw_fd_pcihpitKGBGpB13WTx40K9pHydzCcywsW0F1yAeL", "type": "image/jpeg" } ] } },
+        daoId:0,
+        userid:0,
+        feed:{ "name": "Zakir Hossen", "daoId": 0, "eventid": 0, "budget": "100" }
+    }
+]
 const AllGoals = [
     {
         wallet: "5HBgU6yBy49MT6FC2g8v2YFZnw4FmpQa2ER997gA5M4tJbWX",
@@ -90,7 +98,32 @@ export default function AddData() {
         EasyToast('Registered All Charities!', 'success', true, ToastId.toString());
 
     }
+async function AddEvents() {
+        const ToastId = toast.loading(`Creating Events (${AllEvents.length})`);
+        for (let i = 0; i < AllEvents.length; i++) {
+            EasyToast(`Creating Events  (${i + 1}/${AllEvents.length})`, 'pending', true, ToastId.toString(), true);
 
+            const event = AllEvents[i];
+            const newPromise = new Promise(async (resolve, reject) => {
+                async function onSuccess() {
+                    resolve(true)
+                }
+
+
+                const txs = [api._extrinsics.events.createEvent(JSON.stringify(event.metadata),Number(event.daoId), Number(event.userid)), api._extrinsics.feeds.addFeed(JSON.stringify(event.feed), 'event', new Date().valueOf())];
+
+
+                await api.tx.utility.batch(txs).signAndSend(deriveAcc, (status) => {
+                  showToast(status, ToastId, 'Created Successfully!', onSuccess);
+                });
+
+            })
+            await newPromise
+
+        }
+        EasyToast('Created All Events!', 'success', true, ToastId.toString());
+
+    }
     async function AddGoals() {
         const ToastId = toast.loading(`Creating Goals (${AllGoals.length})`);
         for (let i = 0; i < AllGoals.length; i++) {
@@ -110,7 +143,7 @@ export default function AddData() {
             await newPromise
 
         }
-        EasyToast('Registered All Goals!', 'success', true, ToastId.toString());
+        EasyToast('Created All Goals!', 'success', true, ToastId.toString());
 
     }
 
@@ -138,7 +171,7 @@ export default function AddData() {
             await newPromise
 
         }
-        EasyToast('Registered All Ideas!', 'success', true, ToastId.toString());
+        EasyToast('Created All Ideas!', 'success', true, ToastId.toString());
 
     }
 
@@ -149,6 +182,7 @@ export default function AddData() {
             await AddUsers();
             await AddCharities();
             await AddGoals();
+            await AddEvents();
             await AddIdeas();
         } catch (error) {
             console.error(error)
