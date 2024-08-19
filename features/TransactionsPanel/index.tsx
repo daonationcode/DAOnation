@@ -1,6 +1,6 @@
 import { Table } from '@heathmont/moon-table-tw';
 import { useMemo } from 'react';
-import useEnvironment from '../../services/useEnvironment';
+import useEnvironment from '../../contexts/EnvironmentContext';
 import HeaderLabel from '../../components/components/HeaderLabel';
 
 const TransactionsPanel = () => {

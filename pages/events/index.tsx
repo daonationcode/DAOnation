@@ -3,8 +3,6 @@ import EventCard from '../../components/components/EventCard';
 import { CharityEvent } from '../../data-model/event';
 
 export default function Events() {
- 
-
   return (
     <>
       <Head>

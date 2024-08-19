@@ -10,7 +10,7 @@ import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import Required from '../../components/components/Required';
 
 import { toast } from 'react-toastify';
-import useEnvironment from '../../services/useEnvironment';
+import useEnvironment from '../../contexts/EnvironmentContext';
 import { useIPFSContext } from '../../contexts/IPFSContext';
 import EventTypeOption from '../../components/components/EventTypeOption';
 
@@ -168,12 +168,11 @@ export default function CreateEventModal({ open, onClose, daoId }) {
         window.location.reload();
       }, 1000);
     }
-    
+
     let eventid = Number(await api._query.events.eventIds());
     feed.eventid = eventid;
 
-    const txs = [api._extrinsics.events.createEvent(JSON.stringify(createdObject),Number(daoId), Number(window.userid)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'event', new Date().valueOf())];
-
+    const txs = [api._extrinsics.events.createEvent(JSON.stringify(createdObject), Number(daoId), Number(window.userid)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'event', new Date().valueOf())];
 
     await api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
       showToast(status, ToastId, 'Created Successfully!', onSuccess);

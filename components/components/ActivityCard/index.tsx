@@ -6,7 +6,7 @@ import IdeaCard from '../IdeaCard';
 import GoalCard from '../GoalCard';
 import EventCard from '../EventCard';
 import { useEffect, useState } from 'react';
-import useEnvironment from '../../../services/useEnvironment';
+import useEnvironment from '../../../contexts/EnvironmentContext';
 import { usePolkadotContext } from '../../../contexts/PolkadotContext';
 import { Idea } from '../../../data-model/idea';
 
@@ -113,25 +113,29 @@ function GoalActivity({ data }) {
   );
 }
 
+<<<<<<< Updated upstream
 
 function AuctionActivity({ data,openDonateCoinModal, openDonateNFTModal }) {
+=======
+function AuctionActivity({ data }) {
+>>>>>>> Stashed changes
   const { api, GetAllEvents } = usePolkadotContext();
 
   const [eventURI, setEventURI] = useState({
     id: 0,
     eventId: 0,
     daoId: 0,
-    Title: "",
-    Description: "",
+    Title: '',
+    Description: '',
     Budget: 0,
     End_Date: new Date(),
-    wallet: "",
+    wallet: '',
     UserId: 0,
-    logo: "",
-    type: "",
+    logo: '',
+    type: '',
     reached: 0,
-    amountOfNFTs:0,
-    status:""
+    amountOfNFTs: 0,
+    status: ''
   });
 
   async function fetchContractData() {
@@ -156,7 +160,11 @@ function AuctionActivity({ data,openDonateCoinModal, openDonateNFTModal }) {
           <span className="text-piccolo">{data.name}</span> just created an event
         </p>
       </div>
+<<<<<<< Updated upstream
       <EventCard item={eventURI} openDonateCoinModal={openDonateCoinModal} openDonateNFTModal={openDonateNFTModal} className="shadow-none !bg-goku border border-beerus" />
+=======
+      <EventCard item={eventURI} preview={true} className="shadow-none !bg-goku border border-beerus" />
+>>>>>>> Stashed changes
     </div>
   );
   // return <></>

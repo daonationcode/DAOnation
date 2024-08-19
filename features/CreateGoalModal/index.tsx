@@ -9,7 +9,7 @@ import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import Required from '../../components/components/Required';
 
 import { toast } from 'react-toastify';
-import useEnvironment from '../../services/useEnvironment';
+import useEnvironment from '../../contexts/EnvironmentContext';
 import { useIPFSContext } from '../../contexts/IPFSContext';
 
 let addedDate = false;
@@ -133,7 +133,7 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
     if (PolkadotLoggedIn) {
       let goalid = Number(await api._query.goals.goalIds());
       feed.goalid = goalid;
-   
+
       const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {

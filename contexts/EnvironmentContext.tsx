@@ -15,3 +15,13 @@ export const EnvironmentProvider = ({ children }) => {
 
   return <EnvironmentContext.Provider value={{ setCurrency, getCurrency, isServer }}>{children}</EnvironmentContext.Provider>;
 };
+
+const useEnvironment = () => {
+  const context = useContext(EnvironmentContext);
+  if (context === undefined) {
+    throw new Error('useEnvironment must be used within an EnvironmentProvider');
+  }
+  return context;
+};
+
+export default useEnvironment;

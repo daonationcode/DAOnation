@@ -4,7 +4,7 @@ import { Button } from '@heathmont/moon-core-tw';
 import Link from 'next/link';
 import { ArrowsRightShort, SportDarts } from '@heathmont/moon-icons-tw';
 import { useState } from 'react';
-import useEnvironment from '../../../services/useEnvironment';
+import useEnvironment from '../../../contexts/EnvironmentContext';
 
 const GoalCard = ({ item, className = '' }) => {
   const [showPlaceholder, setShowPlaceholder] = useState(false);

@@ -22,7 +22,7 @@ import { CharityEvent } from '../../../data-model/event';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
-  const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals,GetAllEvents  } = usePolkadotContext();
+  const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals, GetAllEvents } = usePolkadotContext();
   const [DaoURI, setDaoURI] = useState({ Title: '', Description: '', SubsPrice: null, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', allFiles: [], isOwner: false, daoId: null, user_id: null, user_info: null } as Dao);
 
   const [daoId, setDaoID] = useState(-1);
@@ -48,7 +48,7 @@ export default function DAO() {
   useEffect(() => {
     getDaoID();
     fetchData();
-  }, [api, router,daoId]);
+  }, [api, router, daoId]);
 
   useEffect(() => {
     (async function () {
@@ -87,7 +87,7 @@ export default function DAO() {
     if (!daoIdParam) {
       return;
     }
-   setDaoID(Number(daoIdParam));
+    setDaoID(Number(daoIdParam));
   }
 
   async function leaveCommunity() {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button, Dropdown, IconButton, MenuItem, Modal } from '@heathmont/moon-core-tw';
 import { ControlsClose } from '@heathmont/moon-icons-tw';
 import UseFormInput from '../../components/components/UseFormInput';
-import useEnvironment from '../../services/useEnvironment';
+import useEnvironment from '../../contexts/EnvironmentContext';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import { toast } from 'react-toastify';
 

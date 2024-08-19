@@ -1,16 +1,18 @@
 import Image from 'next/legacy/image';
 import Card from '../Card';
 import { ArrowsRightShort, GenericLoyalty, ShopWallet, SportDarts } from '@heathmont/moon-icons-tw';
-import { MouseEventHandler, useState } from 'react';
-import useEnvironment from '../../../services/useEnvironment';
+import { useState } from 'react';
+import useEnvironment from '../../../contexts/EnvironmentContext';
 import { CharityEvent } from '../../../data-model/event';
 import Link from 'next/link';
 import { Button } from '@heathmont/moon-core-tw';
-import { useRouter } from 'next/router';
 
+<<<<<<< Updated upstream
 const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal }: { item: CharityEvent; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) =>void; openDonateNFTModal?: (eventid, eventName, eventWallet) =>void }) => {
+=======
+const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal, preview }: { item: CharityEvent; preview?: boolean; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) => {}; openDonateNFTModal?: (eventid, eventName, eventWallet) => {} }) => {
+>>>>>>> Stashed changes
   const [showPlaceholder, setShowPlaceholder] = useState(false);
-  const router = useRouter();
   const { getCurrency } = useEnvironment();
   if (item?.Title == undefined || ( item?.Title ==="")  ) return <></>;
   return (
@@ -35,14 +37,28 @@ const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTMod
             <p>NFTs</p>
           </div>
           <div className="absolute bottom-0 right-0 flex gap-2">
-            {item.status != "ended" ? <>
-              <Button variant="secondary" iconLeft={<GenericLoyalty />} onClick={() => { openDonateNFTModal(item.eventId, item.Title, item.wallet) }}>
-                Donate NFT
-              </Button>
-              <Button variant="secondary" iconLeft={<ShopWallet />} onClick={() => { openDonateCoinModal(item.eventId, item.Title, item.wallet) }}>
-                Donate Coin
-              </Button>
-            </> : <></>}
+            {item.status !== 'ended' && !preview && (
+              <>
+                <Button
+                  variant="secondary"
+                  iconLeft={<GenericLoyalty />}
+                  onClick={() => {
+                    openDonateNFTModal(item.eventId, item.Title, item.wallet);
+                  }}
+                >
+                  Donate NFT
+                </Button>
+                <Button
+                  variant="secondary"
+                  iconLeft={<ShopWallet />}
+                  onClick={() => {
+                    openDonateCoinModal(item.eventId, item.Title, item.wallet);
+                  }}
+                >
+                  Donate Coin
+                </Button>
+              </>
+            )}
 
             <Link href={`${location.pathname}/event/${item.eventId}`}>
               <Button iconLeft={<ArrowsRightShort />}>Go to event</Button>

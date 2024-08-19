@@ -2,7 +2,7 @@ import { Dropdown, MenuItem } from '@heathmont/moon-core-tw';
 import Card from '../../components/components/Card';
 import { useEffect, useState } from 'react';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import useEnvironment from '../../services/useEnvironment';
+import useEnvironment from '../../contexts/EnvironmentContext';
 
 const options = [{ id: 'most_donations_received', label: 'Received donations' }];
 

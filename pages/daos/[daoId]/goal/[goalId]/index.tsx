@@ -11,7 +11,7 @@ import { usePolkadotContext } from '../../../../../contexts/PolkadotContext';
 import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import useEnvironment from '../../../../../services/useEnvironment';
+import useEnvironment from '../../../../../contexts/EnvironmentContext';
 import { toast } from 'react-toastify';
 import { Dao } from '../../../../../data-model/dao';
 

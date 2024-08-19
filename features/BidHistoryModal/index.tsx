@@ -2,7 +2,7 @@ import { IconButton, Modal } from '@heathmont/moon-core-tw';
 import { ControlsClose } from '@heathmont/moon-icons-tw';
 import { useEffect, useMemo } from 'react';
 import { NFT } from '../../data-model/nft';
-import useEnvironment from '../../services/useEnvironment';
+import useEnvironment from '../../contexts/EnvironmentContext';
 import { Table } from '@heathmont/moon-table-tw';
 import HeaderLabel from '../../components/components/HeaderLabel';
 

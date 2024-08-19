@@ -3,7 +3,7 @@ import Stats, { ProfileStats } from './Stats';
 import DAOCard from '../../components/components/DaoCard';
 import GoalCard from '../../components/components/GoalCard';
 import IdeaCard from '../../components/components/IdeaCard';
-import useEnvironment from '../../services/useEnvironment';
+import useEnvironment from '../../contexts/EnvironmentContext';
 import { Dao } from '../../data-model/dao';
 import { Goal } from '../../data-model/goal';
 import { Idea } from '../../data-model/idea';

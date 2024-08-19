@@ -3,7 +3,7 @@ import { GenericInfo } from '@heathmont/moon-icons-tw';
 import { Table } from '@heathmont/moon-table-tw';
 import { useEffect, useMemo, useState } from 'react';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import useEnvironment from '../../services/useEnvironment';
+import useEnvironment from '../../contexts/EnvironmentContext';
 import HeaderLabel from '../../components/components/HeaderLabel';
 
 const MembersTable = ({ allJoined, goals }) => {
@@ -72,7 +72,7 @@ const MembersTable = ({ allJoined, goals }) => {
       for (let i = 0; i < allJoined.length; i++) {
         const element = allJoined[i];
         let userInfo = await getUserInfoById(Number(element.user_id));
-        let allIdeasIds = allIdeas.map((e) =>  Number(e.user_id) == Number(element.user_id));
+        let allIdeasIds = allIdeas.map((e) => Number(e.user_id) == Number(element.user_id));
 
         let allDonations = await GetAllDonations();
         let totalAmount = 0;

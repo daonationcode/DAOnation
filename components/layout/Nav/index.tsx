@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import CreateDaoModal from '../../../features/CreateDaoModal';
 import { usePolkadotContext } from '../../../contexts/PolkadotContext';
-import useEnvironment from '../../../services/useEnvironment';
+import useEnvironment from '../../../contexts/EnvironmentContext';
 import { GenericUser } from '@heathmont/moon-icons-tw';
 
 let running = false;
 let changedPath = true;
 
 export function Nav(): JSX.Element {
-  const { api, userInfo,userWalletPolkadot } = usePolkadotContext();
+  const { api, userInfo, userWalletPolkadot } = usePolkadotContext();
   const [acc, setAcc] = useState('');
   const [logo, setLogo] = useState('');
   const [user_id, setUser_id] = useState('-1');
@@ -56,7 +56,6 @@ export function Nav(): JSX.Element {
         return;
       }
     } else {
-  
       if (location.pathname !== '/' && location.pathname !== '/add-data' && location.pathname !== '/login' && location.pathname !== '/register') {
         window.location.href = '/';
       }

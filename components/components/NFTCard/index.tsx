@@ -1,6 +1,6 @@
 import Card from '../Card';
 import Image from 'next/image';
-import useEnvironment from '../../../services/useEnvironment';
+import useEnvironment from '../../../contexts/EnvironmentContext';
 import { NFT } from '../../../data-model/nft';
 import { Button } from '@heathmont/moon-core-tw';
 import { ControlsPlus, TimeClock } from '@heathmont/moon-icons-tw';

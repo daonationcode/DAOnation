@@ -9,7 +9,7 @@ import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import Required from '../../components/components/Required';
 
 import { toast } from 'react-toastify';
-import useEnvironment from '../../services/useEnvironment';
+import useEnvironment from '../../contexts/EnvironmentContext';
 import { useIPFSContext } from '../../contexts/IPFSContext';
 
 export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitle }) {
@@ -101,7 +101,6 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
       feed.ideasid = ideasId;
       console.log(JSON.stringify(createdObject), goalId, daoId, window.userid, JSON.stringify(feed));
 
-      return;
       const txs = [api._extrinsics.ideas.createIdeas(JSON.stringify(createdObject), goalId, daoId, window.userid, JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'idea', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {

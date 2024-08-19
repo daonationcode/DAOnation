@@ -3,6 +3,7 @@ declare global {
     userid: string;
     signerAddress: string;
     injectedWeb3: any;
+    editorGJ: any;
   }
 }
 export {};

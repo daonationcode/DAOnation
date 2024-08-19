@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@heathmont/moon-core-tw';
 import { ArrowsRightShort, GenericIdea, ShopWallet } from '@heathmont/moon-icons-tw';
 import { useState } from 'react';
-import useEnvironment from '../../../services/useEnvironment';
+import useEnvironment from '../../../contexts/EnvironmentContext';
 
 const IdeaCard = ({ item, onClickVote, onClickDonate, preview, hideGoToButton, className }: { item: Idea; onClickVote?; onClickDonate?; preview?: boolean; hideGoToButton?: boolean; className?: string }) => {
   const [showPlaceholder, setShowPlaceholder] = useState(false);
