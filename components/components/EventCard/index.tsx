@@ -7,14 +7,10 @@ import { CharityEvent } from '../../../data-model/event';
 import Link from 'next/link';
 import { Button } from '@heathmont/moon-core-tw';
 
-<<<<<<< Updated upstream
-const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal }: { item: CharityEvent; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) =>void; openDonateNFTModal?: (eventid, eventName, eventWallet) =>void }) => {
-=======
-const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal, preview }: { item: CharityEvent; preview?: boolean; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) => {}; openDonateNFTModal?: (eventid, eventName, eventWallet) => {} }) => {
->>>>>>> Stashed changes
+const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal, preview }: { item: CharityEvent; preview?: boolean; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) => void; openDonateNFTModal?: (eventid, eventName, eventWallet) => void }) => {
   const [showPlaceholder, setShowPlaceholder] = useState(false);
   const { getCurrency } = useEnvironment();
-  if (item?.Title == undefined || ( item?.Title ==="")  ) return <></>;
+  if (item?.Title == undefined || item?.Title === '') return <></>;
   return (
     <Card className={`max-w-[720px] ${className}`}>
       <div className="flex w-full">
