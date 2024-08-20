@@ -1,7 +1,7 @@
 import grapesjs, { EditorConfig, PropertyProps } from 'grapesjs';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
-import { gjsPlugin } from '../../components/plugin/gjsPlugin';
+import { gjsPlugin } from '../../../../components/plugin/gjsPlugin';
 
 import gjs_blocks_basic from 'grapesjs-blocks-basic';
 import grapesjs_custom_code from 'grapesjs-custom-code';
@@ -15,7 +15,7 @@ import grapesjs_tui_image_editor from 'grapesjs-tui-image-editor';
 import grapesjs_typed from 'grapesjs-typed';
 import 'grapesjs/dist/css/grapes.min.css';
 import { Button, Input } from '@heathmont/moon-core-tw';
-import { usePolkadotContext } from '../../contexts/PolkadotContext';
+import { usePolkadotContext } from '../../../../contexts/PolkadotContext';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 
@@ -25,7 +25,7 @@ export default function DesignDao() {
   const sleep = (milliseconds) => {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
   };
-  const { api, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
+  const { api, showToast, userWalletPolkadot, userSigner } = usePolkadotContext();
   const router = useRouter();
   let daoId = '';
   const [editor, setEditor] = useState(null);

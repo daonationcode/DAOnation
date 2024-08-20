@@ -1,5 +1,5 @@
 import { Button, Tabs } from '@heathmont/moon-core-tw';
-import { ControlsPlus, GenericEdit, GenericLogOut, SportDarts } from '@heathmont/moon-icons-tw';
+import { ControlsPlus, GenericEdit, GenericHome, GenericLightningBolt, GenericLogOut, GenericPlus, SportDarts } from '@heathmont/moon-icons-tw';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -19,6 +19,7 @@ import CreateEventModal from '../../../features/CreateEventModal';
 import DonateCoinToEventModal from '../../../features/DonateCoinToEventModal';
 import DonateNFTModal from '../../../features/DonateNFTModal';
 import { CharityEvent } from '../../../data-model/event';
+import GenerateHomepageModal from '../../../features/GenerateHomepageModal';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
@@ -30,6 +31,8 @@ export default function DAO() {
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
   const [showDonateNftModal, setShowDonateNFTModal] = useState(false);
+  const [showGenerateHomepageModal, setShowGenerateHomepageModal] = useState(false);
+  const [hasNoTemplate, setHasNoTemplate] = useState(false);
   const [isJoined, setIsJoined] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [JoinedID, setJoinedID] = useState(9999);
@@ -136,7 +139,12 @@ export default function DAO() {
     };
 
     setDaoURI(daoURIShort);
-    setAboutTemplate(template_html);
+
+    if (template_html === '[object Object]') {
+      setHasNoTemplate(true);
+    } else {
+      setAboutTemplate(template_html);
+    }
   }
 
   async function fetchDaoData() {
@@ -149,6 +157,7 @@ export default function DAO() {
           const element = await api._query.daos.daoById(Number(daoId));
           let daoURI = element['__internal__raw'].daoUri.toString();
           let template_html = (await api._query.daos.templateById(daoId)).toString();
+
           updateDaoData(daoURI, template_html);
         } catch (e) {}
       }
@@ -208,6 +217,12 @@ export default function DAO() {
     }
   }
 
+  function closeGenerateHomepageModal(event) {
+    if (event) {
+      setShowGenerateHomepageModal(false);
+    }
+  }
+
   function closeCreateEventModal(event) {
     if (event) {
       setShowCreateEventModal(false);
@@ -216,6 +231,10 @@ export default function DAO() {
 
   function openCreateGoalModal() {
     setShowCreateGoalModal(true);
+  }
+
+  function openGenerateHomepageModal() {
+    setShowGenerateHomepageModal(true);
   }
 
   function openCreateEventModal() {
@@ -245,7 +264,22 @@ export default function DAO() {
         <meta name="description" content="DAO" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className={`flex items-center flex-col gap-8`}>
+      <div className={`flex items-center flex-col gap-8 relative`}>
+        {hasNoTemplate && (
+          <div className="absolute h-full w-full top-0 left-0 bg-goku z-10 flex flex-col gap-4 justify-center items-center">
+            <EmptyState icon={<GenericHome className="text-moon-48" />} label="This charity doesn’t have a homepage yet." />{' '}
+            <div className="flex flex-col gap-2">
+              <Button className="w-[220px]" iconLeft={<GenericLightningBolt />} onClick={openGenerateHomepageModal}>
+                Generate homepage
+              </Button>
+              <Link href={`${daoId}/design-dao`}>
+                <Button className="w-[220px]" variant="secondary" iconLeft={<GenericPlus />}>
+                  Start from scratch
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
         <div className={`gap-8 flex flex-col w-full bg-gohan pt-10 border-beerus border`}>
           <div className="container flex w-full justify-between relative">
             <div className="flex flex-col gap-1">
@@ -332,6 +366,7 @@ export default function DAO() {
         )}
       </div>
 
+      <GenerateHomepageModal open={showGenerateHomepageModal} onClose={closeGenerateHomepageModal} />
       <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} daoId={daoId} />
       <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={daoId} />
       <DonateCoinToEventModal open={!!showDonateCoinModal} onClose={() => setShowDonateCoinModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} recieveWallet={SelectedEventRecieveWallet} />

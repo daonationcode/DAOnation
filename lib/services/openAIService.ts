@@ -1,11 +1,11 @@
-export async function generateTemplate(messages: Array<{ role: string; content: string }>) {
-  const response = await fetch('/api/openai', {
+export async function generateTemplate(daoDescription: string) {
+  const response = await fetch('/api/openai/generateTemplate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      messages: messages
+      daoDescription
     })
   });
 

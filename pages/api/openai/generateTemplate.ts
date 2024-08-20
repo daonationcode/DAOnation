@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
-import { searchImages } from '../../../services/unsplashService';
+import { searchImages } from '../../../lib/services/unsplashService';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
