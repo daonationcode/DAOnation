@@ -16,4 +16,6 @@ export interface Dao {
     walletType: string;
     walletAddress: string;
   };
+  customUrl: string;
+  brandingColor: string;
 }

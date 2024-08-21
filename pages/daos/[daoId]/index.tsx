@@ -20,11 +20,13 @@ import DonateCoinToEventModal from '../../../features/DonateCoinToEventModal';
 import DonateNFTModal from '../../../features/DonateNFTModal';
 import { CharityEvent } from '../../../data-model/event';
 import GenerateHomepageModal from '../../../features/GenerateHomepageModal';
+import { CommunityService } from '../../../services/communityService';
+import { ApiCommunity } from '../../../data-model/api-community';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
   const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals, GetAllEvents } = usePolkadotContext();
-  const [DaoURI, setDaoURI] = useState({ Title: '', Description: '', SubsPrice: null, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', allFiles: [], isOwner: false, daoId: null, user_id: null, user_info: null } as Dao);
+  const [DaoURI, setDaoURI] = useState({ Title: '', Description: '', SubsPrice: null, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', allFiles: [], isOwner: false, daoId: null, user_id: null, user_info: null, brandingColor: '', customUrl: '' } as Dao);
 
   const [daoId, setDaoID] = useState(-1);
   const [showCreateGoalModal, setShowCreateGoalModal] = useState(false);
@@ -135,16 +137,12 @@ export default function DAO() {
       typeimg: daoURI.properties.typeimg.description,
       allFiles: daoURI.properties.allFiles.description,
       SubsPrice: daoURI.properties?.SubsPrice?.description,
+      brandingColor: daoURI.properties?.brandingColor?.description,
+      customUrl: daoURI.properties?.customUrl?.description,
       isOwner
     };
 
     setDaoURI(daoURIShort);
-
-    if (template_html === '[object Object]') {
-      setHasNoTemplate(false);
-    } else {
-      setAboutTemplate(template_html);
-    }
   }
 
   async function fetchDaoData() {
@@ -156,9 +154,15 @@ export default function DAO() {
         try {
           const element = await api._query.daos.daoById(Number(daoId));
           let daoURI = element['__internal__raw'].daoUri.toString();
-          let template_html = (await api._query.daos.templateById(daoId)).toString();
+          const { template } = await CommunityService.getByPolkadotReferenceId(daoId.toString());
 
-          updateDaoData(daoURI, template_html);
+          if (template === '[object Object]' || template === null) {
+            setHasNoTemplate(true);
+          } else {
+            setAboutTemplate(template);
+          }
+
+          updateDaoData(daoURI, template);
         } catch (e) {}
       }
     }
@@ -266,13 +270,13 @@ export default function DAO() {
       </Head>
       <div className={`flex items-center flex-col gap-8 relative`}>
         {hasNoTemplate && (
-          <div className="absolute h-full w-full top-0 left-0 bg-goku z-10 flex flex-col gap-4 justify-center items-center">
+          <div className="absolute h-full w-full top-0 left-0 bg-goku z-5 flex flex-col gap-4 justify-center items-center">
             <EmptyState icon={<GenericHome className="text-moon-48" />} label="This charity doesn’t have a homepage yet." />{' '}
             <div className="flex flex-col gap-2">
               <Button className="w-[220px]" iconLeft={<GenericLightningBolt />} onClick={openGenerateHomepageModal}>
                 Generate homepage
               </Button>
-              <Link href={`${daoId}/design-dao`}>
+              <Link href={`${daoId}/design`}>
                 <Button className="w-[220px]" variant="secondary" iconLeft={<GenericPlus />}>
                   Start from scratch
                 </Button>
@@ -317,7 +321,7 @@ export default function DAO() {
                   </Button>
                 )}
                 {isOwner && (
-                  <Link href={`/DesignDao?[${daoId}]`}>
+                  <Link href={`${daoId}/design`}>
                     <Button iconLeft={<GenericEdit />} variant="secondary" className="w-full">
                       Edit
                     </Button>
@@ -348,7 +352,7 @@ export default function DAO() {
             <CommunityFeed communityName={DaoURI.Title} daoId={daoId} /> <TopCommunityMembers goals={goalsList} allJoined={communityMembers} daoId={daoId} />
           </div>
         )}
-        {tabIndex === 1 && <div className="template-container mt-[-2rem] w-full"></div>}
+        {tabIndex === 1 && <div className="template-container container gap-6 pb-8 w-full"></div>}
         {tabIndex === 2 && (
           <div className="flex flex-col gap-8 container items-center pb-10">
             <Loader element={AuctionEvents.length > 0 ? AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} />) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />} width={768} height={236} many={3} loading={loading} />{' '}
@@ -366,7 +370,7 @@ export default function DAO() {
         )}
       </div>
 
-      <GenerateHomepageModal open={showGenerateHomepageModal} onClose={closeGenerateHomepageModal} />
+      <GenerateHomepageModal open={showGenerateHomepageModal} onClose={closeGenerateHomepageModal} item={DaoURI} />
       <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} daoId={daoId} />
       <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={daoId} />
       <DonateCoinToEventModal open={!!showDonateCoinModal} onClose={() => setShowDonateCoinModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} recieveWallet={SelectedEventRecieveWallet} />

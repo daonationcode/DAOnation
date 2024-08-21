@@ -18,17 +18,19 @@ import { Button, Input } from '@heathmont/moon-core-tw';
 import { usePolkadotContext } from '../../../../contexts/PolkadotContext';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
+import { CommunityService } from '../../../../services/communityService';
+import { GenericDelete, GenericSettings } from '@heathmont/moon-icons-tw';
+import { ApiCommunity } from '../../../../data-model/api-community';
 
-let DaoURI = { Title: '', Description: '', SubsPrice: 0, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', allFiles: [], isOwner: false };
-let rendered = false;
+let DaoURI = { daoId: '', Title: '', Description: '', SubsPrice: 0, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', customUrl: '', allFiles: [], isOwner: false };
 export default function DesignDao() {
-  const sleep = (milliseconds) => {
-    return new Promise((resolve) => setTimeout(resolve, milliseconds));
-  };
-  const { api, showToast, userWalletPolkadot, userSigner } = usePolkadotContext();
+  const { api } = usePolkadotContext();
   const router = useRouter();
+
   let daoId = '';
+
   const [editor, setEditor] = useState(null);
+  const [isNew, setIsNew] = useState(false);
 
   useEffect(() => {
     fetchAll();
@@ -358,7 +360,7 @@ export default function DesignDao() {
         }
       },
       canvas: {
-        styles: ['https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css', '/output.css', '/css/daos.css', '/theme.css', '/css/ideas.css'],
+        styles: ['https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css', '/output.css', '/css/daos.css', '/theme.css'],
         scripts: ['https://code.jquery.com/jquery-3.3.1.slim.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js']
       }
     });
@@ -367,27 +369,50 @@ export default function DesignDao() {
   }
 
   async function fetchAll() {
-    if (typeof window == 'undefined' || api === null || daoId === null) {
+    daoId = router.query['daoId'] as string;
+
+    if (typeof window == 'undefined' || !api || !daoId) {
       return null;
     }
-    await fetchContractData();
+    const data = (await CommunityService.getByPolkadotReferenceId(daoId)) as ApiCommunity;
+
+    const daoURI = await fetchContractData();
+
+    if (!data.template) {
+      console.log('is new?');
+      setIsNew(true);
+    }
+
+    UpdateDaoData(daoURI, data.template);
   }
 
   async function SaveHTML() {
-    const ToastId = toast.loading('Updating ...');
+    daoId = router.query['daoId'] as string;
 
-    let output = editor.getHtml() + '<style>' + editor.getCss() + '</style>';
+    const toastId = toast.loading('Updating ...');
 
-    await api._extrinsics.daos.updateTemplate(Number(daoId), output).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
-      showToast(status, ToastId, 'Updated Successfully!', () => {
-        window.location.href = '/daos/' + daoId;
-      });
-    });
+    const htmlString = editor.getHtml();
+    const parser = new DOMParser();
+    const html = parser.parseFromString(htmlString, 'text/html').querySelector('#dao-container');
+
+    let template = html.outerHTML + '<style>' + editor.getCss() + '</style>';
+
+    console.log('suddently is not new?', template);
+
+    if (isNew) {
+      CommunityService.create({ template, subdomain: DaoURI.customUrl, polkadot_reference_id: daoId });
+    } else {
+      await CommunityService.updateByPolkadotReferenceId(daoId, { template });
+    }
+
+    toast.update(toastId, { type: 'success', render: 'Homepage updated successfully!', autoClose: 1000, isLoading: false });
+
+    router.push(`/daos/${daoId}`);
   }
 
   async function UpdateDaoData(dao_uri, template_html) {
     document.querySelector('#dao-container').innerHTML = template_html;
-    rendered = true;
+
     const daoURI = JSON.parse(dao_uri); //Getting dao URI
 
     DaoURI = {
@@ -398,23 +423,16 @@ export default function DesignDao() {
       logo: daoURI.properties.logo.description,
       wallet: daoURI.properties.wallet.description,
       typeimg: daoURI.properties.typeimg.description,
-      allFiles: daoURI.properties.allFiles.description
+      allFiles: daoURI.properties.allFiles.description,
+      customUrl: daoURI.properties.customUrl.description
     };
     LoadEditor();
   }
 
   async function fetchContractData() {
     try {
-      daoId = router.query['daoId'] as string;
-
       const element = await api._query.daos.daoById(Number(daoId));
-      let daoURI = element['__internal__raw'].daoUri.toString();
-      let template_html = await api._query.daos.templateById(daoId);
-
-      const html =
-        '<h1>Feeding America: A Lifeline for Millions</h1>\n<p>Feeding America is a prominent non-profit organization based in the United States, committed to combating hunger through a robust network of over 200 food banks. Serving as a vital resource, it ensures that more than 46 million individuals access the nourishment they need via food pantries, soup kitchens, shelters, and other community-based agencies.</p>\n<p>As the largest U.S. charity by revenue, according to Forbes, Feeding America\'s extensive reach and impactful initiatives play a crucial role in alleviating food insecurity across the nation. Its dedication to providing food assistance has made a significant difference in the lives of many, fostering hope and support within communities.</p>\n<img src="https://aqua-dull-locust-679.mypinata.cloud/ipfs/bafybeigw3om3v6zt3jsrxpdikbocgihruumzl4vml3r6jlqpe56hu6yosq?pinataGatewayToken=v8BV9VKQs69NLLcVsQaw_fd_pcihpitKGBGpB13WTx40K9pHydzCcywsW0F1yAeL" alt="Feeding America Logo" />';
-
-      UpdateDaoData(daoURI, html);
+      return element['__internal__raw'].daoUri.toString();
     } catch (e) {}
   }
 
@@ -424,13 +442,21 @@ export default function DesignDao() {
         <title>Customize {DaoURI.Title}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div id="editor">
-        <div id="dao-container"></div>
+      <div id="editor" className="min-h-[calc(100vh-86px)]">
+        <div className="container pt-6">
+          <div id="dao-container" className="template-container"></div>
+        </div>
       </div>
       <div className="absolute z-10 top-0 left-0 h-[85px] w-full shadow-moon-lg flex justify-between items-center p-5" style={{ background: 'linear-gradient(0deg, #b3804a -366.48%, #ffffff 34.69%)' }}>
         <Input aria-label="name" className="max-w-[320px]" value={DaoURI.Title} disabled />
         <div className="flex flex-1 justify-end items-center gap-2">
-          <Button variant="ghost" className="!text-white !bg-transparent" onClick={() => history.back()}>
+          <Button variant="secondary">
+            <GenericDelete className="text-moon-24" />
+          </Button>
+          <Button variant="secondary">
+            <GenericSettings className="text-moon-24" />
+          </Button>
+          <Button variant="secondary" onClick={() => history.back()}>
             Cancel
           </Button>
           <Button onClick={SaveHTML}>Save</Button>

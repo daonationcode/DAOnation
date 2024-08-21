@@ -1,19 +1,10 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../db';
+import { ApiCommunity } from '../../data-model/api-community';
 
-interface CommunityAttributes {
-  id?: number;
-  subdomain: string;
-  template?: string;
-  polkadot_reference_id: string;
-  created_at?: Date;
-  updated_at?: Date;
-  deleted_at?: Date | null;
-}
+interface CommunityCreationAttributes extends Optional<ApiCommunity, 'id' | 'template' | 'created_at' | 'updated_at' | 'deleted_at'> {}
 
-interface CommunityCreationAttributes extends Optional<CommunityAttributes, 'id' | 'template' | 'created_at' | 'updated_at' | 'deleted_at'> {}
-
-class Community extends Model<CommunityAttributes, CommunityCreationAttributes> implements CommunityAttributes {
+class Community extends Model<ApiCommunity, CommunityCreationAttributes> implements ApiCommunity {
   public id!: number;
   public subdomain!: string;
   public template!: string;

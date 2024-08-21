@@ -12,7 +12,7 @@ export const Header = () => {
   }, []);
 
   return (
-    <header className={`w-full px-8 py-4 gap-4 flex justify-between items-center z-20 ${styles.header}`}>
+    <header className={`w-full px-8 py-4 gap-4 flex justify-between items-center z-10 ${styles.header}`}>
       <Link href={linkTarget}>
         <div style={{ minWidth: '119px' }}>
           <Image height={48} width={119} src="/images/logo.svg" alt="DAOnation" />

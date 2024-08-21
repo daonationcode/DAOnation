@@ -138,19 +138,6 @@ export default function CreateDaoModal({ open, onClose }) {
     };
     console.log('======================>Creating Dao');
 
-    // var template = await (await fetch(`/template/template.html`)).text();
-
-    // let changings = [
-    //   {
-    //     key: 'dao-title',
-    //     value: DaoTitle
-    //   },
-    //   {
-    //     key: 'dao-image',
-    //     value: allFiles[0].url
-    //   }
-    // ];
-
     toast.update(toastId, { render: 'Creating Dao...', isLoading: true });
 
     async function onSuccess() {

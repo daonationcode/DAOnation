@@ -4,15 +4,16 @@ import UseFormTextArea from '../../components/components/UseFormTextArea';
 import EventTypeOption from '../../components/components/EventTypeOption';
 import { useState } from 'react';
 import Required from '../../components/components/Required';
-import { generateTemplate } from '../../lib/services/openAIService';
+import { generateTemplate } from '../../services/openAIService';
 import { toast } from 'react-toastify';
-import { usePolkadotContext } from '../../contexts/PolkadotContext';
 import { useRouter } from 'next/router';
+import { CommunityService } from '../../services/communityService';
+import { Dao } from '../../data-model/dao';
 
-export default function GenerateHomepageModal({ open, onClose }: { open: boolean; onClose }) {
+export default function GenerateHomepageModal({ open, onClose, item }: { open: boolean; onClose; item: Dao }) {
   const [eventType, setEventType] = useState<'layout1' | 'layout2'>('layout1');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { api, showToast, userWalletPolkadot, userSigner } = usePolkadotContext();
   const router = useRouter();
 
   const [daoDescription, DaoDescriptionInput] = UseFormTextArea({
@@ -23,23 +24,21 @@ export default function GenerateHomepageModal({ open, onClose }: { open: boolean
   });
 
   async function generateHomepage() {
-    const daoId = router.query.daoId;
-
-    router.push(`${daoId}/design-dao`, { query: { daoId } });
-    return;
-    const template = await generateTemplate(daoDescription).then((res) => res.content);
-    // const daoId = router.query.daoId;
-
+    const daoId = router.query.daoId as string;
+    setIsLoading(true);
     const toastId = toast.loading('Generating homepage...');
 
-    await api._extrinsics.daos.updateTemplate(Number(daoId), template).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
-      toast.update(toastId, { type: 'success', render: 'Homepage generated successfully!', autoClose: 1000, isLoading: false });
-      router.push(`${daoId}/design-dao`, { query: { daoId } });
-    });
+    const template = await generateTemplate(daoDescription).then((res) => res.content);
+
+    await CommunityService.create({ template, subdomain: item.customUrl || 'test', polkadot_reference_id: daoId });
+
+    toast.update(toastId, { type: 'success', render: 'Homepage generated successfully!', autoClose: 1000, isLoading: false });
+
+    router.push(`${daoId}/design`);
   }
 
   const isInvalid = () => {
-    return !daoDescription;
+    return !daoDescription || isLoading;
   };
 
   return (
@@ -56,8 +55,8 @@ export default function GenerateHomepageModal({ open, onClose }: { open: boolean
           <div className="flex flex-col gap-2">
             <h6>Purpose of your homepage</h6>
             <div className="flex gap-4">
-              <EventTypeOption icon={<TextCards height={32} width={32} />} label="Predefined layout 1" selected={eventType === 'layout1'} onClick={() => setEventType('layout1')} />
-              <EventTypeOption icon={<TextCards height={32} width={32} />} label="Predefined layout 2" selected={eventType === 'layout2'} onClick={() => setEventType('layout2')} />
+              <EventTypeOption icon={<TextCards height={32} width={32} />} label="Introduce the charity and its mission" selected={eventType === 'layout1'} onClick={() => setEventType('layout1')} />
+              <EventTypeOption icon={<TextCards height={32} width={32} />} label="Explain the charity's activities" selected={eventType === 'layout2'} onClick={() => setEventType('layout2')} />
             </div>
           </div>
 
