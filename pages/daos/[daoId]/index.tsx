@@ -141,7 +141,7 @@ export default function DAO() {
     setDaoURI(daoURIShort);
 
     if (template_html === '[object Object]') {
-      setHasNoTemplate(true);
+      setHasNoTemplate(false);
     } else {
       setAboutTemplate(template_html);
     }
