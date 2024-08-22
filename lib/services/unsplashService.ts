@@ -33,6 +33,6 @@ export async function searchImages(query: string, perPage: number = 10): Promise
     throw new Error(`Error fetching images: ${response.statusText}`);
   }
 
-  const data: UnsplashSearchResponse = await response.json();
+  const data: UnsplashSearchResponse = (await response.json()) as UnsplashSearchResponse;
   return data.results;
 }
