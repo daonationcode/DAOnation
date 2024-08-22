@@ -22,6 +22,7 @@ import { CharityEvent } from '../../../data-model/event';
 import GenerateHomepageModal from '../../../features/GenerateHomepageModal';
 import { CommunityService } from '../../../services/communityService';
 import { ApiCommunity } from '../../../data-model/api-community';
+import { hex2rgb } from '../../../utils/hex-to-rgb';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
@@ -142,6 +143,10 @@ export default function DAO() {
       isOwner
     };
 
+    if (daoURIShort.brandingColor) {
+      document.documentElement.style.setProperty('--piccolo', hex2rgb(daoURIShort.brandingColor));
+    }
+
     setDaoURI(daoURIShort);
   }
 
@@ -154,6 +159,7 @@ export default function DAO() {
         try {
           const element = await api._query.daos.daoById(Number(daoId));
           let daoURI = element['__internal__raw'].daoUri.toString();
+
           const { template } = await CommunityService.getByPolkadotReferenceId(daoId.toString());
 
           if (template === '[object Object]' || template === null) {
