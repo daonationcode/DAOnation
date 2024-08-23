@@ -21,8 +21,7 @@ declare let window;
 export default function Events() {
   //Variables
   const [nfts, setNfts] = useState([]);
-  const { api, getUserInfoById,GetAllDaos, GetAllEvents } = usePolkadotContext();
-  const [eventIdTxt, setEventTxtID] = useState('');
+  const { api, getUserInfoById,GetAllDaos, GetAllEvents,GetAllNfts } = usePolkadotContext();
   const [showDonateNftModal, setShowDonateNFTModal] = useState(false);
   const [showBuyTicketModal, setShowBuyTicketModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
@@ -130,12 +129,11 @@ export default function Events() {
   }
 
   function getEventID() {
-    const eventIdParam = router.query.eventId as string;
+    const eventIdParam = router.query.eventId
     if (!eventIdParam) {
       return;
     }
     setEventID(Number(eventIdParam));
-    setEventTxtID(eventIdParam);
   }
 
   async function fetchContractDataFull() {
@@ -145,12 +143,12 @@ export default function Events() {
         //Load everything-----------
 
         let allEvents = await GetAllEvents();
-        let eventURIFull = allEvents.filter((e) => e?.eventId == eventIdTxt.toString())[0];
+        let eventURIFull = allEvents.filter((e) => Number(e?.eventId) == EventID)[0];
 
-        // let allNfts = await GetAllNfts();
-        // let eventNFTs = allNfts.filter((e) => e.eventid == eventIdTxt.toString());
-        // console.log(eventNFTs);
-        // setNfts(eventNFTs);
+        let allNfts = await GetAllNfts();
+        let eventNFTs = allNfts.filter((e) => e.eventid == EventID.toString());
+        console.log(eventNFTs);
+        setNfts(eventNFTs);
 
         let allDaos = await GetAllDaos();
         let eventDAO = allDaos.filter((e) => e.daoId == eventURIFull.daoId)[0];
@@ -335,7 +333,7 @@ export default function Events() {
         )}
       </div>
 
-      <DonateNFTModal open={showDonateNftModal} onClose={closeDonateNFTModal} eventid={eventIdTxt} eventName={EventURI.Title} />
+      <DonateNFTModal daoid={EventURI?.daoId} open={showDonateNftModal} onClose={closeDonateNFTModal} eventid={EventID} eventName={EventURI.Title} />
       <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} eventid={EventID} recieveWallet={EventURI.wallet} />
       <PlaceHigherBidModal open={!!showPlaceHigherBidModal} onClose={() => setShowPlaceHigherBidModal(null)} item={showPlaceHigherBidModal} />
       <BidHistoryModal open={!!showBidHistoryModal} onClose={() => setShowBidHistoryModal(null)} item={showBidHistoryModal} />

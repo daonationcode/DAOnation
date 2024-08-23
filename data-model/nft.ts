@@ -7,14 +7,14 @@ export interface Bid {
 
 export interface NFT {
   id: string;
-  eventid?: string;
+  daoid?: number;
+  eventid?: number;
   name: string;
   url: string;
   description: string;
-  sender_wallet?: string;
-  reciever_wallet?: string;
   highest_amount?: number;
-  highest_bidder?: string;
+  highest_bidder?: number;
+  highest_bidder_wallet?: string;
   highestBid: Bid;
   bidHistory: Bid[];
 }

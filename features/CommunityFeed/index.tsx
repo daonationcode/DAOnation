@@ -87,7 +87,7 @@ const CommunityFeed = ({ communityName, daoId }) => {
       <AddPostCard avatarUrl={avatarUrl} onClick={() => setShowPostModal(true)} />
       <Loader element={Items.length > 0 ? Items.map((item, index) => <ActivityCard key={index} old_date={item.date} type={item.type} data={item.data} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} ></ActivityCard>) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="There are no posts in the feed yet." />} width={540} height={120} many={3} loading={loading} />
       <CreatePostModal onClose={closeShowPostModal} show={showPostModal} avatarUrl={avatarUrl} userName={userName} communityName={communityName} />
-      <DonateNFTModal open={showDonateNftModal} onClose={closeDonateNFTModal} eventid={selectedAuctionEvent.eventId} eventName={selectedAuctionEvent.eventName} />
+      <DonateNFTModal daoid={daoId} open={showDonateNftModal} onClose={closeDonateNFTModal} eventid={selectedAuctionEvent.eventId} eventName={selectedAuctionEvent.eventName} />
       <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={selectedAuctionEvent.eventName} eventid={selectedAuctionEvent.eventId} recieveWallet={selectedAuctionEvent.wallet} />
   
     </div>

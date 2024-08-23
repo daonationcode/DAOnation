@@ -58,7 +58,7 @@ export default function Profile() {
     let allVotes = await GetAllVotes();
     let allDonations = await GetAllUserDonations();
 
-    // let donated = Number(await contract._donated(Number(user_id))) / 1e18;
+    // let donated = Number(await contract._donated(Number(user_id))) / 1e12;
     let allBadges = UserBadges;
 
     let founddao = [];

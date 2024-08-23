@@ -114,7 +114,7 @@ export default function Goal() {
         //   if (totalIdeas[i] == '') continue;
         //   const object = JSON.parse(totalIdeas[i]);
         //   if (object) {
-        //     let donation = Number((await contract._ideas_uris(Number(ideasId))).donation) / 1e18;
+        //     let donation = Number((await contract._ideas_uris(Number(ideasId))).donation) / 1e12;
         //     total_donated += donation;
         //     arr.push({
         //       //Pushing all data into array

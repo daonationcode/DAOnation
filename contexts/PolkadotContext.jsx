@@ -19,7 +19,9 @@ const AppContext = createContext({
   GetAllDaos: async () => [],
   GetAllJoined: async () => [],
   GetAllGoals: async (cache = false) => [],
+
   GetAllEvents: async(cache = false) => [],
+  GetAllNfts: async (cache = false) => [],
   GetAllFeeds: async () => [],
   GetAllIdeas: async (cache = false) => [],
   GetAllVotes: async () => [],
@@ -594,7 +596,53 @@ export function PolkadotProvider({ children }) {
 
 
 
-  return <AppContext.Provider value={{ api: api, deriveAcc: deriveAcc, GetAllEvents:GetAllEvents, GetAllGoals: GetAllGoals, GetAllIdeas: GetAllIdeas, GetAllVotes: GetAllVotes, GetAllFeeds: GetAllFeeds,GetAllDonations:GetAllDonations,GetAllUserDonations:GetAllUserDonations, updateCurrentUser: updateCurrentUser, GetAllDaos: GetAllDaos, GetAllJoined: GetAllJoined, showToast: showToast, EasyToast: EasyToast, getUserInfoById: getUserInfoById, userWalletPolkadot: userWalletPolkadot, userSigner: userSigner, PolkadotLoggedIn: PolkadotLoggedIn, userInfo: userInfo }}>{children}</AppContext.Provider>;
+  async function fetchPolkadotNftsData() {
+    //Fetching data from Parachain
+    try {
+      if (api) {
+        let totalNftCount = Number(await api._query.events.tokenIds());
+        let arr = [];
+        for (let i = 0; i < totalNftCount; i++) {
+          const element = await api._query.events.tokenById(i);
+          const object = JSON.parse(element['__internal__raw'].tokenUri.toString())
+
+        
+
+          let newElm = {
+            id: Number(element['__internal__raw'].id),
+            eventid: Number(element['__internal__raw'].eventId),
+            daoid: Number(element['__internal__raw'].daoId),
+            name: object.properties.Name.description,
+            url: object.properties.Link.description,
+            description: object.properties.Description.description,
+            highest_amount: Number(element['__internal__raw'].highestAmount)/1e12,
+            highest_bidder: Number(element['__internal__raw'].highestBidderUserid),
+            highest_bidder_wallet:  (element['__internal__raw'].highestBidderWallet).toString(),
+            highestBid:{
+              date: element['__internal__raw'].highestBidDate,
+              walletAddress: Number(element['__internal__raw'].highestBidderWallet),
+              bidder: Number(element['__internal__raw'].highestBidderUserid),
+              bidAmount: Number(element['__internal__raw'].highestAmount)/1e12
+            },
+            bidHistory:[]
+          };
+          arr.push(newElm);
+        }     
+
+
+        return arr;
+      }
+    } catch (error) { console.error(error) }
+    return [];
+  }
+
+  async function GetAllNfts(cache = false) {
+    let arr = [];
+    arr = arr.concat(await fetchPolkadotNftsData());
+    return arr;
+  }
+
+  return <AppContext.Provider value={{ api: api, deriveAcc: deriveAcc, GetAllEvents:GetAllEvents,GetAllNfts:GetAllNfts, GetAllGoals: GetAllGoals, GetAllIdeas: GetAllIdeas, GetAllVotes: GetAllVotes, GetAllFeeds: GetAllFeeds,GetAllDonations:GetAllDonations,GetAllUserDonations:GetAllUserDonations, updateCurrentUser: updateCurrentUser, GetAllDaos: GetAllDaos, GetAllJoined: GetAllJoined, showToast: showToast, EasyToast: EasyToast, getUserInfoById: getUserInfoById, userWalletPolkadot: userWalletPolkadot, userSigner: userSigner, PolkadotLoggedIn: PolkadotLoggedIn, userInfo: userInfo }}>{children}</AppContext.Provider>;
 }
 
 export const usePolkadotContext = () => useContext(AppContext);

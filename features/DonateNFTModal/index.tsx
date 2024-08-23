@@ -10,12 +10,9 @@ import { toast } from 'react-toastify';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
 declare let window;
 
-export default function DonateNFTModal({ open, onClose, eventName, eventid }) {
-  const { userInfo, PolkadotLoggedIn } = usePolkadotContext();
-  const [RecieveType, setRecieveType] = useState('Unqiue');
+export default function DonateNFTModal({ open, onClose, eventName, eventid,daoid }) {
+  const { userInfo, PolkadotLoggedIn,userWalletPolkadot,userSigner,showToast, api } = usePolkadotContext();
 
-  const [Balance, setBalance] = useState();
-  const [coin, setCoin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const { getCurrency } = useEnvironment();
@@ -57,20 +54,71 @@ export default function DonateNFTModal({ open, onClose, eventName, eventid }) {
     console.log('======================>Donating NFT');
     const ToastId = toast.loading('Donating NFT ...');
 
+    //Creating an object of all information to store in EVM
+    const createdObject = {
+      title: 'Asset Metadata',
+      type: 'object',
+      properties: {
+        Link: {
+          type: 'string',
+          description: link
+        },
+        Name: {
+          type: 'string',
+          description: name
+        },
+        Description: {
+          type: 'string',
+          description: description
+        },
+        Price: {
+          type: 'number',
+          description: price
+        },
+        Date: {
+          type: 'date',
+          description: new Date().toLocaleDateString()
+        },
+        wallet: {
+          type: 'string',
+          description: window.signerAddress
+        },
+        user_id: {
+          type: 'number',
+          description: window.userid
+        },
+
+      }
+    };
+
+
     async function onSuccess() {
       setIsLoading(false);
       onClose({ success: true });
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     }
 
-    let feed = {
-      name: userInfo?.fullName,
-      eventid: eventid,
-      nftid: null
-    };
+
+
+    if (PolkadotLoggedIn) {
+
+      
+      const txs = [api._extrinsics.events.claimToken(Number(daoid),Number(eventid),JSON.stringify(createdObject), `${Number(price)*1e12}`,Number(window.userid),window.signerAddress,new Date().toLocaleDateString())];
+
+      const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+        showToast(status, ToastId, 'Donated successfully!', () => {
+          onSuccess();
+        });
+      });
+
+    }
+
+
   }
 
-  async function LoadData() {}
+  async function LoadData() { }
 
   useEffect(() => {
     LoadData();
@@ -92,8 +140,8 @@ export default function DonateNFTModal({ open, onClose, eventName, eventid }) {
                   NFT URL
                   <Required />
                 </h6>
+                <div className="relative h-[150px] w-full border border-beerus bg-goku -mt-2 border-t-0 rounded-b-lg">{link ? <Image unoptimized={true} src={link} alt="" objectFit="contain" layout="fill" /> : <div className='p-3'>No Image placeholder</div>}</div>
                 {LinkInput}
-                <div className="relative h-[150px] w-full border border-beerus bg-goku -mt-2 border-t-0 rounded-b-lg">{link ? <Image unoptimized={true} src={link} alt="" objectFit="contain" layout="fill" /> : <div>No Image placeholder</div>}</div>
               </div>
               <div className="flex flex-col gap-2">
                 <h6>
@@ -116,7 +164,6 @@ export default function DonateNFTModal({ open, onClose, eventName, eventid }) {
                   <Required />
                 </h6>
                 {PriceInput}
-                {price && <span className="text-moon-12 text-trunks">Equal to {price * 0.006938}$</span>}
               </div>
             </div>
           </form>

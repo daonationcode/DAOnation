@@ -29,7 +29,7 @@ const NFTCard = ({ item, eventStatus, className, onShowBidHistory, onShowPlaceHi
               </span>
             </p>
             <p>
-              by <span className="text-piccolo">{item.highest_bidder}</span>
+              by <span className="text-piccolo">{item.highest_bidder_wallet}</span>
             </p>
           </div>
           <div className="flex flex-col gap-2 w-full items-center">

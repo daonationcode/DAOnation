@@ -47,10 +47,10 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
         feed.bidid = 'm_' + bidid;
 
         // Creating Event in Smart contract
-        const methodWithSignature = await window.contractUnique.populateTransaction.bid_nft(Number(item.id), new Date().toLocaleDateString(), window.selectedAddress, userInfo?.fullName?.toString(), Number(window.userid), (Amount * 1e18).toString(), JSON.stringify(feed));
+        const methodWithSignature = await window.contractUnique.populateTransaction.bid_nft(Number(item.id), new Date().toLocaleDateString(), window.selectedAddress, userInfo?.fullName?.toString(), Number(window.userid), (Amount * 1e12).toString(), JSON.stringify(feed));
         const tx = {
           ...methodWithSignature,
-          value: (Amount * 1e18).toString()
+          value: (Amount * 1e12).toString()
         };
 
         toast.update(ToastId, {
