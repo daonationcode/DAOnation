@@ -1,5 +1,5 @@
 import { Button, Tabs } from '@heathmont/moon-core-tw';
-import { GenericLoyalty, ShopWallet } from '@heathmont/moon-icons-tw';
+import { GenericLoyalty, MediaMiceAlternative, MediaPlay, ShopWallet } from '@heathmont/moon-icons-tw';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -16,17 +16,19 @@ import PlaceHigherBidModal from '../../../../../features/PlaceHigherBidModal';
 import { Dao } from '../../../../../data-model/dao';
 import { toast } from 'react-toastify';
 import BuyTicketModal from '../../../../../features/BuyTicketModal';
+import LivestreamEmbed from '../../../../../components/components/LivestreamEmbed';
 
 declare let window;
 export default function Events() {
   //Variables
   const [nfts, setNfts] = useState([]);
-  const { api, getUserInfoById,GetAllDaos, GetAllEvents,GetAllNfts } = usePolkadotContext();
+  const { api, getUserInfoById, GetAllDaos, GetAllEvents, GetAllNfts } = usePolkadotContext();
   const [showDonateNftModal, setShowDonateNFTModal] = useState(false);
   const [showBuyTicketModal, setShowBuyTicketModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
   const [showPlaceHigherBidModal, setShowPlaceHigherBidModal] = useState<NFT | null>(null);
-  const [EventID, setEventID] = useState(-1);
+  const [showEmbedVideo, setShowEmbedVideo] = useState(false);
+  const [eventID, setEventID] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [isDistributing, setDistributing] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
@@ -56,62 +58,9 @@ export default function Events() {
     status: ''
   });
 
-  const mockInfo = {
-    EventId: '0',
-    daoId: '0',
-    Title: 'Concert with Kendrick Martins',
-    Description: 'A description about the Event and what it is all about is written here. It may be longer or shorter depending on what the creator added.',
-    Budget: '10',
-    End_Date: '2024-10-',
-    user_info: {
-      fullName: 'Thomas Goethals',
-      id: '0'
-    },
-    reached: false,
-    wallet: '',
-    logo: '',
-    isOwner: true,
-    eventType: 'livestream',
-    ticketPrice: 10,
-    startDate: '20 Nov 2024 01:15PM',
-    participantsCount: 30,
-    status: ''
-  };
-
-  const mockNFTs: NFT[] = [
-    {
-      id: '',
-      url: 'https://marketplace.canva.com/EAFG5wKTkFk/1/0/1131w/canva-pastel-food-drive-a4-flyer-tBm19VC3AKU.jpg',
-      name: 'NFT LSP9',
-      highestBid: { date: '20 Nov 2022 01:15PM', bidAmount: 20, bidder: 'Barry Bono', walletAddress: 'wallet-address' },
-      bidHistory: [
-        { date: '20 Nov 2022 01:15PM', bidAmount: 20, bidder: 'Bert Bono', walletAddress: 'wallet-address-1' },
-        { date: '19 Nov 2022 01:15PM', bidAmount: 19, bidder: 'Barry Bono', walletAddress: 'wallet-address-2' },
-        { date: '18 Nov 2022 01:15PM', bidAmount: 18, bidder: 'Bevin Bono', walletAddress: 'wallet-address-3' }
-      ],
-      description: 'A description about the token and why its worth bidding for.'
-    },
-    {
-      id: '',
-      url: 'https://marketplace.canva.com/EAFG5wKTkFk/1/0/1131w/canva-pastel-food-drive-a4-flyer-tBm19VC3AKU.jpg',
-      name: 'NFT LSP9',
-      highestBid: { date: '20 Nov 2022 01:15PM', bidAmount: 20, bidder: 'Barry Bono', walletAddress: 'wallet-address' },
-      bidHistory: [{ date: '20 Nov 2022 01:15PM', bidAmount: 20, bidder: 'Barry Bono', walletAddress: 'wallet-address' }],
-      description: 'A description about the token and why its worth bidding for.'
-    },
-    {
-      id: '',
-      url: 'https://marketplace.canva.com/EAFG5wKTkFk/1/0/1131w/canva-pastel-food-drive-a4-flyer-tBm19VC3AKU.jpg',
-      name: 'NFT LSP9',
-      highestBid: { date: '20 Nov 2022 01:15PM', bidAmount: 20, bidder: 'Barry Bono', walletAddress: 'wallet-address' },
-      bidHistory: [{ date: '20 Nov 2022 01:15PM', bidAmount: 20, bidder: 'Barry Bono', walletAddress: 'wallet-address' }],
-      description: 'A description about the token and why its worth bidding for.'
-    }
-  ];
-
   useEffect(() => {
     getEventID();
-    fetchData();
+    fetchContractDataFull();
   }, [api, router]);
 
   const isAuction = () => {
@@ -122,14 +71,8 @@ export default function Events() {
     return EventURI.eventType === 'livestream';
   };
 
-  async function fetchData() {
-    if (router.query.eventId) {
-      fetchContractDataFull();
-    }
-  }
-
   function getEventID() {
-    const eventIdParam = router.query.eventId
+    const eventIdParam = router.query.eventId;
     if (!eventIdParam) {
       return;
     }
@@ -137,16 +80,18 @@ export default function Events() {
   }
 
   async function fetchContractDataFull() {
+    const eventId = Number(router.query.eventId);
     setLoading(true);
+
     try {
-      if (api && EventID !== undefined && EventID !== null) {
+      if (api && eventId !== undefined && eventId !== null) {
         //Load everything-----------
 
         let allEvents = await GetAllEvents();
-        let eventURIFull = allEvents.filter((e) => Number(e?.eventId) == EventID)[0];
+        let eventURIFull = allEvents.filter((e) => Number(e?.eventId) === eventId)[0];
 
         let allNfts = await GetAllNfts();
-        let eventNFTs = allNfts.filter((e) => e.eventid == EventID.toString());
+        let eventNFTs = allNfts.filter((e) => Number(e.eventid) === eventId);
         console.log(eventNFTs);
         setNfts(eventNFTs);
 
@@ -159,6 +104,8 @@ export default function Events() {
         eventURIFull.isOwner = eventURIFull.UserId == Number(window.userid);
 
         setEventURI(eventURIFull);
+
+        console.log(eventURIFull);
         setLoading(false);
       }
     } catch (error) {}
@@ -214,6 +161,10 @@ export default function Events() {
     window.location.reload();
   }
 
+  function openEmbedVideo() {
+    setShowEmbedVideo(true);
+  }
+
   return (
     <>
       <Head>
@@ -222,7 +173,7 @@ export default function Events() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={`flex items-center flex-col gap-8`}>
-        <div className={`gap-8 flex flex-col w-full bg-gohan pt-10 border-beerus border ${isLivestream() && 'pb-10'}`}>
+        <div className={`gap-8 flex flex-col w-full bg-gohan pt-10 border-beerus border min-h-[178px] ${isLivestream() && 'pb-10'}`}>
           <div className="container flex w-full justify-between relative">
             <div className="flex flex-col gap-1">
               <Loader
@@ -244,12 +195,12 @@ export default function Events() {
                 element={
                   <h3 className="flex gap-2 whitespace-nowrap">
                     {isAuction() && <div className="font-bold">{EventURI.status == 'ended' ? 'Ended' : 'In progress'}</div>}
-                    {isLivestream() && <div>{EventURI.participantsCount} participants</div>}
+                    {isLivestream() && <div>{EventURI.participantsCount || 30} participants</div>}
                     <div>•</div>
                     <div className="flex">
-                      Created by &nbsp;
-                      <a href={'/profile/' + EventURI.user_info.id} className="truncate text-piccolo max-w-[120px]">
-                        @{EventURI.user_info.fullName}
+                      Created by&nbsp;
+                      <a href={'/profile/' + EventURI.user_info.id} className="truncate text-piccolo max-w-[220px]">
+                        {EventURI.user_info.fullName}
                       </a>
                     </div>
                   </h3>
@@ -290,6 +241,47 @@ export default function Events() {
           )}
         </div>
         <p className="container">{EventURI.Description}</p>
+        {isLivestream() && (
+          <div className="container mt-[-2rem] w-full flex gap-6 overflow-hidden">
+            <div className="w-full max-w-[476px] h-[476px] overflow-hidden relative">
+              {!showEmbedVideo && (
+                <>
+                  <Image unoptimized={true} objectFit="cover" layout="fill" className="rounded-xl object-cover" src={EventURI.logo} alt="" />
+                  <div className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black bg-opacity-10" onClick={openEmbedVideo}>
+                    <div className="h-[56px] w-[56px] bg-gohan rounded-full flex justify-center items-center">{<MediaPlay className="text-moon-48 text-popo" />}</div>
+                  </div>
+                </>
+              )}
+              {showEmbedVideo && <LivestreamEmbed />}
+            </div>
+            <div className="flex flex-col gap-5 bg-gohan rounded-xl w-full max-w-[300px] items-center p-6 pt-10 shadow-moon-lg">
+              <MediaMiceAlternative className="text-hit text-moon-48" />
+              <div className="font-bold text-moon-20">Starts {EventURI.End_Date}</div>
+              {EventURI.status == 'ended' ? (
+                <>
+                  <div className="text-chichi text-center">Live event ended</div>
+                </>
+              ) : (
+                <>
+                  {EventURI.isOwner ? (
+                    <>
+                      <div className="text-trunks text-center">Ticket holders will get access once the stream begins.</div>
+                      <Button animation={isDistributing ? 'progress' : false} disabled={isDistributing} className="font-bold w-full" onClick={openBuyTicketModal}>
+                        Buy ticket for 10 DOT
+                      </Button>
+                      <div className="flex flex-1 flex-col justify-end text-center text-trunks text-moon-12">
+                        99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to DAOnation.
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
         {isAuction() && tabIndex === 0 && (
           <div className="container mt-[-2rem] w-full flex gap-6">
             <div className="w-full max-w-[476px] h-[476px] overflow-hidden relative">
@@ -333,11 +325,11 @@ export default function Events() {
         )}
       </div>
 
-      <DonateNFTModal daoid={EventURI?.daoId} open={showDonateNftModal} onClose={closeDonateNFTModal} eventid={EventID} eventName={EventURI.Title} />
-      <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} eventid={EventID} recieveWallet={EventURI.wallet} />
+      <DonateNFTModal daoid={EventURI?.daoId} open={showDonateNftModal} onClose={closeDonateNFTModal} eventid={eventID} eventName={EventURI.Title} />
+      <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} eventid={eventID} recieveWallet={EventURI.wallet} />
       <PlaceHigherBidModal open={!!showPlaceHigherBidModal} onClose={() => setShowPlaceHigherBidModal(null)} item={showPlaceHigherBidModal} />
       <BidHistoryModal open={!!showBidHistoryModal} onClose={() => setShowBidHistoryModal(null)} item={showBidHistoryModal} />
-      <BuyTicketModal open={!!showBuyTicketModal} onClose={() => setShowBuyTicketModal(null)} eventName={EventURI.Title} ticketPrice={EventURI.ticketPrice} />
+      <BuyTicketModal open={!!showBuyTicketModal} onClose={() => setShowBuyTicketModal(null)} event={EventURI} />
     </>
   );
 }

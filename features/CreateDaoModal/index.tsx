@@ -166,7 +166,7 @@ export default function CreateDaoModal({ open, onClose }) {
   }
 
   function isInvalid() {
-    return !(DaoTitle && SubsPrice);
+    return !(DaoTitle && SubsPrice && brandingColor);
   }
 
   function addLogo() {

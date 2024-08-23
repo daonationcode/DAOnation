@@ -299,7 +299,7 @@ export default function DAO() {
                 <div className="flex">
                   Managed by &nbsp;
                   <a href={'/profile/' + DaoURI?.user_info?.id} className="truncate text-piccolo max-w-[120px]">
-                    @{DaoURI?.user_info?.fullName.toString()}
+                    {DaoURI?.user_info?.fullName.toString()}
                   </a>
                 </div>
                 <div>•</div>

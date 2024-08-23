@@ -30,7 +30,6 @@ export class CommunityService {
 
   static async getByPolkadotReferenceId(polkadotReferenceId: string): Promise<ApiCommunity> {
     const response = await fetch(`/api/communities/${polkadotReferenceId}`);
-    console.log(response);
     if (!response.ok) {
       return { template: null } as any;
     }

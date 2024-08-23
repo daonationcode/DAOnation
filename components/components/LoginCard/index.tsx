@@ -6,7 +6,7 @@ import UseFormInput from '../UseFormInput';
 import { usePolkadotContext } from '../../../contexts/PolkadotContext';
 import { toast } from 'react-toastify';
 
-const LoginCard = ({ step, onConnectPolkadot,isConnected, setStep }) => {
+const LoginCard = ({ step, onConnectPolkadot, isConnected, setStep }) => {
   const { api, EasyToast } = usePolkadotContext();
 
   const [Email, EmailInput] = UseFormInput({
@@ -50,7 +50,7 @@ const LoginCard = ({ step, onConnectPolkadot,isConnected, setStep }) => {
   }
 
   const LoginForm = () => (
-    <Card className="max-w-[480px]">
+    <Card className="!max-w-[480px]">
       <div className="flex w-full flex-col gap-10">
         <div className="flex flex-1 justify-between items-center relative text-moon-16">
           <div className="flex flex-col gap-6 w-full">
@@ -109,14 +109,13 @@ const LoginCard = ({ step, onConnectPolkadot,isConnected, setStep }) => {
     </Card>
   );
 
-
   return (
     <>
       {step == 1 && LoginForm()}
       {step == 2 && (
         <div className="flex flex-col gap-4 w-full items-center">
           {ConnectPolkadotButton()}
-          {"Or"}
+          {'Or'}
           {ConnectSubWalletButton()}
         </div>
       )}

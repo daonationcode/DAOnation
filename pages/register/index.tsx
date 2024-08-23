@@ -1,7 +1,6 @@
 import Head from 'next/head';
 import UseFormInput from '../../components/components/UseFormInput';
 import { FilesGeneric, GenericUser } from '@heathmont/moon-icons-tw';
-import { NFTStorage } from 'nft.storage';
 import Card from '../../components/components/Card';
 import { Avatar, Button, IconButton } from '@heathmont/moon-core-tw';
 import { useState } from 'react';
@@ -14,7 +13,7 @@ import { useRouter } from 'next/router';
 
 export default function Register() {
   const { api, deriveAcc, showToast } = usePolkadotContext();
- const {UploadBlob} = useIPFSContext();
+  const { UploadBlob } = useIPFSContext();
   const router = useRouter();
 
   //Input fields
@@ -86,7 +85,7 @@ export default function Register() {
             </div>
           </div>
         </div>
-        <Card className="max-w-[480px] container pt-10">
+        <Card className="max-w-[480px] pt-10">
           <div className="flex items-center justify-center flex-col w-full gap-6">
             <div className="flex flex-col gap-6 w-full p-6">
               <div className="upload">

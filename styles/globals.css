@@ -81,6 +81,7 @@ button.black{
   max-width: 800px;
   width: 90%;
   margin: 0 auto;
+  padding: 0;
 }
 
 .homepage-container {
