@@ -9,10 +9,12 @@ const config: Config = {
         'gradient-header': 'linear-gradient(0deg, #ec1f52 -366.48%, #09013e 100%)'
       },
       backgroundColor: {
-        brief: 'rgba(31, 31, 31, 1)'
+        brief: 'rgba(31, 31, 31, 1)',
+        pan: 'rgba(68,68,68, 1)'
       },
       textColor: {
-        brief: 'rgba(31, 31, 31, 1)'
+        brief: 'rgba(31, 31, 31, 1)',
+        pan: 'rgba(68,68,68, 1)'
       },
       screens: {
         xs: '460px'

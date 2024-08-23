@@ -361,12 +361,18 @@ export default function DAO() {
         {tabIndex === 1 && <div className="template-container container gap-6 pb-8 w-full"></div>}
         {tabIndex === 2 && (
           <div className="flex flex-col gap-8 container items-center pb-10">
-            <Loader element={AuctionEvents.length > 0 ? AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} />) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />} width={768} height={236} many={3} loading={loading} />{' '}
+            <Loader
+              element={AuctionEvents.length > 0 ? AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} />) : <EmptyState buttonLabel="Create event" onButtonClick={openCreateEventModal} icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />}
+              width={768}
+              height={236}
+              many={3}
+              loading={loading}
+            />{' '}
           </div>
         )}
         {tabIndex === 3 && (
           <div className="flex flex-col gap-8 container items-center pb-10">
-            <Loader element={goalsList.length > 0 ? goalsList.map((listItem, index) => <GoalCard item={listItem} key={index} />) : <EmptyState icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any goals yet." />} width={768} height={236} many={3} loading={loading} />{' '}
+            <Loader element={goalsList.length > 0 ? goalsList.map((listItem, index) => <GoalCard item={listItem} key={index} />) : <EmptyState buttonLabel="Create goal" onButtonClick={openCreateGoalModal} icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any goals yet." />} width={768} height={236} many={3} loading={loading} />{' '}
           </div>
         )}
         {tabIndex === 4 && (
@@ -377,7 +383,7 @@ export default function DAO() {
       </div>
 
       <GenerateHomepageModal open={showGenerateHomepageModal} onClose={closeGenerateHomepageModal} item={DaoURI} />
-      <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} daoId={daoId} />
+      <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} item={DaoURI} />
       <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={daoId} />
       <DonateCoinToEventModal open={!!showDonateCoinModal} onClose={() => setShowDonateCoinModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} recieveWallet={SelectedEventRecieveWallet} />
       <DonateNFTModal daoid={daoId} open={!!showDonateNftModal} onClose={() => setShowDonateNFTModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} />

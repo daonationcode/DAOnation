@@ -7,13 +7,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { daoDescription } = req.body;
+    const { goalDescription, daoDescription } = req.body;
+
+    if (!goalDescription || typeof goalDescription !== 'string') {
+      return res.status(400).json({ message: 'goalDescription is required and must be a string' });
+    }
 
     if (!daoDescription || typeof daoDescription !== 'string') {
       return res.status(400).json({ message: 'daoDescription is required and must be a string' });
     }
 
-    const completion = await OpenAiService.generateTemplate(daoDescription);
+    const completion = await OpenAiService.generateGoal(goalDescription, daoDescription);
 
     res.status(200).json(completion.choices[0].message);
   } catch (error) {

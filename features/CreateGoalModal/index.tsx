@@ -1,5 +1,5 @@
 import { Button, IconButton, Modal } from '@heathmont/moon-core-tw';
-import { ControlsClose, ControlsPlus } from '@heathmont/moon-icons-tw';
+import { ControlsClose, ControlsPlus, GenericLightningBolt } from '@heathmont/moon-icons-tw';
 import { useEffect, useState } from 'react';
 import UseFormInput from '../../components/components/UseFormInput';
 import UseFormTextArea from '../../components/components/UseFormTextArea';
@@ -11,9 +11,15 @@ import Required from '../../components/components/Required';
 import { toast } from 'react-toastify';
 import useEnvironment from '../../contexts/EnvironmentContext';
 import { useIPFSContext } from '../../contexts/IPFSContext';
+import { OpenAiService } from '../../services/openAIService';
+import { Dao } from '../../data-model/dao';
+import { MediaService } from '../../services/mediaService';
+import InfoBox from '../../components/components/InfoBox';
 
 let addedDate = false;
-export default function CreateGoalModal({ open, onClose, daoId }) {
+
+export default function CreateGoalModal({ open, onClose, item }: { item: Dao; onClose; open }) {
+  const [mode, setMode] = useState<'ai' | 'manual'>('ai');
   const [goalImage, setGoalImage] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
   const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
@@ -30,6 +36,13 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
   });
 
   const [GoalDescription, GoalDescriptionInput] = UseFormTextArea({
+    defaultValue: '',
+    placeholder: 'Add Description',
+    id: '',
+    rows: 4
+  });
+
+  const [describeGoal, DescribeGoalInput] = UseFormTextArea({
     defaultValue: '',
     placeholder: 'Add Description',
     id: '',
@@ -120,7 +133,7 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
 
     let feed = {
       name: userInfo?.fullName,
-      daoId: daoId,
+      daoId: item.daoId,
       goalid: null,
       budget: Budget
     };
@@ -134,7 +147,7 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
       let goalid = Number(await api._query.goals.goalIds());
       feed.goalid = goalid;
 
-      const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
+      const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), item.daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
         showToast(status, ToastId, 'Created successfully!', () => {
@@ -176,9 +189,88 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
     setGoalImage(newImages);
   }
 
-  function isInvalid() {
-    return !(GoalTitle && GoalDescription && Budget && EndDate && goalImage.length > 0);
+  async function generateGoal() {
+    const toastId = toast.loading('Generating goal');
+
+    const { content } = await OpenAiService.generateGoal(describeGoal, 'charity');
+
+    console.log('content', content);
+
+    const { title, description } = JSON.parse(content);
+
+    const { images } = await MediaService.getImage(describeGoal);
+
+    const createdObject = {
+      title: 'Asset Metadata',
+      type: 'object',
+      properties: {
+        Title: {
+          type: 'string',
+          description: title
+        },
+        Description: {
+          type: 'string',
+          description: description
+        },
+        Budget: {
+          type: 'string',
+          description: Budget
+        },
+        End_Date: {
+          type: 'string',
+          description: EndDate
+        },
+        user_id: {
+          type: 'string',
+          description: window.userid
+        },
+        wallet: {
+          type: 'string',
+          description: window.signerAddress
+        },
+        logo: {
+          type: 'string',
+          description: images[0].urls.full
+        }
+      }
+    };
+
+    console.log('======================>Creating Goal', createdObject);
+
+    toast.update(toastId, { render: 'Creating Goal...', isLoading: true });
+
+    let feed = {
+      name: userInfo?.fullName,
+      daoId: item.daoId,
+      goalid: null,
+      budget: Budget
+    };
+
+    async function onSuccess() {
+      setIsCreating(false);
+      onClose({ success: true });
+      window.location.reload();
+    }
+    if (PolkadotLoggedIn) {
+      let goalid = Number(await api._query.goals.goalIds());
+      feed.goalid = goalid;
+
+      const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), item.daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
+
+      const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+        showToast(status, toastId, 'Created successfully!', () => {
+          onSuccess();
+        });
+      });
+    }
   }
+
+  function isInvalid() {
+    return !(((GoalTitle && GoalDescription) || describeGoal) && Budget && EndDate);
+  }
+
+  const isGenerating = () => mode === 'ai';
+  const isManual = () => mode === 'manual';
 
   useEffect(() => {
     let dateTime = new Date();
@@ -191,25 +283,41 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
       <Modal.Panel className="bg-gohan max-w-none w-screen h-screen absolute left-0 sm:relative sm:h-auto sm:w-[90%] sm:max-w-[600px] sm:max-h-[90vh] !rounded-none sm:!rounded-xl">
         <div className={`flex items-center justify-center flex-col`}>
           <div className="flex justify-between items-center w-full border-b border-beerus py-4 px-6">
-            <h1 className="text-moon-20 font-semibold">Create goal</h1>
+            {isManual() && <h1 className="text-moon-20 font-semibold">Create goal</h1>}
+            {isGenerating() && <h1 className="text-moon-20 font-semibold">Create goal</h1>}
             <IconButton className="text-trunks" variant="ghost" icon={<ControlsClose />} onClick={onClose} />
           </div>
           <div className="flex flex-col gap-6 w-full p-6  max-h-[calc(90vh-162px)] overflow-auto">
-            <div className="flex flex-col gap-2">
-              <h6>
-                Goal name
-                <Required />
-              </h6>
-              {GoalTitleInput}
-            </div>
+            {isGenerating() && <InfoBox icon={<GenericLightningBolt />} label="You are generating with AI. Describe your goal as detailed as possible to get the best result." />}
 
-            <div className="flex flex-col gap-2">
-              <h6>
-                Description
-                <Required />
-              </h6>
-              {GoalDescriptionInput}
-            </div>
+            {isManual() && (
+              <div className="flex flex-col gap-2">
+                <h6>
+                  Goal name
+                  <Required />
+                </h6>
+                {GoalTitleInput}
+              </div>
+            )}
+
+            {isManual() && (
+              <div className="flex flex-col gap-2">
+                <h6>
+                  Description
+                  <Required />
+                </h6>
+                {GoalDescriptionInput}
+              </div>
+            )}
+            {isGenerating() && (
+              <div className="flex flex-col gap-2">
+                <h6>
+                  Describe your goal
+                  <Required />
+                </h6>
+                {DescribeGoalInput}
+              </div>
+            )}
             <div className="flex gap-8 w-full">
               <div className="flex flex-col gap-2 w-full">
                 <h6>
@@ -228,29 +336,43 @@ export default function CreateGoalModal({ open, onClose, daoId }) {
                 {EndDateInput}
               </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <h6>
-                Image
-                <Required />
-              </h6>
-              <div className="content-start flex flex-row flex-wrap gap-4 justify-start overflow-auto relative text-center text-white w-full">
-                <input className="file-input" hidden onChange={filehandleChange} accept="image/*" id="goalImage" name="goalImage" type="file" />
-                <div className="flex flex-col">
-                  {goalImage.length < 1 && <AddImageInput onClick={addImage} />}
-                  <ImageListDisplay images={goalImage} onDeleteImage={deleteSelectedImages} />
+            {isManual() && (
+              <div className="flex flex-col gap-2">
+                <h6>
+                  Image
+                  <Required />
+                </h6>
+                <div className="content-start flex flex-row flex-wrap gap-4 justify-start overflow-auto relative text-center text-white w-full">
+                  <input className="file-input" hidden onChange={filehandleChange} accept="image/*" id="goalImage" name="goalImage" type="file" />
+                  <div className="flex flex-col">
+                    {goalImage.length < 1 && <AddImageInput onClick={addImage} />}
+                    <ImageListDisplay images={goalImage} onDeleteImage={deleteSelectedImages} />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="flex justify-between border-t border-beerus w-full p-6 gap-4 absolute sm:relative bottom-0">
           <Button variant="ghost" onClick={onClose} className="flex-1 sm:flex-none">
             Cancel
           </Button>
-          <Button animation={isCreating ? 'progress' : false} disabled={isCreating || isInvalid()} onClick={create} className="flex-1 sm:flex-none">
-            <ControlsPlus className="text-moon-24" />
-            Create goal
-          </Button>
+          {isManual() && (
+            <Button iconLeft={<ControlsPlus />} animation={isCreating ? 'progress' : false} disabled={isCreating || isInvalid()} onClick={create} className="flex-1 sm:flex-none">
+              Create goal
+            </Button>
+          )}
+          {isGenerating() && (
+            <div className="flex gap-2">
+              <Button variant="secondary" animation={isCreating ? 'progress' : false} disabled={isCreating} onClick={() => setMode('manual')} className="flex-1 sm:flex-none">
+                Create from scratch
+              </Button>
+
+              <Button iconLeft={<GenericLightningBolt />} animation={isCreating ? 'progress' : false} disabled={isCreating || isInvalid()} onClick={generateGoal} className="flex-1 sm:flex-none">
+                Generate
+              </Button>
+            </div>
+          )}
         </div>
       </Modal.Panel>
     </Modal>
