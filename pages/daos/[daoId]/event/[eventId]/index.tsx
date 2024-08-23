@@ -252,7 +252,7 @@ export default function Events() {
                   </div>
                 </>
               )}
-              {showEmbedVideo && <LivestreamEmbed />}
+              {showEmbedVideo && <LivestreamEmbed link="" />}
             </div>
             <div className="flex flex-col gap-5 bg-gohan rounded-xl w-full max-w-[300px] items-center p-6 pt-10 shadow-moon-lg">
               <MediaMiceAlternative className="text-hit text-moon-48" />
