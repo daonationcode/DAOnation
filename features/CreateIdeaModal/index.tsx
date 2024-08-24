@@ -1,6 +1,6 @@
 import { Button, IconButton, Modal } from '@heathmont/moon-core-tw';
 import { ControlsClose, ControlsPlus } from '@heathmont/moon-icons-tw';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import UseFormInput from '../../components/components/UseFormInput';
 import UseFormTextArea from '../../components/components/UseFormTextArea';
 import AddImageInput from '../../components/components/AddImageInput';
@@ -11,26 +11,55 @@ import Required from '../../components/components/Required';
 import { toast } from 'react-toastify';
 import useEnvironment from '../../contexts/EnvironmentContext';
 import { useIPFSContext } from '../../contexts/IPFSContext';
+import { AiService } from '../../services/aiService';
+import { Dao } from '../../data-model/dao';
+import { Goal } from '../../data-model/goal';
+import IdeaSuggestionBox from '../../components/components/IdeaSuggestionBox';
+import { IdeaSuggestion } from '../../data-model/idea-suggestion';
 
-export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitle }) {
+export default function CreateIdeaModal({ show, onClose, daoId, goalId, goal, dao }: { show; onClose; daoId; goalId; goal: Goal; dao: Dao }) {
   const [ideaImage, setIdeaImage] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
 
   const { userInfo, PolkadotLoggedIn, userWalletPolkadot, showToast, userSigner, api } = usePolkadotContext();
   const { UploadBlob } = useIPFSContext();
   const { isServer } = useEnvironment();
+  const [suggestions, setSuggestions] = useState<IdeaSuggestion[]>([]);
+
+  async function getSuggestions() {
+    const suggestions = await AiService.generateIdeas(goal.Description, dao.Title);
+
+    setSuggestions(suggestions);
+  }
+
+  async function setSuggestedIdea(suggestion: IdeaSuggestion) {
+    setTitle(suggestion.title);
+    setDescription(suggestion.description);
+
+    const response = await fetch(suggestion.imageUrl);
+    const blob = await response.blob();
+    const file = new File([blob], 'idea.png', { type: 'image/jpeg' });
+
+    setIdeaImage([file]);
+  }
+
+  useEffect(() => {
+    if (goal.goalId && dao.daoId) {
+      getSuggestions();
+    }
+  }, [goal, dao]);
 
   if (isServer()) return null;
 
   //Input fields
-  const [IdeasTitle, IdeasTitleInput] = UseFormInput({
+  const [IdeasTitle, IdeasTitleInput, setTitle] = UseFormInput({
     defaultValue: '',
     type: 'text',
     placeholder: 'Ideas name',
     id: ''
   });
 
-  const [IdeasDescription, IdeasDescriptionInput] = UseFormTextArea({
+  const [IdeasDescription, IdeasDescriptionInput, setDescription] = UseFormTextArea({
     defaultValue: '',
     placeholder: 'Ideas Description',
     id: '',
@@ -85,7 +114,7 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
 
     let feed = {
       name: userInfo?.fullName.toString(),
-      goalTitle: goalTitle,
+      goalTitle: goal.Title,
       ideasid: null,
       daoId: daoId
     };
@@ -99,7 +128,7 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
     if (PolkadotLoggedIn) {
       let ideasId = Number(await api._query.ideas.ideasIds());
       feed.ideasid = ideasId;
-    
+
       const txs = [api._extrinsics.ideas.createIdeas(JSON.stringify(createdObject), goalId, daoId, window.userid, JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'idea', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
@@ -170,8 +199,12 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goalTitl
                 <Required />
               </h6>
               {IdeasTitleInput}
+              <div className="flex gap-2">
+                {suggestions.map((suggestion, i) => (
+                  <IdeaSuggestionBox suggestion={suggestion} key={i} onClick={() => setSuggestedIdea(suggestion)} />
+                ))}
+              </div>
             </div>
-
             <div className="flex flex-col gap-2">
               <h6>
                 Description

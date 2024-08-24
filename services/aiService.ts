@@ -1,6 +1,8 @@
-export class OpenAiService {
+import { IdeaSuggestion } from '../data-model/idea-suggestion';
+
+export class AiService {
   static async generateTemplate(daoDescription: string) {
-    const response = await fetch('/api/openai/generateTemplate', {
+    const response = await fetch('/api/ai/generateTemplate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -19,7 +21,7 @@ export class OpenAiService {
   }
 
   static async generateGoal(goalDescription: string, daoDescription): Promise<{ content: string }> {
-    const response = await fetch('/api/openai/generateGoal', {
+    const response = await fetch('/api/ai/generateGoal', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -38,8 +40,8 @@ export class OpenAiService {
     return data;
   }
 
-  static async generateIdeas(goalDescription: string, daoDescription) {
-    const response = await fetch('/api/openai/generateIdeas', {
+  static async generateIdeas(goalDescription: string, daoDescription: string): Promise<IdeaSuggestion[]> {
+    const response = await fetch('/api/ai/generateIdeas', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

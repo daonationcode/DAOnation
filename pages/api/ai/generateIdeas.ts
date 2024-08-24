@@ -17,9 +17,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: 'daoDescription is required and must be a string' });
     }
 
-    const completion = await OpenAiService.generateIdeas(goalDescription, daoDescription);
+    const ideas = await OpenAiService.generateIdeas(goalDescription, daoDescription);
 
-    res.status(200).json(completion.choices[0].message);
+    res.status(200).json(ideas);
   } catch (error) {
     res.status(500).json({ message: 'Error with OpenAI API', error: error.message });
   }

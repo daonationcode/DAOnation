@@ -271,15 +271,15 @@ export default function GrantIdeas() {
                 loading={loading}
                 width={300}
                 element={
-                  <h5 className="font-semibold">
-                    <Link href={`../../../../${router.query.daoId}`} className="text-piccolo">
+                  <h5 className="font-semibold whitespace-nowrap">
+                    <Link href={`../../../../${router.query.daoId}`} className="text-piccolo truncate">
                       {CurrentDAO?.Title}
                     </Link>{' '}
                     &gt;{' '}
-                    <Link className="text-piccolo" href={`../../../../${router.query.daoId}/goal/${router.query.goalId}`}>
+                    <Link className="text-piccolo truncate max-w-[200px] inline-flex" href={`../../../../${router.query.daoId}/goal/${router.query.goalId}`}>
                       {IdeasURI?.goalURI?.Title}
                     </Link>{' '}
-                    &gt; {IdeasURI?.Title}
+                    &gt; Idea
                   </h5>
                 }
               />
@@ -302,8 +302,8 @@ export default function GrantIdeas() {
                     <div>•</div>
                     <div className="flex">
                       Created by &nbsp;
-                      <a href={'/profile/' + IdeasURI?.user_info?.id} className="truncate text-piccolo max-w-[120px]">
-                        @{IdeasURI?.user_info?.fullName}
+                      <a href={'/profile/' + IdeasURI?.user_info?.id} className="truncate text-piccolo max-w-[220px]">
+                        {IdeasURI?.user_info?.fullName}
                       </a>
                     </div>
                   </h3>

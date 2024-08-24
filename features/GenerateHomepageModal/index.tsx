@@ -4,7 +4,7 @@ import UseFormTextArea from '../../components/components/UseFormTextArea';
 import EventTypeOption from '../../components/components/EventTypeOption';
 import { useState } from 'react';
 import Required from '../../components/components/Required';
-import { OpenAiService } from '../../services/openAIService';
+import { AiService } from '../../services/aiService';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import { CommunityService } from '../../services/communityService';
@@ -28,7 +28,7 @@ export default function GenerateHomepageModal({ open, onClose, item }: { open: b
     setIsLoading(true);
     const toastId = toast.loading('Generating homepage...');
 
-    const template = await OpenAiService.generateTemplate(daoDescription).then((res) => res.content);
+    const template = await AiService.generateTemplate(daoDescription).then((res) => res.content);
 
     await CommunityService.create({ template, subdomain: item.customUrl || 'test', polkadot_reference_id: daoId });
 

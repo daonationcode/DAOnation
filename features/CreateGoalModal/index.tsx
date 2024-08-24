@@ -11,10 +11,12 @@ import Required from '../../components/components/Required';
 import { toast } from 'react-toastify';
 import useEnvironment from '../../contexts/EnvironmentContext';
 import { useIPFSContext } from '../../contexts/IPFSContext';
-import { OpenAiService } from '../../services/openAIService';
+import { AiService } from '../../services/aiService';
 import { Dao } from '../../data-model/dao';
 import { MediaService } from '../../services/mediaService';
 import InfoBox from '../../components/components/InfoBox';
+import { UnsplashImage } from '../../data-model/unspash-image';
+import SuggestedImage from '../../components/components/SuggestedImage';
 
 let addedDate = false;
 
@@ -22,6 +24,7 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
   const [mode, setMode] = useState<'ai' | 'manual'>('ai');
   const [goalImage, setGoalImage] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [suggestedImages, setSuggestedImages] = useState<UnsplashImage[]>([]);
   const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
   const { isServer } = useEnvironment();
 
@@ -128,7 +131,7 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
         allFiles
       }
     };
-    console.log('======================>Creating Goal');
+    console.log('======================>Creating Goal', createdObject);
     toast.update(ToastId, { render: 'Creating Goal...', isLoading: true });
 
     let feed = {
@@ -192,11 +195,13 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
   async function generateGoal() {
     const toastId = toast.loading('Generating goal');
 
-    const { content } = await OpenAiService.generateGoal(describeGoal, 'charity');
+    const { content } = await AiService.generateGoal(describeGoal, 'charity');
 
     const { title, description } = JSON.parse(content);
 
-    const { images } = await MediaService.getImage(describeGoal);
+    const { images } = await MediaService.getImages(describeGoal);
+
+    console.log('full url', images[0].urls.full);
 
     const createdObject = {
       title: 'Asset Metadata',
@@ -228,8 +233,9 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
         },
         logo: {
           type: 'string',
-          description: images[0].urls.full
-        }
+          description: { url: images[0].urls.regular, type: 'image/jpeg' }
+        },
+        allFiles: [{ url: images[0].urls.regular, type: 'image/jpeg' }]
       }
     };
 
@@ -267,6 +273,22 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
     return !(((GoalTitle && GoalDescription) || describeGoal) && Budget && EndDate);
   }
 
+  async function getImageSuggestions(title: string) {
+    if (title.length > 10) {
+      const { images } = await MediaService.getImages(title);
+
+      setSuggestedImages(images);
+    }
+  }
+
+  async function onChooseImage(image: UnsplashImage) {
+    const response = await fetch(image.urls.regular);
+    const blob = await response.blob();
+    const file = new File([blob], 'goal.png', { type: 'image/jpeg' });
+
+    setGoalImage([file]);
+  }
+
   const isGenerating = () => mode === 'ai';
   const isManual = () => mode === 'manual';
 
@@ -274,6 +296,10 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
     let dateTime = new Date();
     if (!addedDate) setEndDate(dateTime.toISOString().split('T')[0]);
   }, []);
+
+  useEffect(() => {
+    getImageSuggestions(GoalTitle);
+  }, [GoalTitle]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -340,12 +366,13 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
                   Image
                   <Required />
                 </h6>
-                <div className="content-start flex flex-row flex-wrap gap-4 justify-start overflow-auto relative text-center text-white w-full">
+                <div className="content-start flex flex-row flex-wrap gap-[6px] justify-start overflow-auto relative text-center text-white w-full">
                   <input className="file-input" hidden onChange={filehandleChange} accept="image/*" id="goalImage" name="goalImage" type="file" />
                   <div className="flex flex-col">
                     {goalImage.length < 1 && <AddImageInput onClick={addImage} />}
                     <ImageListDisplay images={goalImage} onDeleteImage={deleteSelectedImages} />
                   </div>
+                  {goalImage.length === 0 && suggestedImages.map((image, i) => <SuggestedImage image={image.urls.regular} onClick={() => onChooseImage(image)} key={i} />)}
                 </div>
               </div>
             )}

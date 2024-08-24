@@ -36,7 +36,7 @@ export default function Goal() {
     wallet: '',
     logo: '',
     isOwner: true
-  });
+  } as any);
   const [goalId, setGoalID] = useState(-1);
   const [tabIndex, setTabIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -51,8 +51,6 @@ export default function Goal() {
   const { getCurrency } = useEnvironment();
 
   const router = useRouter();
-
-  let id = ''; //id from url
 
   useEffect(() => {
     getGoalID();
@@ -269,8 +267,8 @@ export default function Goal() {
                     <div>•</div>
                     <div className="flex">
                       Created by &nbsp;
-                      <a href={'/profile/' + GoalURI?.user_info?.id} className="truncate text-piccolo max-w-[120px]">
-                        @{GoalURI?.user_info?.fullName.toString()}
+                      <a href={'/profile/' + GoalURI?.user_info?.id} className="truncate text-piccolo max-w-[220px]">
+                        {GoalURI?.user_info?.fullName.toString()}
                       </a>
                     </div>
                   </h3>
@@ -327,7 +325,7 @@ export default function Goal() {
                     />
                   ))
                 ) : (
-                  <EmptyState icon={<GenericIdea className="text-moon-48" />} label="This goal doesn’t have any ideas yet." />
+                  <EmptyState icon={<GenericIdea className="text-moon-48" />} label="This goal doesn’t have any ideas yet." buttonLabel="Create idea" onButtonClick={openCreateIdeaModal} />
                 )
               }
               width={768}
@@ -338,7 +336,7 @@ export default function Goal() {
           </div>
         )}
       </div>
-      <CreateIdeaModal show={showCreateIdeaModal} onClose={closeCreateIdeaModal} goalId={goalId} daoId={GoalURI.daoId} goalTitle={GoalURI.Title} />
+      <CreateIdeaModal show={showCreateIdeaModal} onClose={closeCreateIdeaModal} goalId={goalId} daoId={GoalURI.daoId} goal={GoalURI} dao={GoalDAOURI} />
       <DonateCoinModal recievetype="" ideasid={selectedIdeasId} daoId={router.query.daoId} goalURI={GoalURI} show={DonatemodalShow} onHide={closeDonateModal} address={selectedIdeasWallet} recieveWallet={selectedIdeasRecieveWallet} />
     </>
   );

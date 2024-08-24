@@ -203,6 +203,8 @@ export default function DAO() {
         }
         setGoalsList(arr.reverse());
 
+        console.log('goals', arr);
+
         let allEvents = await GetAllEvents();
         let currentEvents = allEvents.filter((e) => e?.daoId == daoId);
 

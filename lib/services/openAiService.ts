@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { UnsplashService } from './unsplashService';
+import { IdeaSuggestion } from '../../data-model/idea-suggestion';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -38,11 +39,11 @@ export class OpenAiService {
     return completion;
   }
 
-  static async generateIdeas(goalDescription: string, daoDescription: string) {
+  static async generateIdeas(goalDescription: string, daoDescription: string): Promise<IdeaSuggestion[]> {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'You are a idea generation assistant. You return 3 ideas based on a goal description as an array with a string for each. Omit any markdown, it should be a stringified JSON that Javascript can JSON.parse directly.' },
+        { role: 'system', content: 'You are a idea generation assistant. You return 3 ideas based on a goal description as an array with a title and description for each. Omit any markdown, it should be a JSON that Javascript can JSON.parse directly.' },
         {
           role: 'user',
           content: `Generate 3 realistic ideas a charity with the following description ${daoDescription} could try to implement to achieve the following goal: ${goalDescription}. `
@@ -50,6 +51,18 @@ export class OpenAiService {
       ]
     });
 
-    return completion;
+    const ideas = JSON.parse(completion.choices[0].message.content);
+
+    const mappedIdeas = await Promise.all(
+      ideas.map(async (item) => {
+        const images = await UnsplashService.searchImages(item.description);
+        return {
+          ...item,
+          imageUrl: images[0].urls.regular
+        };
+      })
+    );
+
+    return mappedIdeas;
   }
 }

@@ -12,7 +12,7 @@ const ImageListDisplay = ({ images, onDeleteImage }: { images: any[]; onDeleteIm
     <div className="flex gap-2">
       {displayImages.map((item, i) => {
         return (
-          <button key={i} onClick={() => onDeleteImage(i)} name="deleteBTN" className="h-[120px] w-[180px] rounded-moon-i-md relative overflow-hidden">
+          <button key={i} onClick={() => onDeleteImage(i)} name="deleteBTN" className="h-[120px] w-[180px] rounded-moon-i-xs relative overflow-hidden">
             {item.type.includes('image') ? (
               <Image unoptimized={true} src={URL.createObjectURL(item)} alt="" objectFit="cover" layout="fill" className="object-cover" />
             ) : (
