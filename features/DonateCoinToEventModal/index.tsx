@@ -13,7 +13,6 @@ export default function DonateCoinToEventModal({ open, onClose, eventName, event
   const [isLoading, setIsLoading] = useState(false);
   const { userInfo, PolkadotLoggedIn, userWalletPolkadot, userSigner, showToast, api } = usePolkadotContext();
 
-  const { getCurrency } = useEnvironment();
 
   const [Amount, AmountInput] = UseFormInput({
     defaultValue: '',

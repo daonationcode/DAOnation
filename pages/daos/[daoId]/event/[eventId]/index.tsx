@@ -9,7 +9,7 @@ import DonateCoinToEventModal from '../../../../../features/DonateCoinToEventMod
 import DonateNFTModal from '../../../../../features/DonateNFTModal';
 import Loader from '../../../../../components/components/Loader';
 import Link from 'next/link';
-import { NFT } from '../../../../../data-model/nft';
+import { Bid, NFT } from '../../../../../data-model/nft';
 import NFTCard from '../../../../../components/components/NFTCard';
 import BidHistoryModal from '../../../../../features/BidHistoryModal';
 import PlaceHigherBidModal from '../../../../../features/PlaceHigherBidModal';
@@ -22,7 +22,7 @@ declare let window;
 export default function Events() {
   //Variables
   const [nfts, setNfts] = useState([]);
-  const { api, getUserInfoById, GetAllDaos, GetAllEvents, GetAllNfts } = usePolkadotContext();
+  const { api, getUserInfoById, GetAllDaos, GetAllEvents, GetAllNfts, GetAllBids } = usePolkadotContext();
   const [showDonateNftModal, setShowDonateNFTModal] = useState(false);
   const [showBuyTicketModal, setShowBuyTicketModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
@@ -92,8 +92,11 @@ export default function Events() {
 
         let allNfts = await GetAllNfts();
         let eventNFTs = allNfts.filter((e) => Number(e.eventid) === eventId);
-        console.log(eventNFTs);
+
         setNfts(eventNFTs);
+
+
+
 
         let allDaos = await GetAllDaos();
         let eventDAO = allDaos.filter((e) => e.daoId == eventURIFull.daoId)[0];
@@ -327,7 +330,7 @@ export default function Events() {
 
       <DonateNFTModal daoid={EventURI?.daoId} open={showDonateNftModal} onClose={closeDonateNFTModal} eventid={eventID} eventName={EventURI.Title} />
       <DonateCoinToEventModal open={showDonateCoinModal} onClose={closeDonateCoinModal} eventName={EventURI.Title} eventid={eventID} recieveWallet={EventURI.wallet} />
-      <PlaceHigherBidModal open={!!showPlaceHigherBidModal} onClose={() => setShowPlaceHigherBidModal(null)} item={showPlaceHigherBidModal} />
+      <PlaceHigherBidModal open={!!showPlaceHigherBidModal} onClose={() => setShowPlaceHigherBidModal(null)} recieveWallet={EventURI.wallet} item={showPlaceHigherBidModal} />
       <BidHistoryModal open={!!showBidHistoryModal} onClose={() => setShowBidHistoryModal(null)} item={showBidHistoryModal} />
       <BuyTicketModal open={!!showBuyTicketModal} onClose={() => setShowBuyTicketModal(null)} event={EventURI} />
     </>

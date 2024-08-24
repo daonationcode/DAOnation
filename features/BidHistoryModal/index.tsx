@@ -47,7 +47,7 @@ export default function BidHistoryModal({ open, onClose, item }: { open: boolean
             <h1 className="text-moon-20 font-semibold">View bids on {item?.name}</h1>
             <IconButton className="text-trunks" variant="ghost" icon={<ControlsClose />} onClick={onClose} />
           </div>
-          <div className="flex flex-col gap-6 w-full p-6 max-h-[calc(90vh-162px)]">{item && item.bidHistory && <Table data={item?.bidHistory} defaultColumn={defaultColumn} columns={columns} />}</div>
+          <div className="flex flex-col gap-6 w-full p-6 max-h-[calc(90vh-162px)]">{item && item.bidHistory && <Table data={[]} defaultColumn={defaultColumn} columns={columns} />}</div>
         </div>
       </Modal.Panel>
     </Modal>

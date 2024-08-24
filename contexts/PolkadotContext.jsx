@@ -15,20 +15,21 @@ const AppContext = createContext({
   userWalletPolkadot: '',
   userSigner: null,
   PolkadotLoggedIn: false,
-  EasyToast: (message, type, UpdateType = false, ToastId = '',isLoading=false) => { },
+  EasyToast: (message, type, UpdateType = false, ToastId = '', isLoading = false) => { },
   GetAllDaos: async () => [],
   GetAllJoined: async () => [],
   GetAllGoals: async (cache = false) => [],
 
-  GetAllEvents: async(cache = false) => [],
+  GetAllEvents: async (cache = false) => [],
   GetAllNfts: async (cache = false) => [],
+  GetAllBids: async (cache = false) => [],
   GetAllFeeds: async () => [],
   GetAllIdeas: async (cache = false) => [],
   GetAllVotes: async () => [],
   GetAllDonations: async () => [],
   GetAllUserDonations: async () => [],
   getUserInfoById: async (userid) => ({}),
-  updateCurrentUser: () => {}
+  updateCurrentUser: () => { }
 });
 
 export function PolkadotProvider({ children }) {
@@ -38,14 +39,14 @@ export function PolkadotProvider({ children }) {
   const [userInfo, setUserInfo] = useState({});
   const [userWalletPolkadot, setUserWalletPolkadot] = useState('');
   const [userSigner, setUserSigner] = useState('');
-  const [{ wallet},] = useConnectWallet();
+  const [{ wallet },] = useConnectWallet();
 
 
   async function showToast(status, IdOrShowAlert, FinalizedText, doAfter, callToastSuccess = true, events, ShowToast = false) {
     if (status.isInBlock) {
       if (ShowToast == false) {
-      toast.update(IdOrShowAlert, { render: 'Transaction In block...', isLoading: true });
-      }else {
+        toast.update(IdOrShowAlert, { render: 'Transaction In block...', isLoading: true });
+      } else {
         IdOrShowAlert('pending', 'Transaction In block...');
       }
 
@@ -80,7 +81,7 @@ export function PolkadotProvider({ children }) {
       return {};
     }
   }
-  async function EasyToast(message, type, UpdateType = false, ToastId = '',isLoading = false) {
+  async function EasyToast(message, type, UpdateType = false, ToastId = '', isLoading = false) {
     if (UpdateType) {
       toast.update(ToastId, {
         render: message,
@@ -96,7 +97,7 @@ export function PolkadotProvider({ children }) {
 
   async function updateCurrentUser() {
 
-    if (wallet?.accounts){
+    if (wallet?.accounts) {
 
       setUserWalletPolkadot(wallet.accounts[0].address);
       window.signerAddress = wallet.accounts[0].address;
@@ -107,9 +108,9 @@ export function PolkadotProvider({ children }) {
 
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     updateCurrentUser();
-  },[wallet])
+  }, [wallet])
   useEffect(() => {
     (async function () {
       try {
@@ -145,6 +146,7 @@ export function PolkadotProvider({ children }) {
   let allGoals = [];
   let allEvents = [];
   let allDaos = [];
+  let allBids = [];
 
   async function InsertData(totalDAOCount, allDAOs) {
     const arr = [];
@@ -153,9 +155,9 @@ export function PolkadotProvider({ children }) {
       let originalwallet = '';
 
       if (allDAOs[i]?.daoUri) {
-          object = JSON.parse(allDAOs[i].daoUri?.toString());
-          originalwallet = allDAOs[i].daoWallet?.toString();
-        }
+        object = JSON.parse(allDAOs[i].daoUri?.toString());
+        originalwallet = allDAOs[i].daoWallet?.toString();
+      }
       if (object) {
         let user_info = await getUserInfoById(object.properties?.user_id?.description);
         arr.push({
@@ -167,8 +169,8 @@ export function PolkadotProvider({ children }) {
           user_info: user_info,
           user_id: object.properties?.user_id?.description,
           logo: object.properties.logo.description?.url,
-          wallet:originalwallet,
-          recievewallet:  object.properties.wallet.description,
+          wallet: originalwallet,
+          recievewallet: object.properties.wallet.description,
           recievetype: 'Polkadot',
           SubsPrice: object.properties?.SubsPrice?.description,
           Created_Date: object.properties?.Created_Date?.description,
@@ -257,10 +259,10 @@ export function PolkadotProvider({ children }) {
     for (let i = 0; i < totalGoalCount; i++) {
       let object = '';
       let daoId = -1;
-       if (allGoals[i]?.goalUri) {
-          object = JSON.parse(allGoals[i].goalUri?.toString());
-          daoId =Number(allGoals[i].daoId);
-        }
+      if (allGoals[i]?.goalUri) {
+        object = JSON.parse(allGoals[i].goalUri?.toString());
+        daoId = Number(allGoals[i].daoId);
+      }
       let goalId = Number(i);
 
       let reached = 0;
@@ -317,7 +319,7 @@ export function PolkadotProvider({ children }) {
   }
 
   async function GetAllGoals(cache = false) {
-    if (cache && allGoals.length >0) return allGoals;
+    if (cache && allGoals.length > 0) return allGoals;
     allIdeas = await GetAllIdeas();
     let arr = [];
     allGoals = arr.concat(await fetchPolkadotGoalData());
@@ -429,9 +431,9 @@ export function PolkadotProvider({ children }) {
     } catch (error) { }
     return [];
   }
- 
+
   async function GetAllIdeas(cache = false) {
-    if (cache && allIdeas.length >0) return allIdeas;
+    if (cache && allIdeas.length > 0) return allIdeas;
     allVotes = await GetAllVotes();
     allDonations = await GetAllDonations();
 
@@ -483,7 +485,7 @@ export function PolkadotProvider({ children }) {
             id: element['__internal__raw'].id.toString(),
             ideasId: element['__internal__raw'].ideasId.toString(),
             userid: element['__internal__raw'].userid.toString(),
-            donation: Number(element['__internal__raw'].donation.toString())/ 1e12,
+            donation: Number(element['__internal__raw'].donation.toString()) / 1e12,
           };
           arr.push(newElm);
         }
@@ -503,17 +505,17 @@ export function PolkadotProvider({ children }) {
   async function GetAllUserDonations() {
     let allDonations = await GetAllDonations();
     let users = {};
-    allDonations.forEach((elm)=>{
-      if (users[elm.userid]== undefined) users[elm.userid]= 0;
-      users[elm.userid] = Number(users[elm.userid] ) + elm.donation;
+    allDonations.forEach((elm) => {
+      if (users[elm.userid] == undefined) users[elm.userid] = 0;
+      users[elm.userid] = Number(users[elm.userid]) + elm.donation;
     })
     return users;
   }
 
 
-  
 
-  
+
+
   async function fetchPolkadotEventDonationsData() {
     //Fetching data from Parachain
     try {
@@ -526,7 +528,7 @@ export function PolkadotProvider({ children }) {
             id: element['__internal__raw'].id.toString(),
             eventId: element['__internal__raw'].eventId.toString(),
             userid: element['__internal__raw'].userid.toString(),
-            donation: Number(element['__internal__raw'].donation.toString())/ 1e12,
+            donation: Number(element['__internal__raw'].donation.toString()) / 1e12,
           };
           arr.push(newElm);
         }
@@ -553,7 +555,7 @@ export function PolkadotProvider({ children }) {
           const object = JSON.parse(element['__internal__raw'].eventUri.toString())
 
           let totalDonation = 0;
-          let currentEventDonations = allEventDonations.filter((e) => e.eventId ==  Number(element['__internal__raw'].id))
+          let currentEventDonations = allEventDonations.filter((e) => e.eventId == Number(element['__internal__raw'].id))
           for (let i = 0; i < currentEventDonations.length; i++) {
             const element = (currentEventDonations[i]);
             totalDonation += element.donation;
@@ -564,7 +566,7 @@ export function PolkadotProvider({ children }) {
             eventId: Number(element['__internal__raw'].id),
             daoId: Number(element['__internal__raw'].daoId),
             Title: object.properties.Title.description,
-            Description: object.properties.description,
+            Description: object.properties.Description.description,
             Budget: object.properties.Budget.description,
             End_Date: object.properties.End_Date.description,
             wallet: object.properties.wallet.description,
@@ -577,7 +579,7 @@ export function PolkadotProvider({ children }) {
           };
           arr.push(newElm);
         }
-      
+
 
 
         return arr;
@@ -587,8 +589,8 @@ export function PolkadotProvider({ children }) {
   }
 
   async function GetAllEvents(cache = false) {
-    if (cache && allEvents.length >0) return allEvents;
-    allEventDonations= await GetAllEventDonations();
+    if (cache && allEvents.length > 0) return allEvents;
+    allEventDonations = await GetAllEventDonations();
     let arr = [];
     arr = arr.concat(await fetchPolkadotEventData());
     return arr;
@@ -606,28 +608,36 @@ export function PolkadotProvider({ children }) {
           const element = await api._query.events.tokenById(i);
           const object = JSON.parse(element['__internal__raw'].tokenUri.toString())
 
-        
+          const nftid = Number(element['__internal__raw'].id);
+          let bidHistory = [];
+          for (let i = 0; i < allBids.length; i++) {
+            const bidElement = allBids[i];
+            if (bidElement.nftId ==  nftid) bidHistory.push(bidElement);
+          }
+          console.log(bidHistory)
 
           let newElm = {
-            id: Number(element['__internal__raw'].id),
+            id: nftid,
             eventid: Number(element['__internal__raw'].eventId),
             daoid: Number(element['__internal__raw'].daoId),
             name: object.properties.Name.description,
             url: object.properties.Link.description,
             description: object.properties.Description.description,
-            highest_amount: Number(element['__internal__raw'].highestAmount)/1e12,
-            highest_bidder: Number(element['__internal__raw'].highestBidderUserid),
-            highest_bidder_wallet:  (element['__internal__raw'].highestBidderWallet).toString(),
-            highestBid:{
-              date: element['__internal__raw'].highestBidDate,
-              walletAddress: Number(element['__internal__raw'].highestBidderWallet),
-              bidder: Number(element['__internal__raw'].highestBidderUserid),
-              bidAmount: Number(element['__internal__raw'].highestAmount)/1e12
+            highest_amount: Number(element['__internal__raw'].highestAmount) / 1e12,
+            highest_bidder: (element['__internal__raw'].highestBidder).toString(),
+            highest_bidder_userid: Number(element['__internal__raw'].highestBidderUserid),
+            highest_bidder_wallet: (element['__internal__raw'].highestBidderWallet).toString(),
+            highestBid: {
+              date: element['__internal__raw'].highestBidDate.toString(),
+              walletAddress: (element['__internal__raw'].highestBidderWallet).toString(),
+              bidder: (element['__internal__raw'].highestBidder).toString(),
+              bidderUserId: Number(element['__internal__raw'].highestBidderUserid),
+              bidAmount: Number(element['__internal__raw'].highestAmount) / 1e12
             },
-            bidHistory:[]
+            bidHistory: bidHistory
           };
           arr.push(newElm);
-        }     
+        }
 
 
         return arr;
@@ -637,12 +647,55 @@ export function PolkadotProvider({ children }) {
   }
 
   async function GetAllNfts(cache = false) {
+    allBids= await GetAllBids();
     let arr = [];
     arr = arr.concat(await fetchPolkadotNftsData());
     return arr;
   }
 
-  return <AppContext.Provider value={{ api: api, deriveAcc: deriveAcc, GetAllEvents:GetAllEvents,GetAllNfts:GetAllNfts, GetAllGoals: GetAllGoals, GetAllIdeas: GetAllIdeas, GetAllVotes: GetAllVotes, GetAllFeeds: GetAllFeeds,GetAllDonations:GetAllDonations,GetAllUserDonations:GetAllUserDonations, updateCurrentUser: updateCurrentUser, GetAllDaos: GetAllDaos, GetAllJoined: GetAllJoined, showToast: showToast, EasyToast: EasyToast, getUserInfoById: getUserInfoById, userWalletPolkadot: userWalletPolkadot, userSigner: userSigner, PolkadotLoggedIn: PolkadotLoggedIn, userInfo: userInfo }}>{children}</AppContext.Provider>;
+  async function fetchPolkadotBidsData() {
+    //Fetching data from Parachain
+    try {
+      if (api) {
+        let totalBidCount = Number(await api._query.events.bidIds());
+        let arr = [];
+        for (let i = 0; i < totalBidCount; i++) {
+          const element = await api._query.events.bidById(i);
+
+
+
+          let newElm = {
+            id: Number(element['__internal__raw'].id),
+            nftId: Number(element['__internal__raw'].nftId),
+            eventId: Number(element['__internal__raw'].eventId),
+            daoId: Number(element['__internal__raw'].daoId),
+            date: element['__internal__raw'].date.toString(),
+            walletAddress: (element['__internal__raw'].walletAddress).toString(),
+            bidder: (element['__internal__raw'].bidder).toString(),
+            bidderUserId: Number(element['__internal__raw'].bidderUserid),
+            bidAmount: Number(element['__internal__raw'].bidAmount) / 1e12,
+          };
+          arr.push(newElm);
+        }
+
+
+        return arr;
+      }
+    } catch (error) { console.error(error) }
+    return [];
+  }
+
+  async function GetAllBids(cache = false) {
+    let arr = [];
+    arr = arr.concat(await fetchPolkadotBidsData());
+    return arr;
+  }
+
+
+
+
+
+  return <AppContext.Provider value={{ api: api, deriveAcc: deriveAcc, GetAllEvents: GetAllEvents, GetAllNfts: GetAllNfts,GetAllBids:GetAllBids, GetAllGoals: GetAllGoals, GetAllIdeas: GetAllIdeas, GetAllVotes: GetAllVotes, GetAllFeeds: GetAllFeeds, GetAllDonations: GetAllDonations, GetAllUserDonations: GetAllUserDonations, updateCurrentUser: updateCurrentUser, GetAllDaos: GetAllDaos, GetAllJoined: GetAllJoined, showToast: showToast, EasyToast: EasyToast, getUserInfoById: getUserInfoById, userWalletPolkadot: userWalletPolkadot, userSigner: userSigner, PolkadotLoggedIn: PolkadotLoggedIn, userInfo: userInfo }}>{children}</AppContext.Provider>;
 }
 
 export const usePolkadotContext = () => useContext(AppContext);

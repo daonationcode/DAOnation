@@ -8,13 +8,13 @@ import { toast } from 'react-toastify';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
 
 declare let window;
-export default function PlaceHigherBidModal({ open, onClose, item }: { open: boolean; onClose: () => void; item: NFT }) {
-  const { userInfo, PolkadotLoggedIn } = usePolkadotContext();
+export default function PlaceHigherBidModal({ open, onClose, item, recieveWallet }: { open: boolean; onClose: () => void; item: NFT; recieveWallet: String }) {
   const [BalanceAmount, setBalanceAmount] = useState(0);
-  const [Coin, setCoin] = useState('UNQ');
+  const [Coin, setCoin] = useState('DOT');
   const [isLoading, setIsLoading] = useState(false);
+  const { userInfo, PolkadotLoggedIn, userWalletPolkadot, userSigner, showToast, api } = usePolkadotContext();
 
-  const { getCurrency } = useEnvironment();
+
 
   const [Amount, AmountInput] = UseFormInput({
     defaultValue: '',
@@ -43,26 +43,16 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
       };
 
       try {
-        const bidid = Number(await window.contractUnique._bid_ids());
-        feed.bidid = 'm_' + bidid;
+        let bidId = Number(await api._query.events.bidIds());
+        feed.bidid = bidId;
 
-        // Creating Event in Smart contract
-        const methodWithSignature = await window.contractUnique.populateTransaction.bid_nft(Number(item.id), new Date().toLocaleDateString(), window.selectedAddress, userInfo?.fullName?.toString(), Number(window.userid), (Amount * 1e12).toString(), JSON.stringify(feed));
-        const tx = {
-          ...methodWithSignature,
-          value: (Amount * 1e12).toString()
-        };
 
-        toast.update(ToastId, {
-          render: 'Bid Successful!',
-          type: 'success',
-          isLoading: false,
-          autoClose: 1000,
-          closeButton: true,
-          closeOnClick: true,
-          draggable: true
+        const txs = [api.tx.balances.transferAllowDeath(recieveWallet, `${Amount * 1e12}`), api._extrinsics.events.bidToken(`${Amount * 1e12}`, item.id, item.eventid, item.daoid, new Date().toLocaleDateString(), userInfo.fullName?.toString(), window.signerAddress, Number(window.userid)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'bid', new Date().valueOf())];
+
+       await api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+          showToast(status, ToastId, 'Bid Successful!', onSuccess);
         });
-        onSuccess();
+
       } catch (error) {
         setIsLoading(false);
         console.error(error);
@@ -72,26 +62,26 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
     }
   }
 
-  async function LoadData(currencyChanged = false) {
-    async function setPolkadotVara() {}
+  async function LoadData() {
+    if (!api) return;
+    async function setPolkadot() {
 
-    if (currencyChanged == false && Coin == '') {
-      setPolkadotVara();
-    } else if (currencyChanged == true && Coin == 'VARA') {
-      setPolkadotVara();
+      const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
+
+      setBalanceAmount(Number((Number(balance.free.toString()) / 1e12).toString()));
     }
+
+    setPolkadot();
   }
 
   function isInvalid() {
     return !Amount || item?.highest_amount >= Amount;
   }
-  useEffect(() => {
-    if (Coin !== '') LoadData(true);
-  }, [Coin]);
+
 
   useEffect(() => {
     LoadData();
-  }, [open]);
+  }, [open, api]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -114,17 +104,7 @@ export default function PlaceHigherBidModal({ open, onClose, item }: { open: boo
                 <div className="flex items-center ">
                   <span className="font-semibold flex-1">Total</span>
                   <div className="max-w-[140px] mr-4"> {AmountInput}</div>
-                  <Dropdown value={Coin} onChange={setCoin} className="max-w-[100px] ">
-                    <Dropdown.Select>{Coin}</Dropdown.Select>
-                    <Dropdown.Options className="bg-gohan w-48 min-w-0">
-                      <Dropdown.Option value="UNQ">
-                        <MenuItem>UNQ</MenuItem>
-                      </Dropdown.Option>
-                      <Dropdown.Option value="VARA">
-                        <MenuItem>VARA</MenuItem>
-                      </Dropdown.Option>
-                    </Dropdown.Options>
-                  </Dropdown>
+                  {Coin}
                 </div>
                 {Coin != '' ? (
                   <>

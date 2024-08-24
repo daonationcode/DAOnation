@@ -75,7 +75,7 @@ const CommunityFeed = ({ communityName, daoId }) => {
 
   useEffect(() => {
     setAvatarUrl(userInfo.imgIpfs);
-    setUserName(userInfo.fullName);
+    setUserName(userInfo.fullName?.toString());
   }, [userInfo]);
 
   useEffect(() => {
