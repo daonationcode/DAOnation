@@ -194,8 +194,6 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
 
     const { content } = await OpenAiService.generateGoal(describeGoal, 'charity');
 
-    console.log('content', content);
-
     const { title, description } = JSON.parse(content);
 
     const { images } = await MediaService.getImage(describeGoal);
