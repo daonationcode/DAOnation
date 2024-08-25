@@ -6,6 +6,7 @@ import polkadotConfig from './json/polkadot-config.json';
 import { toast } from 'react-toastify';
 
 import { useConnectWallet, useNotifications, useSetChain } from "@subwallet-connect/react";
+import Cookies from 'js-cookie';
 
 const AppContext = createContext({
   api: null,
@@ -124,8 +125,8 @@ export function PolkadotProvider({ children }) {
         const newPair = keyring.addFromUri(polkadotConfig.derive_acc);
         setDeriveAcc(newPair);
 
-        if (window.localStorage.getItem('loggedin') == 'true') {
-          let userid = window.localStorage.getItem('user_id');
+        if (Cookies.get('loggedin') == 'true') {
+          let userid = Cookies.get('user_id');
           window.userid = userid;
           const userInformation = await _api.query.users.userById(userid);
           setUserInfo(userInformation);

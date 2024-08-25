@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import { useEffect } from 'react';
 
 export default function Logout() {
@@ -6,7 +7,7 @@ export default function Logout() {
   }, []);
 
   function logout() {
-    window.localStorage.setItem('loggedin', '');
+    Cookies.remove('loggedin');
     window.location.href = '/';
   }
 

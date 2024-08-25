@@ -6,7 +6,9 @@ import { useRouter } from 'next/router';
 import CreateDaoModal from '../../../features/CreateDaoModal';
 import { usePolkadotContext } from '../../../contexts/PolkadotContext';
 import useEnvironment from '../../../contexts/EnvironmentContext';
-import { GenericUser } from '@heathmont/moon-icons-tw';
+import { GenericLogOut, GenericUser, ShopWallet } from '@heathmont/moon-icons-tw';
+import { ApiCommunity } from '../../../data-model/api-community';
+import Cookies from 'js-cookie';
 
 let running = false;
 let changedPath = true;
@@ -19,14 +21,15 @@ export function Nav(): JSX.Element {
   const [Balance, setBalance] = useState('');
   const [count, setCount] = useState(0);
   const [isSigned, setSigned] = useState(false);
+  const [communityBranding, setCommunityBranding] = useState<ApiCommunity>(null);
   const [showCreateDaoModal, setShowCreateDaoModal] = useState(false);
   const [hasJoinedCommunities, setHasJoinedCommunities] = useState(true);
-  const { getCurrency, setCurrency, isServer } = useEnvironment();
+  const { getCurrency, setCurrency, isServer, getCommunityBranding } = useEnvironment();
 
   const router = useRouter();
 
   async function fetchInfo() {
-    if (window.localStorage.getItem('loggedin') === 'true') {
+    if (Cookies.get('loggedin') === 'true') {
       try {
         if (userWalletPolkadot && api && userInfo?.fullName) {
           const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
@@ -72,9 +75,14 @@ export function Nav(): JSX.Element {
       running = false;
     }
   }, [count, router.pathname]);
+
   useEffect(() => {
     changedPath = true;
   }, [router.pathname]);
+
+  useEffect(() => {
+    setCommunityBranding(getCommunityBranding());
+  }, [getCommunityBranding()]);
 
   setInterval(() => {
     if (!isServer()) {
@@ -85,7 +93,7 @@ export function Nav(): JSX.Element {
   }, 1000);
 
   function onClickDisConnect() {
-    router.push('logout');
+    router.push('/logout');
   }
 
   function closeModal() {
@@ -99,7 +107,7 @@ export function Nav(): JSX.Element {
     <>
       <nav className="main-nav w-full flex justify-between items-center">
         <ul className="flex justify-between items-center w-full">
-          {isSigned && (
+          {isSigned && !communityBranding && (
             <span className="hidden sm:inline-flex">
               {hasJoinedCommunities && <NavItem highlight={router.pathname === '/joined'} link="/joined" label="Joined charities" />}
               <NavItem highlight={router.pathname === '/daos'} link="/daos" label="Charities" />
@@ -144,11 +152,31 @@ export function Nav(): JSX.Element {
                     <Dropdown.Options className="bg-gohan w-48 min-w-0">
                       <Dropdown.Option>
                         <Link href={`/profile/${user_id}`} passHref>
-                          <MenuItem>Go to my profile</MenuItem>
+                          <MenuItem>
+                            <GenericUser className="text-moon-24" />
+                            <MenuItem.Title>Go to my profile</MenuItem.Title>
+                          </MenuItem>
                         </Link>
                       </Dropdown.Option>
                       <Dropdown.Option>
-                        <MenuItem onClick={onClickDisConnect}>Log out</MenuItem>
+                        <Link href={`/profile/${user_id}`} passHref>
+                          <MenuItem>
+                            <ShopWallet className="text-moon-24" />
+                            <MenuItem.Title>Top up your account</MenuItem.Title>
+                          </MenuItem>
+                        </Link>
+                      </Dropdown.Option>
+                      <Dropdown.Option>
+                        <MenuItem>
+                          <GenericLogOut className="text-moon-24" />
+                          <MenuItem.Title>Leave this charity</MenuItem.Title>
+                        </MenuItem>
+                      </Dropdown.Option>
+                      <Dropdown.Option>
+                        <MenuItem onClick={onClickDisConnect}>
+                          <GenericLogOut className="text-moon-24" />
+                          <MenuItem.Title>Log out</MenuItem.Title>
+                        </MenuItem>
                       </Dropdown.Option>
                     </Dropdown.Options>
                   </Dropdown>

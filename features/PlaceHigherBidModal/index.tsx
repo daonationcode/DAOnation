@@ -14,8 +14,6 @@ export default function PlaceHigherBidModal({ open, onClose, item, recieveWallet
   const [isLoading, setIsLoading] = useState(false);
   const { userInfo, PolkadotLoggedIn, userWalletPolkadot, userSigner, showToast, api } = usePolkadotContext();
 
-
-
   const [Amount, AmountInput] = UseFormInput({
     defaultValue: '',
     type: 'number',
@@ -24,6 +22,12 @@ export default function PlaceHigherBidModal({ open, onClose, item, recieveWallet
     className: 'max-w-[140px]'
   });
 
+  async function onSuccess() {
+    setIsLoading(false);
+    onClose();
+    window.location.reload();
+  }
+
   async function placeBidOnNFT() {
     if (item.highest_amount < Amount) {
       setIsLoading(true);
@@ -31,11 +35,6 @@ export default function PlaceHigherBidModal({ open, onClose, item, recieveWallet
       console.log('======================>Bidding NFT');
       const ToastId = toast.loading('Bidding NFT ...');
 
-      async function onSuccess() {
-        setIsLoading(false);
-        onClose();
-        window.location.reload();
-      }
       let feed = {
         name: userInfo?.fullName,
         nftid: item.id,
@@ -46,13 +45,11 @@ export default function PlaceHigherBidModal({ open, onClose, item, recieveWallet
         let bidId = Number(await api._query.events.bidIds());
         feed.bidid = bidId;
 
-
         const txs = [api.tx.balances.transferAllowDeath(recieveWallet, `${Amount * 1e12}`), api._extrinsics.events.bidToken(`${Amount * 1e12}`, item.id, item.eventid, item.daoid, new Date().toLocaleDateString(), userInfo.fullName?.toString(), window.signerAddress, Number(window.userid)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'bid', new Date().valueOf())];
 
-       await api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+        await api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
           showToast(status, ToastId, 'Bid Successful!', onSuccess);
         });
-
       } catch (error) {
         setIsLoading(false);
         console.error(error);
@@ -65,7 +62,6 @@ export default function PlaceHigherBidModal({ open, onClose, item, recieveWallet
   async function LoadData() {
     if (!api) return;
     async function setPolkadot() {
-
       const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
 
       setBalanceAmount(Number((Number(balance.free.toString()) / 1e12).toString()));
@@ -77,7 +73,6 @@ export default function PlaceHigherBidModal({ open, onClose, item, recieveWallet
   function isInvalid() {
     return !Amount || item?.highest_amount >= Amount;
   }
-
 
   useEffect(() => {
     LoadData();

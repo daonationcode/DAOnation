@@ -6,7 +6,11 @@ class CommunityService {
   }
 
   static async getByPolkadotReferenceId(polkadotReferenceId: string) {
-    return await Community.findOne({ where: { polkadot_reference_id: polkadotReferenceId } });
+    return await Community.findOne({ where: { polkadotReferenceId } });
+  }
+
+  static async getBySubdomainName(subdomain: string) {
+    return await Community.findOne({ where: { subdomain } });
   }
 
   static async create(data: Partial<Community>) {
@@ -14,7 +18,7 @@ class CommunityService {
   }
 
   static async updateByPolkadotReferenceId(polkadotReferenceId: string, updateData: Partial<Community>) {
-    const community = await Community.findOne({ where: { polkadot_reference_id: polkadotReferenceId } });
+    const community = await Community.findOne({ where: { polkadotReferenceId } });
     if (community) {
       return await community.update(updateData);
     }
@@ -22,7 +26,7 @@ class CommunityService {
   }
 
   static async deleteByPolkadotReferenceId(polkadotReferenceId: string) {
-    const community = await Community.findOne({ where: { polkadot_reference_id: polkadotReferenceId } });
+    const community = await Community.findOne({ where: { polkadotReferenceId } });
     if (community) {
       await community.destroy();
       return true;

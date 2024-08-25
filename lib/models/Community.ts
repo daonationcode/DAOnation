@@ -7,8 +7,12 @@ interface CommunityCreationAttributes extends Optional<ApiCommunity, 'id' | 'tem
 class Community extends Model<ApiCommunity, CommunityCreationAttributes> implements ApiCommunity {
   public id!: number;
   public subdomain!: string;
+  public name!: string;
+  public imageUrl!: string;
+  public brandingColor!: string;
+  public description!: string;
   public template!: string;
-  public polkadot_reference_id!: string;
+  public polkadotReferenceId!: string;
   public created_at!: Date;
   public updated_at!: Date;
   public deleted_at!: Date | null;
@@ -25,10 +29,27 @@ Community.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    template: {
-      type: DataTypes.TEXT
+    brandingColor: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
-    polkadot_reference_id: {
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    imageUrl: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    template: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    polkadotReferenceId: {
       type: DataTypes.STRING(50),
       allowNull: false,
       unique: true

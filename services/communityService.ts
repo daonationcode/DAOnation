@@ -37,6 +37,18 @@ export class CommunityService {
     return data as ApiCommunity;
   }
 
+  static async getBySubdomain(subdomain: string): Promise<ApiCommunity> {
+    const response = await fetch(`/api/communities/subdomain/${subdomain}`);
+
+    if (!response.ok) {
+      window.location.href = window.location.protocol + '//' + window.location.host.split('.')[1] + '/joined';
+      return;
+    }
+
+    const data = await response.json();
+    return data as ApiCommunity;
+  }
+
   static async updateByPolkadotReferenceId(polkadotReferenceId: string, updateData: Partial<ApiCommunity>): Promise<ApiCommunity> {
     const response = await fetch(`/api/communities/${polkadotReferenceId}`, {
       method: 'PUT',

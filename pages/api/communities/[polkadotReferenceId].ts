@@ -2,11 +2,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import CommunityService from '../../../lib/services/communityService';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { polkadot_reference_id } = req.query;
+  const { polkadotReferenceId } = req.query;
 
   switch (req.method) {
     case 'GET':
-      const community = await CommunityService.getByPolkadotReferenceId(polkadot_reference_id as string);
+      const community = await CommunityService.getByPolkadotReferenceId(polkadotReferenceId as string);
       if (community) {
         res.status(200).json(community);
       } else {
@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case 'PUT':
       const updateData = req.body;
-      const updatedCommunity = await CommunityService.updateByPolkadotReferenceId(polkadot_reference_id as string, updateData);
+      const updatedCommunity = await CommunityService.updateByPolkadotReferenceId(polkadotReferenceId as string, updateData);
       if (updatedCommunity) {
         res.status(200).json(updatedCommunity);
       } else {
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       break;
 
     case 'DELETE':
-      const deleted = await CommunityService.deleteByPolkadotReferenceId(polkadot_reference_id as string);
+      const deleted = await CommunityService.deleteByPolkadotReferenceId(polkadotReferenceId as string);
       if (deleted) {
         res.status(204).end();
       } else {

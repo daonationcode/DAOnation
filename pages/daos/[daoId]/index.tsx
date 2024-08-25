@@ -143,10 +143,6 @@ export default function DAO() {
       isOwner
     };
 
-    if (daoURIShort.brandingColor) {
-      document.documentElement.style.setProperty('--piccolo', hex2rgb(daoURIShort.brandingColor));
-    }
-
     setDaoURI(daoURIShort);
   }
 
@@ -162,7 +158,7 @@ export default function DAO() {
 
           const { template } = await CommunityService.getByPolkadotReferenceId(daoId.toString());
 
-          if (template === '[object Object]' || template === null) {
+          if (!template || template === '[object Object]') {
             setHasNoTemplate(true);
           } else {
             setAboutTemplate(template);
@@ -346,8 +342,8 @@ export default function DAO() {
           <div className="container">
             <Tabs selectedIndex={tabIndex} onChange={setTabIndex}>
               <Tabs.List>
-                <Tabs.Tab>Feed</Tabs.Tab>
                 <Tabs.Tab>About</Tabs.Tab>
+                <Tabs.Tab>Feed</Tabs.Tab>
                 <Tabs.Tab>Events ({AuctionEvents.length})</Tabs.Tab>
                 <Tabs.Tab>Goals ({goalsList.length})</Tabs.Tab>
                 <Tabs.Tab>Members ({communityMembers.length})</Tabs.Tab>
@@ -355,12 +351,12 @@ export default function DAO() {
             </Tabs>
           </div>
         </div>
-        {tabIndex === 0 && (
+        {tabIndex === 0 && <div className="template-container container gap-6 pb-8 w-full"></div>}
+        {tabIndex === 1 && (
           <div className="container flex gap-6">
             <CommunityFeed communityName={DaoURI.Title} daoId={daoId} /> <TopCommunityMembers goals={goalsList} allJoined={communityMembers} daoId={daoId} />
           </div>
         )}
-        {tabIndex === 1 && <div className="template-container container gap-6 pb-8 w-full"></div>}
         {tabIndex === 2 && (
           <div className="flex flex-col gap-8 container items-center pb-10">
             <Loader

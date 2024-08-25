@@ -22,7 +22,7 @@ import { CommunityService } from '../../../../services/communityService';
 import { GenericDelete, GenericSettings } from '@heathmont/moon-icons-tw';
 import { ApiCommunity } from '../../../../data-model/api-community';
 
-let DaoURI = { daoId: '', Title: '', Description: '', SubsPrice: 0, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', customUrl: '', allFiles: [], isOwner: false };
+let DaoURI = { daoId: '', Title: '', Description: '', SubsPrice: 0, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', customUrl: '', brandingColor: '', allFiles: [], isOwner: false };
 export default function DesignDao() {
   const { api } = usePolkadotContext();
   const router = useRouter();
@@ -397,13 +397,7 @@ export default function DesignDao() {
 
     let template = html.outerHTML + '<style>' + editor.getCss() + '</style>';
 
-    console.log('suddently is not new?', template);
-
-    if (isNew) {
-      CommunityService.create({ template, subdomain: DaoURI.customUrl, polkadot_reference_id: daoId });
-    } else {
-      await CommunityService.updateByPolkadotReferenceId(daoId, { template });
-    }
+    await CommunityService.updateByPolkadotReferenceId(daoId, { template });
 
     toast.update(toastId, { type: 'success', render: 'Homepage updated successfully!', autoClose: 1000, isLoading: false });
 

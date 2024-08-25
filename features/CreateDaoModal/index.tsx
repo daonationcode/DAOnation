@@ -11,6 +11,8 @@ import ImageListDisplay from '../../components/components/ImageListDisplay';
 import { toast } from 'react-toastify';
 import Required from '../../components/components/Required';
 import ColorPicker from '../../components/components/ColorPicker';
+import { CommunityService } from '../../services/communityService';
+import { useRouter } from 'next/router';
 
 let addedDate = false;
 export default function CreateDaoModal({ open, onClose }) {
@@ -18,7 +20,8 @@ export default function CreateDaoModal({ open, onClose }) {
   const [creating, setCreating] = useState(false);
   const [brandingColor, setBrandingColor] = useState('');
 
-  const { api, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
+  const { api, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn, GetAllDaos } = usePolkadotContext();
+  const router = useRouter();
 
   const { UploadBlob } = useIPFSContext();
 
@@ -49,12 +52,6 @@ export default function CreateDaoModal({ open, onClose }) {
     type: 'date',
     placeholder: 'Start date',
     id: 'startdate'
-  });
-  const [RecieveWallet, RecieveWalletInput, setRecieveWallet] = UseFormInput({
-    defaultValue: '',
-    type: 'text',
-    placeholder: `Wallet Address (Polkadot)`,
-    id: 'recipient'
   });
 
   const [SubsPrice, SubsPriceInput] = UseFormInput({
@@ -142,13 +139,16 @@ export default function CreateDaoModal({ open, onClose }) {
 
     async function onSuccess() {
       setCreating(false);
-      onClose({ success: true });
-      window.setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+
+      const daos = await GetAllDaos();
+      const newDao = daos.find((dao) => dao.customUrl === CustomUrl);
+
+      await CommunityService.create({ template: '', polkadotReferenceId: newDao.daoId, name: DaoTitle, imageUrl: DaoImage[0].url, brandingColor, subdomain: CustomUrl, description: '' });
+
+      window.location.href = `${location.protocol}//${newDao.customUrl}.${location.host}/daos/${newDao.daoId}`;
     }
     if (PolkadotLoggedIn) {
-      await api._extrinsics.daos.createDao(userWalletPolkadot, JSON.stringify(createdObject), {}).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+      await api._extrinsics.daos.createDao(userWalletPolkadot, JSON.stringify(createdObject), {}).signAndSend(userWalletPolkadot, { signer: userSigner }, async (status) => {
         showToast(status, toastId, 'Created Successfully!', onSuccess);
       });
     }

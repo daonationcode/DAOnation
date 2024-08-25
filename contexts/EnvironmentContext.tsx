@@ -1,19 +1,25 @@
 import React, { Dispatch, SetStateAction, createContext, useContext, useState } from 'react';
+import { ApiCommunity } from '../data-model/api-community';
 
 // Create the context
-export const EnvironmentContext = createContext({} as { setCurrency: Dispatch<SetStateAction<string>>; getCurrency: () => string; isServer: () => boolean });
+export const EnvironmentContext = createContext({} as { setCurrency: Dispatch<SetStateAction<string>>; getCurrency: () => string; isServer: () => boolean; getCommunityBranding: () => ApiCommunity; setCommunityBranding });
 
 // Provider component
 export const EnvironmentProvider = ({ children }) => {
   const [currency, setCurrency] = useState('');
+  const [communityBranding, setCommunityBranding] = useState<ApiCommunity>(null);
 
   const getCurrency = () => {
     return currency;
   };
 
+  const getCommunityBranding = () => {
+    return communityBranding;
+  };
+
   const isServer = () => typeof window === 'undefined';
 
-  return <EnvironmentContext.Provider value={{ setCurrency, getCurrency, isServer }}>{children}</EnvironmentContext.Provider>;
+  return <EnvironmentContext.Provider value={{ setCurrency, getCurrency, isServer, getCommunityBranding, setCommunityBranding }}>{children}</EnvironmentContext.Provider>;
 };
 
 const useEnvironment = () => {

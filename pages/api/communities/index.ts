@@ -14,21 +14,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case 'POST':
       try {
-        const { subdomain, template, polkadot_reference_id } = req.body;
+        const { subdomain, template, polkadotReferenceId, imageUrl, brandingColor, name, description } = req.body;
 
-        if (!subdomain || !polkadot_reference_id) {
-          return res.status(400).json({ error: 'subdomain and polkadot_reference_id are required' });
+        if (!subdomain || !polkadotReferenceId) {
+          return res.status(400).json({ error: 'subdomain and polkadotReferenceId are required' });
         }
 
         const newCommunity = await CommunityService.create({
           subdomain,
           template,
-          polkadot_reference_id
+          polkadotReferenceId,
+          imageUrl,
+          brandingColor,
+          name,
+          description
         });
 
         res.status(201).json(newCommunity);
       } catch (error) {
-        res.status(500).json({ error: 'Failed to create community' });
+        res.status(400).json({ error: 'Failed to create community' });
       }
       break;
 

@@ -1,33 +1,31 @@
 import Head from 'next/head';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import LoginCard from '../../components/components/LoginCard';
 import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
 
-import {useConnectWallet, useSetChain} from "@subwallet-connect/react";
-
-
+import { useConnectWallet } from '@subwallet-connect/react';
 
 export default function Login() {
   const [isConnected, setIsConnected] = useState(false);
   const [step, setStep] = useState(1);
 
-  const [ { wallet},connect, disconnect] = useConnectWallet();
-
-
+  const [{ wallet }, connect] = useConnectWallet();
 
   const router = useRouter();
+
   useEffect(() => {
     setConnectionStatus();
   }, [wallet]);
 
   useEffect(() => {
-    if ( isConnected) {
+    if (isConnected) {
       window.location.href = '/joined';
     }
   }, [isConnected, router]); // Dependency array
 
   const setConnectionStatus = () => {
-    if (window.localStorage.getItem('loggedin') === 'true' && wallet !=null) {
+    if (Cookies.get('loggedin') === 'true' && wallet != null) {
       setIsConnected(true);
     } else {
       setIsConnected(false);
@@ -35,9 +33,14 @@ export default function Login() {
   };
 
   async function onConnectPolkadot() {
-   let walletList =  await connect();
-   console.log(walletList);
-    window.localStorage.setItem('loggedin', 'true');
+    await connect();
+
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 2);
+
+    Cookies.set('loggedin', 'true', { expires: 30, domain: `.${location.hostname}`, path: '/', sameSite: 'Lax' });
+    Cookies.set('loggedin', 'true', { expires: 30, domain: `${location.hostname}`, path: '/', sameSite: 'Lax' }); // covers localhost
+
     setIsConnected(true);
   }
 
@@ -54,7 +57,7 @@ export default function Login() {
           <p>Step {step} of 2</p>
         </div>
       </div>
-      <div className="container flex flex-col items-center pt-10 gap-10">{<LoginCard setStep={setStep} step={step} isConnected={isConnected} onConnectPolkadot={onConnectPolkadot} />}</div>
+      <div className="container flex flex-col items-center !pt-8 gap-10">{<LoginCard setStep={setStep} step={step} isConnected={isConnected} onConnectPolkadot={onConnectPolkadot} />}</div>
     </>
   );
 }

@@ -5,6 +5,7 @@ import { SoftwareLogin } from '@heathmont/moon-icons-tw';
 import UseFormInput from '../UseFormInput';
 import { usePolkadotContext } from '../../../contexts/PolkadotContext';
 import { toast } from 'react-toastify';
+import Cookies from 'js-cookie';
 
 const LoginCard = ({ step, onConnectPolkadot, isConnected, setStep }) => {
   const { api, EasyToast } = usePolkadotContext();
@@ -31,7 +32,9 @@ const LoginCard = ({ step, onConnectPolkadot, isConnected, setStep }) => {
       const element = await api._query.users.userById(i);
       if (element.email.toString() == Email && element.password.toString() == Password) {
         found = true;
-        localStorage.setItem('user_id', i.toString());
+        Cookies.set('user_id', i.toString(), { expires: 30, domain: `.${location.hostname}`, path: '/', sameSite: 'Lax' });
+        Cookies.set('user_id', i.toString(), { expires: 30, domain: `${location.hostname}`, path: '/', sameSite: 'Lax' }); // covers localhost
+
         EasyToast('Logged in Successfully!', 'success', true, ToastId.toString());
 
         setStep(2);

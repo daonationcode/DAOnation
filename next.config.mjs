@@ -5,6 +5,10 @@ const nextConfig = {
       {
         hostname: 'images.unsplash.com',
         protocol: 'https'
+      },
+      {
+        hostname: 'aqua-dull-locust-679.mypinata.cloud',
+        protocol: 'https'
       }
     ]
   }

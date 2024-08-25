@@ -30,7 +30,7 @@ export default function GenerateHomepageModal({ open, onClose, item }: { open: b
 
     const template = await AiService.generateTemplate(daoDescription).then((res) => res.content);
 
-    await CommunityService.create({ template, subdomain: item.customUrl || 'test', polkadot_reference_id: daoId });
+    await CommunityService.updateByPolkadotReferenceId(daoId, { template });
 
     toast.update(toastId, { type: 'success', render: 'Homepage generated successfully!', autoClose: 1000, isLoading: false });
 

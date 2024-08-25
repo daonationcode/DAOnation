@@ -1,4 +1,5 @@
 import { Button } from '@heathmont/moon-core-tw';
+import Cookies from 'js-cookie';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,7 +10,7 @@ export default function Welcome() {
   const router = useRouter();
 
   useEffect(() => {
-    if (localStorage.getItem('loggedin') == 'true') {
+    if (Cookies.get('loggedin') == 'true') {
       router.push('/joined');
     }
   }, [router]);

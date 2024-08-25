@@ -3,7 +3,6 @@ import { GenericInfo } from '@heathmont/moon-icons-tw';
 import { Table } from '@heathmont/moon-table-tw';
 import { useEffect, useMemo, useState } from 'react';
 import { usePolkadotContext } from '../../contexts/PolkadotContext';
-import useEnvironment from '../../contexts/EnvironmentContext';
 import HeaderLabel from '../../components/components/HeaderLabel';
 
 const MembersTable = ({ allJoined, goals }) => {
