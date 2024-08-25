@@ -1,8 +1,10 @@
 import grapesjs, { EditorConfig, PropertyProps } from 'grapesjs';
 import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { gjsPlugin } from '../../../../components/plugin/gjsPlugin';
 
+import { Button, Input } from '@heathmont/moon-core-tw';
+import { GenericDelete, GenericSettings } from '@heathmont/moon-icons-tw';
 import gjs_blocks_basic from 'grapesjs-blocks-basic';
 import grapesjs_custom_code from 'grapesjs-custom-code';
 import grapesjs_parser_postcss from 'grapesjs-parser-postcss';
@@ -14,13 +16,11 @@ import grapesjs_tooltip from 'grapesjs-tooltip';
 import grapesjs_tui_image_editor from 'grapesjs-tui-image-editor';
 import grapesjs_typed from 'grapesjs-typed';
 import 'grapesjs/dist/css/grapes.min.css';
-import { Button, Input } from '@heathmont/moon-core-tw';
-import { usePolkadotContext } from '../../../../contexts/PolkadotContext';
-import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
-import { CommunityService } from '../../../../services/communityService';
-import { GenericDelete, GenericSettings } from '@heathmont/moon-icons-tw';
+import { toast } from 'react-toastify';
+import { usePolkadotContext } from '../../../../contexts/PolkadotContext';
 import { ApiCommunity } from '../../../../data-model/api-community';
+import { CommunityService } from '../../../../services/communityService';
 
 let DaoURI = { daoId: '', Title: '', Description: '', SubsPrice: 0, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', customUrl: '', brandingColor: '', allFiles: [], isOwner: false };
 export default function DesignDao() {

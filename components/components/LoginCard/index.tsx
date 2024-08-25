@@ -117,8 +117,8 @@ const LoginCard = ({ step, onConnectPolkadot, isConnected, setStep }) => {
       {step == 1 && LoginForm()}
       {step == 2 && (
         <div className="flex flex-col gap-4 w-full items-center">
-          {ConnectPolkadotButton()}
-          {'Or'}
+          {/* {ConnectPolkadotButton()}
+          {'Or'} */}
           {ConnectSubWalletButton()}
         </div>
       )}

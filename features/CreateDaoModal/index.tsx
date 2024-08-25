@@ -143,7 +143,7 @@ export default function CreateDaoModal({ open, onClose }) {
       const daos = await GetAllDaos();
       const newDao = daos.find((dao) => dao.customUrl === CustomUrl);
 
-      await CommunityService.create({ template: '', polkadotReferenceId: newDao.daoId, name: DaoTitle, imageUrl: DaoImage[0].url, brandingColor, subdomain: CustomUrl, description: '' });
+      await CommunityService.create({ template: '', polkadotReferenceId: newDao.daoId, name: DaoTitle, imageUrl: newDao.logo, brandingColor, subdomain: CustomUrl, description: '' });
 
       window.location.href = `${location.protocol}//${newDao.customUrl}.${location.host}/daos/${newDao.daoId}`;
     }

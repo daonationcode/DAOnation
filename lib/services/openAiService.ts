@@ -65,4 +65,21 @@ export class OpenAiService {
 
     return mappedIdeas;
   }
+
+  static async generateCategories(query: string): Promise<string> {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You are an assistant that turns a text into meaningful categories for image search. You return 3 categories separated by a comma. Omit any markdown or other fluff.' },
+        {
+          role: 'user',
+          content: `Transform this query into useful categories for making an image search ${query}.`
+        }
+      ]
+    });
+
+    console.log('search categories', completion.choices[0].message.content);
+
+    return completion.choices[0].message.content;
+  }
 }

@@ -35,16 +35,7 @@ export const Header = () => {
       setLinkTarget(`/daos/${communityBranding.polkadotReferenceId}`);
 
       if (communityBranding.brandingColor) {
-        document.documentElement.style.setProperty('--piccolo', hex2rgb(communityBranding.brandingColor), 'important');
-      }
-
-      if (window.userid) {
-        router.push(`/daos/${communityBranding.polkadotReferenceId}`);
-      } else {
-        if (router.pathname) {
-          console.log(router.pathname);
-          // router.push(`/login`);
-        }
+        document.documentElement.style.setProperty('--piccolo', hex2rgb(communityBranding.brandingColor));
       }
 
       setIsLoading(false);
@@ -61,7 +52,7 @@ export const Header = () => {
         )}
         {communityLogo && (
           <div className="w-[120px] h-[48px] relative">
-            <Image className="object-cover" fill src={communityLogo} alt={communityName} />
+            <Image className="object-contain" fill src={communityLogo} alt={communityName} />
           </div>
         )}
       </Link>

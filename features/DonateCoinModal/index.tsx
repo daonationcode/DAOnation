@@ -29,7 +29,6 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
     className: 'max-w-[140px]'
   });
 
-
   async function DonateCoinSubmission(e) {
     e.preventDefault();
     console.clear();
@@ -50,12 +49,11 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
     });
 
     async function onSuccess() {
-      window.location.reload();
       LoadData();
       setisLoading(false);
       setisSent(true);
 
-      onHide({ success: true });
+      onHide({ success: true, amount: Amount });
     }
     if (Coin == 'DOT') {
       let recipient = recievetype == 'Polkadot' ? recieveWallet : address;
@@ -83,7 +81,7 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
   }
   useEffect(() => {
     LoadData();
-  }, [show,api]);
+  }, [show, api]);
 
   return (
     <Modal open={show} onClose={onHide}>

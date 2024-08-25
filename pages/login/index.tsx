@@ -24,7 +24,7 @@ export default function Login() {
     }
   }, [isConnected, router]); // Dependency array
 
-  const setConnectionStatus = () => {
+  const setConnectionStatus = async () => {
     if (Cookies.get('loggedin') === 'true' && wallet != null) {
       setIsConnected(true);
     } else {

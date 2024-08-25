@@ -21,8 +21,6 @@ import DonateNFTModal from '../../../features/DonateNFTModal';
 import { CharityEvent } from '../../../data-model/event';
 import GenerateHomepageModal from '../../../features/GenerateHomepageModal';
 import { CommunityService } from '../../../services/communityService';
-import { ApiCommunity } from '../../../data-model/api-community';
-import { hex2rgb } from '../../../utils/hex-to-rgb';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
@@ -59,11 +57,13 @@ export default function DAO() {
   useEffect(() => {
     (async function () {
       if (aboutTemplate != '' && window) {
-        setTimeout(() => {
+        setTimeout(async () => {
+          const { template } = await CommunityService.getByPolkadotReferenceId(daoId.toString());
+
           let template_container = document.querySelector('.template-container');
 
           if (template_container) {
-            template_container.innerHTML = aboutTemplate;
+            template_container.innerHTML = template;
             let joinBTN = template_container.querySelector('.join-community-block');
             let goalBTN = template_container.querySelector('.create-goal-block');
             if ((isOwner || isJoined) && joinBTN) {
@@ -295,14 +295,14 @@ export default function DAO() {
               <CommunitySwitcher title={DaoURI.Title} daoId={daoId} />
               <h3 className="flex gap-2 whitespace-nowrap">
                 <div className="flex">
-                  Managed by &nbsp;
-                  <a href={'/profile/' + DaoURI?.user_info?.id} className="truncate text-piccolo max-w-[120px]">
+                  Managed by&nbsp;
+                  <a href={'/profile/' + DaoURI?.user_info?.id} className="truncate text-piccolo max-w-[220px]">
                     {DaoURI?.user_info?.fullName.toString()}
                   </a>
                 </div>
                 <div>•</div>
                 <div>
-                  <span className="text-hit font-semibold">${DaoURI.SubsPrice}</span> p/month
+                  <span className="text-hit font-semibold">{DaoURI.SubsPrice}</span> p/month
                 </div>
               </h3>
             </div>
@@ -381,7 +381,7 @@ export default function DAO() {
       </div>
 
       <GenerateHomepageModal open={showGenerateHomepageModal} onClose={closeGenerateHomepageModal} item={DaoURI} />
-      <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} item={DaoURI} />
+      <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} item={DaoURI} daoId={daoId.toString()} />
       <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={daoId} />
       <DonateCoinToEventModal open={!!showDonateCoinModal} onClose={() => setShowDonateCoinModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} recieveWallet={SelectedEventRecieveWallet} />
       <DonateNFTModal daoid={daoId} open={!!showDonateNftModal} onClose={() => setShowDonateNFTModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} />

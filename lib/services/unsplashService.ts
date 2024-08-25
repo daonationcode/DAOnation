@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { UnsplashImage } from '../../data-model/unspash-image';
+import { OpenAiService } from './openAiService';
 
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
@@ -13,7 +14,9 @@ interface UnsplashSearchResponse {
 
 export class UnsplashService {
   static async searchImages(query: string, perPage: number = 1): Promise<UnsplashImage[]> {
-    const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=${perPage}`, {
+    const categories = await OpenAiService.generateCategories(query);
+
+    const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(categories)}&per_page=${perPage}`, {
       headers: {
         Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`
       }

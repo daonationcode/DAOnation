@@ -251,9 +251,12 @@ export default function GrantIdeas() {
   const uniqueAndSort = (comments) => Array.from(new Map(comments.map((item) => [item.id, item])).values()).sort((a: { date: number }, b: { date: number }) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   function closeDonateModal(event) {
-    if (event) {
-      setDonateModalShow(false);
+    if (event && event.amount) {
+      console.log(event);
+      setIdeasURI({ ...IdeasURI, donation: IdeasURI.donation + event.amount });
     }
+
+    setDonateModalShow(false);
   }
 
   return (

@@ -17,16 +17,18 @@ import { MediaService } from '../../services/mediaService';
 import InfoBox from '../../components/components/InfoBox';
 import { UnsplashImage } from '../../data-model/unspash-image';
 import SuggestedImage from '../../components/components/SuggestedImage';
+import { useRouter } from 'next/router';
 
 let addedDate = false;
 
-export default function CreateGoalModal({ open, onClose, item }: { item: Dao; onClose; open }) {
+export default function CreateGoalModal({ open, onClose, item, daoId }: { item: Dao; daoId: string; onClose; open }) {
   const [mode, setMode] = useState<'ai' | 'manual'>('ai');
   const [goalImage, setGoalImage] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
   const [suggestedImages, setSuggestedImages] = useState<UnsplashImage[]>([]);
   const { api, userInfo, showToast, userWalletPolkadot, userSigner, PolkadotLoggedIn } = usePolkadotContext();
   const { isServer } = useEnvironment();
+  const { query } = useRouter();
 
   const { UploadBlob } = useIPFSContext();
 
@@ -136,7 +138,7 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
 
     let feed = {
       name: userInfo?.fullName,
-      daoId: item.daoId,
+      daoId: daoId,
       goalid: null,
       budget: Budget
     };
@@ -150,7 +152,7 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
       let goalid = Number(await api._query.goals.goalIds());
       feed.goalid = goalid;
 
-      const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), item.daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
+      const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
         showToast(status, ToastId, 'Created successfully!', () => {
@@ -245,7 +247,7 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
 
     let feed = {
       name: userInfo?.fullName,
-      daoId: item.daoId,
+      daoId: daoId,
       goalid: null,
       budget: Budget
     };
@@ -259,7 +261,9 @@ export default function CreateGoalModal({ open, onClose, item }: { item: Dao; on
       let goalid = Number(await api._query.goals.goalIds());
       feed.goalid = goalid;
 
-      const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), item.daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
+      console.log(daoId);
+
+      const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
         showToast(status, toastId, 'Created successfully!', () => {
