@@ -19,6 +19,7 @@ export interface NFT {
   name: string;
   url: string;
   description: string;
+  owner?:number;
   highest_amount?: number;
   highest_bidder?: string;
   highest_bidder_userid?: number;

@@ -13,11 +13,12 @@ import BadgesPanel from '../../features/BadgesPanel';
 import CollectiblesPanel from '../../features/CollectiblesPanel';
 
 export default function Profile() {
-  const { api, getUserInfoById, GetAllDaos, GetAllIdeas, GetAllGoals, GetAllJoined, GetAllVotes, GetAllUserDonations, PolkadotLoggedIn } = usePolkadotContext();
+  const { api, getUserInfoById, GetAllDaos, GetAllIdeas, GetAllNfts, GetAllGoals, GetAllJoined, GetAllVotes, GetAllUserDonations, PolkadotLoggedIn } = usePolkadotContext();
   const [Goals, setGoals] = useState([]);
   const [Ideas, setIdeas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [Daos, setDaos] = useState([]);
+  const [Nfts, setNfts] = useState([]);
   const [UserBadges, setUserBadges] = useState({
     dao: false,
     joined: false,
@@ -53,10 +54,13 @@ export default function Profile() {
     //Fetching data from Smart contract
     let allDaos = await GetAllDaos();
     let allJoined = await GetAllJoined();
-    let allGoals = await GetAllGoals();
-    let allIdeas = await GetAllIdeas();
-    let allVotes = await GetAllVotes();
-    let allDonations = await GetAllUserDonations();
+    let allGoals = await GetAllGoals(true);
+    let allVotes = await GetAllVotes(true);
+    let allDonations = await GetAllUserDonations(true);
+    let allIdeas = await GetAllIdeas(true);
+    let allNfts = await GetAllNfts(true);
+    let allUserNfts = allNfts.filter((e)=>e.owner === Number(user_id));
+    setNfts(allUserNfts);
 
     // let donated = Number(await contract._donated(Number(user_id))) / 1e12;
     let allBadges = UserBadges;
@@ -193,7 +197,7 @@ export default function Profile() {
       </div>
       <div className="container !py-10">
         {tabIndex === 0 && <SummaryPanel Daos={Daos} Goals={Goals} Ideas={Ideas} loggedUser={loggedUser} loading={loading} stats={stats} />}
-        {tabIndex === 1 && <CollectiblesPanel />}
+        {tabIndex === 1 && <CollectiblesPanel nfts={Nfts} />}
         {tabIndex === 2 && <BadgesPanel badges={UserBadges} />}
         {tabIndex === 3 && <TransactionsPanel />}
       </div>

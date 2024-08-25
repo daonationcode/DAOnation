@@ -16,7 +16,7 @@ const SummaryPanel = ({ stats, loggedUser, Daos, Goals, Ideas, loading }: { stat
   return (
     <Card className="min-h-[556px]">
       <div className="w-full flex flex-col gap-10">
-        <Loader many={2} loading={loading} width={750} height={80} element={<Stats stats={stats} currency={getCurrency()} />} />
+        <Loader many={2} loading={loading} width={'100%'} height={80} element={<Stats stats={stats} currency={getCurrency()} />} />
         <div className="flex flex-col gap-5">
           <Tabs>
             <Tabs.List>
@@ -29,7 +29,7 @@ const SummaryPanel = ({ stats, loggedUser, Daos, Goals, Ideas, loading }: { stat
                 <Loader
                   many={1}
                   loading={loading}
-                  width={750}
+                  width={'100%'}
                   height={250}
                   element={Daos.map((dao, index) => (
                     <DAOCard key={index} item={dao} hasJoined className="shadow-none border border-beerus" />
@@ -40,7 +40,7 @@ const SummaryPanel = ({ stats, loggedUser, Daos, Goals, Ideas, loading }: { stat
                 <Loader
                   many={1}
                   loading={loading}
-                  width={750}
+                  width={'100%'}
                   height={250}
                   element={Goals.map((goal, index) => (
                     <GoalCard key={index} item={goal} className="shadow-none border border-beerus" />
@@ -51,7 +51,7 @@ const SummaryPanel = ({ stats, loggedUser, Daos, Goals, Ideas, loading }: { stat
                 <Loader
                   many={1}
                   loading={loading}
-                  width={750}
+                  width={'100%'}
                   height={250}
                   element={Ideas.map((idea, index) => (
                     <IdeaCard key={index} item={idea} preview className="shadow-none border border-beerus" />

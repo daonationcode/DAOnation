@@ -116,22 +116,7 @@ function GoalActivity({ data }) {
 function AuctionActivity({ data, openDonateCoinModal, openDonateNFTModal, preview }) {
   const { api, GetAllEvents } = usePolkadotContext();
 
-  const [eventURI, setEventURI] = useState({
-    id: 0,
-    eventId: 0,
-    daoId: 0,
-    Title: '',
-    Description: '',
-    Budget: 0,
-    End_Date: new Date(),
-    wallet: '',
-    UserId: 0,
-    logo: '',
-    type: '',
-    reached: 0,
-    amountOfNFTs: 0,
-    status: ''
-  });
+  const [eventURI, setEventURI] = useState();
 
   async function fetchContractData() {
     if (api) {

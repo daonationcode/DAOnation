@@ -124,6 +124,10 @@ export default function CreateEventModal({ open, onClose, daoId }) {
           type: 'string',
           description: EndDate
         },
+        Time:{
+          type:'string',
+          description:Time
+        },
         user_id: {
           type: 'string',
           description: window.userid

@@ -48,7 +48,7 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
       let recipient = recievetype == 'Polkadot' ? recieveWallet : address;
       const txs = [api.tx.balances.transferAllowDeath(recipient, `${Amount * 1e12}`), api._extrinsics.daos.joinCommunity(daoId, Number(window.userid), new Date().toLocaleDateString(), feed), api._extrinsics.feeds.addFeed(feed, 'join', new Date().valueOf())];
 
-      const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+      const transfer =  await api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
         showToast(status, ToastId, 'Joined successfully!', () => {
           onSuccess();
         });
@@ -102,34 +102,23 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
 
           <div className="flex flex-col gap-3 w-full p-8">
             <div className="flex justify-between pt-8">
-              <h4 className="font-semibold text-moon-18">Total</h4>
-              <h4 className="font-semibold text-moon-18">{SubsPrice} USD</h4>
+              <h4 className="font-semibold text-moon-18">Price</h4>
+              <h4 className="font-semibold text-moon-18">{SubsPrice} DOT</h4>
             </div>
 
-            <div className="flex justify-between">
-              <h4 className="font-semibold text-moon-18">Coin</h4>
-              <h4 className="font-semibold text-moon-18"></h4>
-              <div className="flex items-center gap-2">
-                {Amount}
-                <Dropdown value={Coin} onChange={setCoin}>
-                  <Dropdown.Select placeholder={'Select a Currency'}>{Coin}</Dropdown.Select>
-                  <Dropdown.Options className="bg-gohan w-48 min-w-0 w-full">
-                    <Dropdown.Option  value="DOT">
-                      <MenuItem >DOT</MenuItem>
-                    </Dropdown.Option>
-                    
-                  </Dropdown.Options>
-                </Dropdown>
-              </div>
-            </div>
+            <>
+                  {Number(Balance) - SubsPrice < 1 ? (
+                    <>
+                      <p className=" w-full text-right text-chichi">Insufficent Balance </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-trunks w-full text-right">Your balance will be {Number(Balance) - SubsPrice + ' ' + Coin} </p>
+                    </>
+                  )}
+            </>
 
-            {/* {Amount > Balance ? (
-              <p className="pt-5 text-right text-dodoria">Insufficient funds</p>
-            ) : (
-              <p className="pt-5 text-right">
-                Your balance is {Balance} {Coin}
-              </p>
-            )} */}
+           
           </div>
 
           <div className="flex justify-between border-t border-beerus w-full p-6">

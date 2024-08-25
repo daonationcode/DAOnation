@@ -33,13 +33,6 @@ export default function CreateDaoModal({ open, onClose }) {
     id: ''
   });
 
-  const [DaoDescription, DaoDescriptionInput] = UseFormTextArea({
-    defaultValue: '',
-    placeholder: 'Add Description',
-    id: '',
-    rows: 4
-  });
-
   const [CustomUrl, CustomUrlInput] = UseFormInput({
     defaultValue: '',
     type: 'text',
@@ -60,12 +53,6 @@ export default function CreateDaoModal({ open, onClose }) {
     placeholder: '0.00',
     id: 'subs_price'
   });
-
-  useEffect(() => {
-    let dateTime = new Date();
-
-    if (!addedDate) setStartDate(dateTime.toISOString().split('T')[0]);
-  }, [PolkadotLoggedIn]);
 
   //Function after clicking Create Dao Button
   async function createDao() {
@@ -220,7 +207,7 @@ export default function CreateDaoModal({ open, onClose }) {
             <div className="flex gap-8 w-full">
               <div className="flex flex-col gap-2 w-full">
                 <h6>
-                  Subscription Price
+                  Subscription Price (in DOT)
                   <Required />
                 </h6>
                 {SubsPriceInput}

@@ -2,7 +2,7 @@ import Card from '../../components/components/Card';
 import NFTCard from '../../components/components/NFTCard';
 import { NFT } from '../../data-model/nft';
 
-const CollectiblesPanel = () => {
+const CollectiblesPanel = ({nfts}:{nfts:NFT[]}) => {
   const mockNFTs: NFT[] = [
     {
       id: 0,
@@ -36,7 +36,7 @@ const CollectiblesPanel = () => {
 
   return (
     <Card>
-      <div className="w-full flex flex-wrap gap-6">{mockNFTs && mockNFTs.length > 0 ? mockNFTs.map((nft, i) => <NFTCard className="max-w-[calc(50%-12px)] flex-1 basis-[calc(50%-12px)] border-beerus border !shadow-none" item={nft} key={i} display={true} />) : <>You don't have activity yet</>}</div>
+      <div className="w-full flex flex-wrap gap-6">{nfts && nfts.length > 0 ? nfts.map((nft, i) => <NFTCard className="max-w-[calc(50%-12px)] flex-1 basis-[calc(50%-12px)] border-beerus border !shadow-none" item={nft} key={i} display={true} />) : <>You don't have activity yet</>}</div>
     </Card>
   );
 };

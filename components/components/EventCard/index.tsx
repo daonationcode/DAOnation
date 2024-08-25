@@ -7,7 +7,7 @@ import { CharityEvent } from '../../../data-model/event';
 import Link from 'next/link';
 import { Button } from '@heathmont/moon-core-tw';
 
-const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal, preview }: { item: CharityEvent; preview?: boolean; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) => void; openDonateNFTModal?: (eventid, eventName, eventWallet) => void }) => {
+const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal, preview }: { item: CharityEvent; preview?: boolean; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) => void; openDonateNFTModal?: (eventid, eventName, eventWallet) => void, }) => {
   const [showPlaceholder, setShowPlaceholder] = useState(false);
   const { getCurrency } = useEnvironment();
   if (item?.Title == undefined || item?.Title === '') return <></>;

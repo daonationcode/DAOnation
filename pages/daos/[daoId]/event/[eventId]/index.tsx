@@ -22,15 +22,17 @@ declare let window;
 export default function Events() {
   //Variables
   const [nfts, setNfts] = useState([]);
-  const { api, getUserInfoById, GetAllDaos, GetAllEvents, GetAllNfts, GetAllBids } = usePolkadotContext();
+  const { api, getUserInfoById, GetAllDaos, GetAllEvents, userWalletPolkadot, userSigner, showToast } = usePolkadotContext();
   const [showDonateNftModal, setShowDonateNFTModal] = useState(false);
   const [showBuyTicketModal, setShowBuyTicketModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
   const [showPlaceHigherBidModal, setShowPlaceHigherBidModal] = useState<NFT | null>(null);
   const [showEmbedVideo, setShowEmbedVideo] = useState(false);
+  const [BoughtTicket, setBoughtTicket] = useState(false);
   const [eventID, setEventID] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [isDistributing, setDistributing] = useState(false);
+  const [isBuyingTicket, setBuyingTicket] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
 
   const [EventDAOURI, setEventDAOURI] = useState({} as Dao);
@@ -44,6 +46,7 @@ export default function Events() {
     Description: '',
     Budget: '',
     End_Date: '',
+    TimeFormat: "",
     user_info: {
       fullName: '',
       id: null
@@ -54,7 +57,9 @@ export default function Events() {
     isOwner: true,
     eventType: '',
     ticketPrice: 0,
+    eventStreamUrl: "",
     participantsCount: 0,
+    LiveStarted: false,
     status: ''
   });
 
@@ -90,12 +95,7 @@ export default function Events() {
         let allEvents = await GetAllEvents();
         let eventURIFull = allEvents.filter((e) => Number(e?.eventId) === eventId)[0];
 
-        let allNfts = await GetAllNfts();
-        let eventNFTs = allNfts.filter((e) => Number(e.eventid) === eventId);
-
-        setNfts(eventNFTs);
-
-
+        setNfts(eventURIFull.NFTS);
 
 
         let allDaos = await GetAllDaos();
@@ -108,10 +108,9 @@ export default function Events() {
 
         setEventURI(eventURIFull);
 
-        console.log(eventURIFull);
         setLoading(false);
       }
-    } catch (error) {}
+    } catch (error) { }
     setLoading(false);
   }
 
@@ -139,24 +138,60 @@ export default function Events() {
     setShowBuyTicketModal(true);
   }
 
+  async function buyTicketHandle() {
+    setBuyingTicket(true);
+
+    console.log('======================>Buying Ticket');
+    const ToastId = toast.loading('Buying Ticket ...');
+
+    async function onSuccess() {
+      setBoughtTicket(true);
+      openBuyTicketModal()
+      setBuyingTicket(false);
+
+    }
+
+    try {
+      // Buy Ticket
+
+      const txs = [api._extrinsics.events.buyTicket(Number(window.userid), Number(eventID), Number(EventDAOURI.daoId), new Date().toLocaleDateString())];
+
+      await api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+        showToast(status, ToastId, 'Bought Ticket Successfully!', () => {
+          onSuccess();
+        });
+      });
+
+
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   async function distributeNFTs() {
     setDistributing(true);
 
     console.log('======================>Distributing NFT');
     const ToastId = toast.loading('Distributing NFT ...');
 
-    try {
-      // Creating Event in Smart contract
+    async function onSuccess() {
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
 
-      toast.update(ToastId, {
-        render: 'Distributed NFTs!',
-        type: 'success',
-        isLoading: false,
-        autoClose: 1000,
-        closeButton: true,
-        closeOnClick: true,
-        draggable: true
+    try {
+      // Distribute NFTs
+
+      const txs = [api._extrinsics.events.distributeNfts(Number(eventID))];
+
+      await api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+        showToast(status, ToastId, 'Distributed successfully!', () => {
+          onSuccess();
+        });
       });
+
+
     } catch (e) {
       console.error(e);
     }
@@ -187,18 +222,18 @@ export default function Events() {
                     <Link className="text-piccolo" href={`../../${router.query.daoId}`}>
                       {EventDAOURI?.Title}
                     </Link>{' '}
-                    &gt; {EventURI.eventType === 'auction' ? 'Event' : 'Live event'}
+                    {isAuction() ? 'Event' : 'Live event'}
                   </h5>
                 }
               />
               <Loader loading={loading} width={300} element={<h1 className="text-moon-32 font-bold">{EventURI.Title}</h1>} />
               <Loader
                 loading={loading}
-                width={770}
+                width={600}
                 element={
                   <h3 className="flex gap-2 whitespace-nowrap">
                     {isAuction() && <div className="font-bold">{EventURI.status == 'ended' ? 'Ended' : 'In progress'}</div>}
-                    {isLivestream() && <div>{EventURI.participantsCount || 30} participants</div>}
+                    {isLivestream() && <div>{EventURI.participantsCount || 0} participants</div>}
                     <div>•</div>
                     <div className="flex">
                       Created by&nbsp;
@@ -214,20 +249,25 @@ export default function Events() {
               {EventURI.status == 'ended' ? (
                 <></>
               ) : (
-                <>
-                  {isAuction() && (
-                    <Button iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
-                      Donate NFT
+                <>{!EventURI.isOwner &&
+                  <>
+                    {isAuction() && (
+                      <Button iconLeft={<GenericLoyalty />} onClick={openDonateNFTModal}>
+                        Donate NFT
+                      </Button>
+                    )}
+                    {isLivestream() && !BoughtTicket && (
+                      <Button iconLeft={<ShopWallet />} onClick={buyTicketHandle}>
+                        Buy ticket
+                      </Button>
+                    )}
+                    <Button iconLeft={<ShopWallet />} variant="secondary" onClick={openDonateCoinModal}>
+                      Donate Coin
                     </Button>
-                  )}
-                  {isLivestream() && (
-                    <Button iconLeft={<ShopWallet />} onClick={openBuyTicketModal}>
-                      Buy ticket
-                    </Button>
-                  )}
-                  <Button iconLeft={<ShopWallet />} variant="secondary" onClick={openDonateCoinModal}>
-                    Donate Coin
-                  </Button>
+                  </>
+                }
+
+
                 </>
               )}
             </div>
@@ -250,35 +290,39 @@ export default function Events() {
               {!showEmbedVideo && (
                 <>
                   <Image unoptimized={true} objectFit="cover" layout="fill" className="rounded-xl object-cover" src={EventURI.logo} alt="" />
-                  <div className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black bg-opacity-10" onClick={openEmbedVideo}>
+                  {(BoughtTicket || EventURI.isOwner) && <div className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black bg-opacity-10" onClick={openEmbedVideo}>
                     <div className="h-[56px] w-[56px] bg-gohan rounded-full flex justify-center items-center">{<MediaPlay className="text-moon-48 text-popo" />}</div>
-                  </div>
+                  </div>}
                 </>
               )}
-              {showEmbedVideo && <LivestreamEmbed link="" />}
+              {(BoughtTicket || EventURI.isOwner) && showEmbedVideo && <LivestreamEmbed link={EventURI.eventStreamUrl} />}
             </div>
             <div className="flex flex-col gap-5 bg-gohan rounded-xl w-full max-w-[300px] items-center p-6 pt-10 shadow-moon-lg">
               <MediaMiceAlternative className="text-hit text-moon-48" />
-              <div className="font-bold text-moon-20">Starts {EventURI.End_Date}</div>
+              {EventURI.LiveStarted && <div className="font-bold text-moon-20"> Live stream started <br /> {EventURI.TimeFormat}, {EventURI.End_Date}</div>}
+
+              {!EventURI.LiveStarted && <div className="font-bold text-moon-20"> Starts {EventURI.TimeFormat}, {EventURI.End_Date}</div>}
               {EventURI.status == 'ended' ? (
                 <>
                   <div className="text-chichi text-center">Live event ended</div>
                 </>
               ) : (
                 <>
-                  {EventURI.isOwner ? (
+                  {!EventURI.LiveStarted && <div className="text-trunks text-center">Ticket holders will get access once the stream begins.</div>}
+                  {BoughtTicket && EventURI.LiveStarted && <div className="text-trunks text-center">You can watch it now. Enjoy the event!</div>}
+
+                  {!EventURI.isOwner && (
                     <>
-                      <div className="text-trunks text-center">Ticket holders will get access once the stream begins.</div>
-                      <Button animation={isDistributing ? 'progress' : false} disabled={isDistributing} className="font-bold w-full" onClick={openBuyTicketModal}>
-                        Buy ticket for 10 DOT
-                      </Button>
-                      <div className="flex flex-1 flex-col justify-end text-center text-trunks text-moon-12">
-                        99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to DAOnation.
-                      </div>
+
+                      {<Button animation={isBuyingTicket ? 'progress' : false} disabled={isBuyingTicket || BoughtTicket} className="font-bold w-full" onClick={buyTicketHandle}>
+                        {!BoughtTicket ? `Buy ticket for ${EventURI.ticketPrice} DOT` : 'You already own a ticket'}
+                      </Button>}
+
                     </>
-                  ) : (
-                    <></>
-                  )}
+                  ) }
+                  <div className="flex flex-1 flex-col justify-end text-center text-trunks text-moon-12">
+                      99.9% of the proceeds go to the charity. <br /> Just 0.1% goes to DAOnation.
+                    </div>
                 </>
               )}
             </div>

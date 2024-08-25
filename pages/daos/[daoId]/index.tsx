@@ -302,7 +302,7 @@ export default function DAO() {
                 </div>
                 <div>•</div>
                 <div>
-                  <span className="text-hit font-semibold">{DaoURI.SubsPrice}</span> p/month
+                  <span className="text-hit font-semibold">DOT {DaoURI.SubsPrice}</span> p/month
                 </div>
               </h3>
             </div>
