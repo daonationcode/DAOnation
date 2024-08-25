@@ -41,7 +41,7 @@ export class CommunityService {
     const response = await fetch(`/api/communities/subdomain/${subdomain}`);
 
     if (!response.ok) {
-      window.location.href = window.location.protocol + '//' + window.location.host.split('.')[1] + '/joined';
+      window.location.href = window.location.protocol + '//' + window.location.host.split('.').splice(1).join('.') + '/joined';
       return;
     }
 

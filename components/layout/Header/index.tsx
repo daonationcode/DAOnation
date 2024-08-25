@@ -25,7 +25,7 @@ export const Header = () => {
   }, []);
 
   async function checkSubdomain() {
-    if (location.host.split('.').length > 1) {
+    if ((location.host.split('.').length === 2 && location.host.includes('localhost')) || (location.host.split('.').length === 3 && location.host.includes('daonation.org'))) {
       setIsLoading(true);
       const communityBranding = await CommunityService.getBySubdomain(location.host.split('.')[0]);
 
