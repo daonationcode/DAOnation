@@ -9,6 +9,7 @@ import useEnvironment from '../../../contexts/EnvironmentContext';
 import { GenericLogOut, GenericUser, ShopWallet } from '@heathmont/moon-icons-tw';
 import { ApiCommunity } from '../../../data-model/api-community';
 import Cookies from 'js-cookie';
+import PolkadotConfig from '../../../contexts/json/polkadot-config.json';
 
 let running = false;
 let changedPath = true;
@@ -159,7 +160,7 @@ export function Nav(): JSX.Element {
                         </Link>
                       </Dropdown.Option>
                       <Dropdown.Option>
-                        <Link href={`/profile/${user_id}`} passHref>
+                        <Link href={`https://polkadot.js.org/apps/?rpc=${PolkadotConfig.chain_rpc}#/accounts`} passHref target="_blank">
                           <MenuItem>
                             <ShopWallet className="text-moon-24" />
                             <MenuItem.Title>Top up your account</MenuItem.Title>

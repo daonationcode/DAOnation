@@ -91,7 +91,7 @@ export default function DAOs() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-8 container items-center pb-10">
+        <div className="flex flex-col gap-8 container items-center !pb-10">
           <Loader element={list.length > 0 ? list.map((listItem, index) => <DAOCard hasJoined={hasJoined(listItem)} item={listItem} key={index} onJoinCommunity={() => openJoinModal(listItem)} />) : <EmptyState icon={<GenericUsers className="text-moon-48" />} label="There are no communities created yet" />} loading={loading} width={768} height={236} many={3} />{' '}
         </div>
       </div>

@@ -32,7 +32,7 @@ export const Header = () => {
       setCommunityBranding(communityBranding);
       setCommunityLogo(communityBranding.imageUrl);
       setCommunityName(communityBranding.name);
-      setLinkTarget(`/daos/${communityBranding.subdomain}`);
+      setLinkTarget(`/daos/${communityBranding.polkadotReferenceId}`);
 
       if (communityBranding.brandingColor) {
         document.documentElement.style.setProperty('--piccolo', hex2rgb(communityBranding.brandingColor), 'important');

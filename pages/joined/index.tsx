@@ -70,7 +70,7 @@ export const Joined = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={`flex items-center flex-col gap-8`}>
-        <div className={`gap-8 flex w-full bg-gohan pt-10 pb-6 border-beerus border`}>
+        <div className={`gap-8 flex w-full bg-gohan p-10 pb-6 border-beerus border`}>
           <div className="container flex w-full justify-between">
             <h1 className="text-moon-32 font-bold">Joined charities</h1>
             <Button iconLeft={<ControlsPlus />} onClick={openModal} className="pe-2 sm:pe-4">
@@ -79,7 +79,7 @@ export const Joined = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-8 container items-center pb-10">
+        <div className="flex flex-col gap-8 container items-center !pb-10">
           <Loader element={list.length > 0 ? list.map((listItem, index) => <DAOCard item={listItem} key={index} hasJoined />) : <EmptyState icon={<GenericUsers className="text-moon-48" />} label="You haven't joined any communities yet" />} loading={loading} width={768} height={236} many={3} />{' '}
         </div>
       </div>

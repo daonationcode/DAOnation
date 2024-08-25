@@ -191,7 +191,7 @@ export default function Profile() {
           </Tabs>
         </div>
       </div>
-      <div className="container py-10">
+      <div className="container !py-10">
         {tabIndex === 0 && <SummaryPanel Daos={Daos} Goals={Goals} Ideas={Ideas} loggedUser={loggedUser} loading={loading} stats={stats} />}
         {tabIndex === 1 && <CollectiblesPanel />}
         {tabIndex === 2 && <BadgesPanel badges={UserBadges} />}
