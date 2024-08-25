@@ -38,8 +38,7 @@ export default function Login() {
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + 2);
 
-    Cookies.set('loggedin', 'true', { expires: 30, domain: `.${location.hostname}`, path: '/', sameSite: 'Lax' });
-    Cookies.set('loggedin', 'true', { expires: 30, domain: `${location.hostname}`, path: '/', sameSite: 'Lax' }); // covers localhost
+    Cookies.set('loggedin', 'true', { expires: 30, path: '/', sameSite: 'Lax' }); // covers localhost
 
     setIsConnected(true);
   }

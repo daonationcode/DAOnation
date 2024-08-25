@@ -32,8 +32,7 @@ const LoginCard = ({ step, onConnectPolkadot, isConnected, setStep }) => {
       const element = await api._query.users.userById(i);
       if (element.email.toString() == Email && element.password.toString() == Password) {
         found = true;
-        Cookies.set('user_id', i.toString(), { expires: 30, domain: `.${location.hostname}`, path: '/', sameSite: 'Lax' });
-        Cookies.set('user_id', i.toString(), { expires: 30, domain: `${location.hostname}`, path: '/', sameSite: 'Lax' }); // covers localhost
+        Cookies.set('user_id', i.toString(), { expires: 30, path: '/', sameSite: 'Lax' }); // covers localhost
 
         EasyToast('Logged in Successfully!', 'success', true, ToastId.toString());
 
