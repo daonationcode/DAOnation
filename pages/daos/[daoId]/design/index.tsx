@@ -440,7 +440,7 @@ export default function DesignDao() {
       </Head>
       <div id="editor" className="min-h-[calc(100vh-86px)]">
         {brandColor && (
-          <div className="container pt-6" style={{ '--piccolo': brandColor }}>
+          <div className="container pt-6" style={{ '--piccolo': brandColor } as any}>
             <div id="dao-container" className="template-container" dangerouslySetInnerHTML={{ __html: template }}></div>
           </div>
         )}
