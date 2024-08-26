@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, createContext, useContext, useState } 
 import { ApiCommunity } from '../data-model/api-community';
 
 // Create the context
-export const EnvironmentContext = createContext({} as { setCurrency: Dispatch<SetStateAction<string>>; getCurrency: () => string; isServer: () => boolean; getCommunityBranding: () => ApiCommunity; setCommunityBranding });
+export const EnvironmentContext = createContext({} as { setCurrency: Dispatch<SetStateAction<string>>; getCurrency: () => string; isServer: () => boolean; getCommunityBranding: () => ApiCommunity; setCommunityBranding; isSubdomain: () => boolean });
 
 // Provider component
 export const EnvironmentProvider = ({ children }) => {
@@ -19,7 +19,9 @@ export const EnvironmentProvider = ({ children }) => {
 
   const isServer = () => typeof window === 'undefined';
 
-  return <EnvironmentContext.Provider value={{ setCurrency, getCurrency, isServer, getCommunityBranding, setCommunityBranding }}>{children}</EnvironmentContext.Provider>;
+  const isSubdomain = () => !!communityBranding;
+
+  return <EnvironmentContext.Provider value={{ setCurrency, getCurrency, isServer, getCommunityBranding, setCommunityBranding, isSubdomain }}>{children}</EnvironmentContext.Provider>;
 };
 
 const useEnvironment = () => {

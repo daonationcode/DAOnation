@@ -5,12 +5,14 @@ import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 
 import { useConnectWallet } from '@subwallet-connect/react';
+import useEnvironment from '../../contexts/EnvironmentContext';
 
 export default function Login() {
   const [isConnected, setIsConnected] = useState(false);
   const [step, setStep] = useState(1);
 
   const [{ wallet }, connect] = useConnectWallet();
+  const { getCommunityBranding, isSubdomain } = useEnvironment();
 
   const router = useRouter();
 
@@ -20,7 +22,11 @@ export default function Login() {
 
   useEffect(() => {
     if (isConnected) {
-      window.location.href = '/joined';
+      if (isSubdomain()) {
+        window.location.href = `/daos/${getCommunityBranding().polkadotReferenceId}`;
+      } else {
+        window.location.href = '/joined';
+      }
     }
   }, [isConnected, router]); // Dependency array
 
