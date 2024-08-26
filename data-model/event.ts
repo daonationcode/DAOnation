@@ -1,11 +1,11 @@
-import { NFT } from "./nft";
+import { NFT } from './nft';
 
-export interface JoinedLiveEvent{
- id: Number;
- userId:Number,
- eventId:Number,
- daoId:Number,
- date:String 
+export interface JoinedLiveEvent {
+  id: Number;
+  userId: Number;
+  eventId: Number;
+  daoId: Number;
+  date: String;
 }
 
 export interface CharityEvent {
@@ -16,19 +16,19 @@ export interface CharityEvent {
   Description: string;
   Budget: number;
   eventStreamUrl?: string;
-  ticketPrice?:number;
+  ticketPrice?: number;
   End_Date: string;
-  Time?:string;
-  TimeFormat?:string;
-  LiveStarted?:boolean;
+  Time?: string;
+  TimeFormat?: string;
+  LiveStarted?: boolean;
   wallet: string;
   UserId: Number;
   logo: string;
   type: string;
   reached: number;
   amountOfNFTs: number;
-  status:string;
-  participantsCount?:0;
-  NFTS?:NFT[]
-
+  status: string;
+  participantsCount?: 0;
+  NFTS?: NFT[];
+  eventType: 'livestream' | 'auction';
 }

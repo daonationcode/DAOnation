@@ -20,7 +20,9 @@ export default function BuyTicketModal({ open, onClose, event }: { open: boolean
             <h3 className="text-moon-24 text-center">You have a ticket!</h3>
             <p className="text-trunks text-center">
               The stream of the {event?.Title} will start on <br />
-              <strong>{event?.TimeFormat}, {event.End_Date}</strong>
+              <strong>
+                {event?.TimeFormat}, {event?.End_Date}
+              </strong>
             </p>
           </div>
         </div>

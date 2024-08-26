@@ -21,6 +21,7 @@ import DonateNFTModal from '../../../features/DonateNFTModal';
 import { CharityEvent } from '../../../data-model/event';
 import GenerateHomepageModal from '../../../features/GenerateHomepageModal';
 import { CommunityService } from '../../../services/communityService';
+import BuyTicketModal from '../../../features/BuyTicketModal';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
@@ -32,6 +33,7 @@ export default function DAO() {
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [showDonateCoinModal, setShowDonateCoinModal] = useState(false);
   const [showDonateNftModal, setShowDonateNFTModal] = useState(false);
+  const [showBuyTicketModal, setShowBuyTicketModal] = useState(false);
   const [showGenerateHomepageModal, setShowGenerateHomepageModal] = useState(false);
   const [hasNoTemplate, setHasNoTemplate] = useState(false);
   const [isJoined, setIsJoined] = useState(false);
@@ -257,6 +259,16 @@ export default function DAO() {
     setShowDonateCoinModal(true);
   }
 
+  function openBuyTicketModal(eventid, eventName, eventWallet) {
+    setSelectedEventId(eventid);
+    setSelectedEventName(eventName);
+    setSelectedEventReceiveWallet(eventWallet);
+
+    console.log(AuctionEvents);
+
+    setShowBuyTicketModal(true);
+  }
+
   function openDonateNFTModal(eventid, eventName, eventWallet) {
     setSelectedEventId(eventid);
     setSelectedEventName(eventName);
@@ -360,7 +372,13 @@ export default function DAO() {
         {tabIndex === 2 && (
           <div className="flex flex-col gap-8 container items-center pb-10">
             <Loader
-              element={AuctionEvents.length > 0 ? AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} />) : <EmptyState buttonLabel="Create event" onButtonClick={openCreateEventModal} icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />}
+              element={
+                AuctionEvents.length > 0 ? (
+                  AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} openBuyTicketModal={openBuyTicketModal} />)
+                ) : (
+                  <EmptyState buttonLabel="Create event" onButtonClick={openCreateEventModal} icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />
+                )
+              }
               width={768}
               height={236}
               many={3}
@@ -385,6 +403,7 @@ export default function DAO() {
       <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={daoId} />
       <DonateCoinToEventModal open={!!showDonateCoinModal} onClose={() => setShowDonateCoinModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} recieveWallet={SelectedEventRecieveWallet} />
       <DonateNFTModal daoid={daoId} open={!!showDonateNftModal} onClose={() => setShowDonateNFTModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} />
+      <BuyTicketModal open={!!showBuyTicketModal} onClose={() => setShowBuyTicketModal(false)} event={AuctionEvents.find((event) => Number(event.id) === Number(SelectedEventId))} />
     </>
   );
 }
