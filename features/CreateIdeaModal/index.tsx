@@ -44,7 +44,7 @@ export default function CreateIdeaModal({ show, onClose, daoId, goalId, goal, da
   }
 
   useEffect(() => {
-    if (goal.goalId !== undefined && dao.daoId !== undefined) {
+    if (goal.goalId !== undefined && dao.daoId !== undefined && goal.Description && dao.Title) {
       getSuggestions();
     }
   }, [goal, dao]);

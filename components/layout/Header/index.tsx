@@ -38,8 +38,6 @@ export const Header = () => {
         document.documentElement.style.setProperty('--piccolo', hex2rgb(communityBranding.brandingColor));
       }
 
-      console.log(router.pathname);
-
       if (router.pathname === '/daos' || router.pathname === '/joined') {
         router.push(`daos/${communityBranding.polkadotReferenceId}`);
       }

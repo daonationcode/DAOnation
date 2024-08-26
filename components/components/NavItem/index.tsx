@@ -12,7 +12,7 @@ const NavItem = ({ link, label, highlight, onClick }: { link?: string; label: st
   );
 
   const StandaloneButton = () => (
-    <Button style={{ background: 'none', border: '0px', color: 'black', fontWeight: highlight ? 600 : 400 }} onClick={onClick}>
+    <Button style={{ background: 'none', border: '0px', color: 'black', fontWeight: highlight ? 600 : 400, textDecoration: 'none', listStyle: 'none' }} onClick={onClick}>
       {label}
     </Button>
   );

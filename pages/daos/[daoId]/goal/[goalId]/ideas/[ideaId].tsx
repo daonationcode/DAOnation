@@ -252,7 +252,6 @@ export default function GrantIdeas() {
 
   function closeDonateModal(event) {
     if (event && event.amount) {
-      console.log(event);
       setIdeasURI({ ...IdeasURI, donation: IdeasURI.donation + event.amount });
     }
 

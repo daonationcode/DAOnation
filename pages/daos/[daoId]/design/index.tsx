@@ -21,6 +21,7 @@ import { toast } from 'react-toastify';
 import { usePolkadotContext } from '../../../../contexts/PolkadotContext';
 import { ApiCommunity } from '../../../../data-model/api-community';
 import { CommunityService } from '../../../../services/communityService';
+import { hex2rgb } from '../../../../utils/hex-to-rgb';
 
 let DaoURI = { daoId: '', Title: '', Description: '', SubsPrice: 0, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', customUrl: '', brandingColor: '', allFiles: [], isOwner: false };
 export default function DesignDao() {
@@ -31,6 +32,8 @@ export default function DesignDao() {
 
   const [editor, setEditor] = useState(null);
   const [isNew, setIsNew] = useState(false);
+  const [template, setTemplate] = useState(null);
+  const [brandColor, setBrandColor] = useState('');
 
   useEffect(() => {
     fetchAll();
@@ -375,15 +378,16 @@ export default function DesignDao() {
       return null;
     }
     const data = (await CommunityService.getByPolkadotReferenceId(daoId)) as ApiCommunity;
+    setTemplate(data.template);
+    setBrandColor(hex2rgb(data.brandingColor));
 
     const daoURI = await fetchContractData();
 
     if (!data.template) {
-      console.log('is new?');
       setIsNew(true);
     }
 
-    UpdateDaoData(daoURI, data.template);
+    UpdateDaoData(daoURI);
   }
 
   async function SaveHTML() {
@@ -404,9 +408,7 @@ export default function DesignDao() {
     router.push(`/daos/${daoId}`);
   }
 
-  async function UpdateDaoData(dao_uri, template_html) {
-    document.querySelector('#dao-container').innerHTML = template_html;
-
+  async function UpdateDaoData(dao_uri) {
     const daoURI = JSON.parse(dao_uri); //Getting dao URI
 
     DaoURI = {
@@ -437,9 +439,11 @@ export default function DesignDao() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div id="editor" className="min-h-[calc(100vh-86px)]">
-        <div className="container pt-6">
-          <div id="dao-container" className="template-container"></div>
-        </div>
+        {brandColor && (
+          <div className="container pt-6" style={{ '--piccolo': brandColor }}>
+            <div id="dao-container" className="template-container" dangerouslySetInnerHTML={{ __html: template }}></div>
+          </div>
+        )}
       </div>
       <div className="absolute z-10 top-0 left-0 h-[85px] w-full shadow-moon-lg flex justify-between items-center p-5" style={{ background: 'linear-gradient(0deg, #b3804a -366.48%, #ffffff 34.69%)' }}>
         <Input aria-label="name" className="max-w-[320px]" value={DaoURI.Title} disabled />

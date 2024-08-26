@@ -78,8 +78,6 @@ export class OpenAiService {
       ]
     });
 
-    console.log('search categories', completion.choices[0].message.content);
-
     return completion.choices[0].message.content;
   }
 }

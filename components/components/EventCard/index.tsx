@@ -11,10 +11,6 @@ const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTMod
   const [showPlaceholder, setShowPlaceholder] = useState(false);
   const { getCurrency } = useEnvironment();
 
-  useEffect(() => {
-    console.log('ITEM', item);
-  }, []);
-
   const isAuction = () => item.eventType === 'auction';
   const isLivestream = () => item.eventType === 'livestream';
 

@@ -22,6 +22,7 @@ import { CharityEvent } from '../../../data-model/event';
 import GenerateHomepageModal from '../../../features/GenerateHomepageModal';
 import { CommunityService } from '../../../services/communityService';
 import BuyTicketModal from '../../../features/BuyTicketModal';
+import useEnvironment from '../../../contexts/EnvironmentContext';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
@@ -50,6 +51,7 @@ export default function DAO() {
   const [SelectedEventRecieveWallet, setSelectedEventReceiveWallet] = useState('');
 
   const router = useRouter();
+  const { isSubdomain } = useEnvironment();
 
   useEffect(() => {
     getDaoID();
@@ -59,24 +61,8 @@ export default function DAO() {
   useEffect(() => {
     (async function () {
       if (aboutTemplate != '' && window) {
-        setTimeout(async () => {
-          const { template } = await CommunityService.getByPolkadotReferenceId(daoId.toString());
-
-          let template_container = document.querySelector('.template-container');
-
-          if (template_container) {
-            template_container.innerHTML = template;
-            let joinBTN = template_container.querySelector('.join-community-block');
-            let goalBTN = template_container.querySelector('.create-goal-block');
-            if ((isOwner || isJoined) && joinBTN) {
-              joinBTN.setAttribute('style', 'display:none');
-            }
-
-            if (!(isOwner || isJoined) && goalBTN) {
-              goalBTN.setAttribute('style', 'display:none');
-            }
-          }
-        }, 500);
+        const { template } = await CommunityService.getByPolkadotReferenceId(daoId.toString());
+        setAboutTemplate(template);
       }
     })();
   }, [aboutTemplate, tabIndex]);
@@ -201,8 +187,6 @@ export default function DAO() {
         }
         setGoalsList(arr.reverse());
 
-        console.log('goals', arr);
-
         let allEvents = await GetAllEvents();
         let currentEvents = allEvents.filter((e) => e?.daoId == daoId);
 
@@ -263,8 +247,6 @@ export default function DAO() {
     setSelectedEventId(eventid);
     setSelectedEventName(eventName);
     setSelectedEventReceiveWallet(eventWallet);
-
-    console.log(AuctionEvents);
 
     setShowBuyTicketModal(true);
   }
@@ -363,7 +345,7 @@ export default function DAO() {
             </Tabs>
           </div>
         </div>
-        {tabIndex === 0 && <div className="template-container container gap-6 pb-8 w-full"></div>}
+        {tabIndex === 0 && <div className="template-container container" dangerouslySetInnerHTML={{ __html: aboutTemplate }}></div>}
         {tabIndex === 1 && (
           <div className="container flex gap-6">
             <CommunityFeed communityName={DaoURI.Title} daoId={daoId} /> <TopCommunityMembers goals={goalsList} allJoined={communityMembers} daoId={daoId} />

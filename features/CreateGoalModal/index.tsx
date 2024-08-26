@@ -203,8 +203,6 @@ export default function CreateGoalModal({ open, onClose, item, daoId }: { item: 
 
     const { images } = await MediaService.getImages(describeGoal);
 
-    console.log('full url', images[0].urls.full);
-
     const createdObject = {
       title: 'Asset Metadata',
       type: 'object',
@@ -260,8 +258,6 @@ export default function CreateGoalModal({ open, onClose, item, daoId }: { item: 
     if (PolkadotLoggedIn) {
       let goalid = Number(await api._query.goals.goalIds());
       feed.goalid = goalid;
-
-      console.log(daoId);
 
       const txs = [api._extrinsics.goals.createGoal(JSON.stringify(createdObject), daoId, Number(window.userid), JSON.stringify(feed)), api._extrinsics.feeds.addFeed(JSON.stringify(feed), 'goal', new Date().valueOf())];
 
