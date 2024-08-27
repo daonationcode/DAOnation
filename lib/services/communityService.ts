@@ -25,13 +25,10 @@ class CommunityService {
     return null;
   }
 
-  static async deleteByPolkadotReferenceId(polkadotReferenceId: string) {
-    const community = await Community.findOne({ where: { polkadotReferenceId } });
-    if (community) {
-      await community.destroy();
-      return true;
-    }
-    return false;
+  static async deleteAll() {
+    await Community.destroy({ where: {}, truncate: true });
+
+    return null;
   }
 }
 
