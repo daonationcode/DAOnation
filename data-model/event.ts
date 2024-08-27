@@ -29,6 +29,9 @@ export interface CharityEvent {
   amountOfNFTs: number;
   status: string;
   participantsCount?: 0;
+  participants?: [];
+  isOwner?:boolean,
+  boughtTicket?:boolean;
   NFTS?: NFT[];
   eventType: 'livestream' | 'auction';
 }

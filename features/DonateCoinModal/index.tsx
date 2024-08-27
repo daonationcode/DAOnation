@@ -56,7 +56,7 @@ export default function DonateCoinModal({ ideasid, daoId, goalURI, show, onHide,
       onHide({ success: true, amount: Amount });
     }
     if (Coin == 'DOT') {
-      let recipient = recievetype == 'Polkadot' ? recieveWallet : address;
+      let recipient = address;
       const txs = [api.tx.balances.transferAllowDeath(recipient, `${Amount * 1e12}`), api._extrinsics.ideas.addDonation(ideasid, `${Amount * 1e12}`, Number(window.userid)), api._extrinsics.feeds.addFeed(feed2, 'donation', new Date().valueOf())];
 
       const transfer = api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {

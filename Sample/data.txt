@@ -1,44 +1,64 @@
-Data for videoUsers:
+Data for video 
+Users:
 password: 12345678
 1.
-Ariel Amir
-arielamir2013@yahoo.com
+James Anderson
+james2013@yahoo.com
 2.
-Adrian Kobus
-akobus923@gmail.com
+Emily
+emily923@gmail.com
 3.
-Aleksey Petrov
-petrov4003@gmail.com
-4.
-Elia Zia
-zialia5405@gmail.com
-5.
-Sofia Dippel
-sd.kr402@outlook.com
+Sarah
+sarah4003@gmail.com
+
 
 Charities:
 1.
-Title: Feeding America
-Membership fee: 0.05$
-Description: Feeding America is a United States–based non-profit organization that is a nationwide network of more than 200 food banks that feed more than 46 million people through food pantries, soup kitchens, shelters, and other community-based agencies. Forbes ranks it as the largest U.S. charity by revenue.
-Video link: https://www.youtube.com/watch?v=Py5JW5J8afg
+Title: Conscious Nona
+Membership fee: 50
+Description: Conscious Nona is a wellbeing community focusing on activating self-awareness to connect and create sustainable, conscious communities. Conscious Nona is located in the heart of Central Florida, and is renowned for its picturesque landscapes, innovative technology, and a strong sense of community.
+
+Video link: https://www.youtube.com/watch?v=-caKTHhZRko
 background color: #196666
 button background color: #C1A050
-Image 1: https://media.licdn.com/dms/image/D4E12AQFJwrxG2fuvGQ/article-cover_image-shrink_720_1280/0/1692715350135?e=1720656000&v=beta&t=tDznSYCYTx88Fk7x3wJWZQQR0RPvrl6hBshPf9aWKQ0
-Image 2:  https://media-cldnry.s-nbcnews.com/image/upload/MSNBC/Components/Video/201909/tdy_news_9a_jones_hunger_190912_1920x1080.jpg
-Image 3: https://i.postimg.cc/V6czjHdP/20170626-161621.jpg
-2.
-Title: Doctors Without Borders
-Image: https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2Mgw3Xg5IEGpQsQlgUhpKfsr2alD7ud9KaFgYmJ78eg&s
+
+Image 1: https://i.postimg.cc/2SBFj30Q/1.png
+Image 2: https://i.postimg.cc/SK6683Fj/2.jpg
+Image 3: https://i.postimg.cc/9McGBbCb/3.png
+
+
 3.
 Title: World Wildlife Fund (WWF)
 Image: https://graffica.info/wp-content/uploads/2017/07/WWF-Oso-Polar-1200x900.jpg
 
+Auction Events:
+
+*Title:* "Digital Art for Good"
+
+*Description:* Support Feeding America by bidding on exclusive NFTs from talented artists. Every piece sold helps provide meals to those facing hunger. Join us in using digital art to make a real-world impact!
+
+
+
+### Live Stream Event
+
+*Title:* "Uganda Community Connection With Village Connect And Conscious Nona"
+
+*Description:* Explore Uganda on a 12-day journey to the Pearl of Africa. Engage with the Ugandan Jewish community (the Abayudaya), witness breathtaking natural wonders, do a game drive and river boat ride to see amazing wildlife and there’s an optional add-on to encounter mountain gorillas up close. We’ll be staying in the eastern part of Uganda, where you’ll make a real connection with our partner communities. You’ll visit Global Village Connect projects, schools and synagogues. You’ll hike beautiful Sipi Falls, and you’ll spend Shabbat with the Abayudaya community.
+
+
+Live: https://www.youtube.com/@stevethijssen2941/streams
+rtmp://a.rtmp.youtube.com/live2
+rtmp://b.rtmp.youtube.com/live2?backup=1
+4y17-y787-hkrz-25qh-6t2v
+
+
+
+
 Goal:
-Title: Community food security in Texas
-Description: Community food security in Texas" aims to ensure that every Texan has consistent access to nutritious food, free from the constraints of financial limitations or geographical barriers. This objective involves multifaceted strategies, including addressing food insecurity by implementing programs for food distribution, meal assistance, and nutrition education targeted at vulnerable communities. Beyond mere sustenance, the objective emphasizes the importance of promoting nutritional health, offering diverse and wholesome food options to support the overall well-being of individuals and families.
-Moreover, achieving community food security in Texas entails building sustainable food systems resilient to shocks such as natural disasters or economic fluctuations. This involves supporting local farmers, advocating for policies enhancing food sovereignty, and fostering urban agriculture initiatives. Empowering communities is central to this objective, encouraging ownership through education, capacity building, and community engagement. By providing resources, fostering partnerships, and facilitating participatory decision-making processes, communities can tailor solutions that best reflect their needs and preferences.
-Equity and accessibility are paramount in the pursuit of community food security in Texas. Recognizing the impact of factors like income, race, geography, and disability, efforts are made to address disparities and barriers to access. Prioritizing equity ensures that all Texans have the opportunity to access nutritious food, fostering health, sustainability, and resilience across the state.
+Title: Community food security in Uganda
+Description: Community food security in Uganda" aims to ensure that every Texan has consistent access to nutritious food, free from the constraints of financial limitations or geographical barriers. This objective involves multifaceted strategies, including addressing food insecurity by implementing programs for food distribution, meal assistance, and nutrition education targeted at vulnerable communities. Beyond mere sustenance, the objective emphasizes the importance of promoting nutritional health, offering diverse and wholesome food options to support the overall well-being of individuals and families.
+
+
 Image: https://shoutoutdfw.com/wp-content/uploads/2022/09/c-PersonalRajAsava__IMG62621_1661282528627.jpg
 Amount: $1.500.000
 

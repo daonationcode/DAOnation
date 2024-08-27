@@ -585,6 +585,15 @@ export function PolkadotProvider({ children }) {
           if (eventType != "auction") {
             LiveStarted = isPast(LiveDate)
           }
+          let AllParticipants = allLiveEventJoined.filter((e)=>e.eventId == eventId)
+          let UserJoined = AllParticipants.findIndex((p)=>p.userId == window.userid)
+         let boughtTicket = false;
+          if (UserJoined > -1){
+            boughtTicket =(true)  
+          }
+          let  isOwner = Number(element['__internal__raw'].userId) === Number(window.userid);
+
+
           let newElm = {
             id: eventId,
             eventId: eventId,
@@ -601,6 +610,9 @@ export function PolkadotProvider({ children }) {
             eventType: eventType,
             eventStreamUrl: object.properties.eventStreamUrl.description,
             participantsCount: Number(element['__internal__raw'].participant),
+            participants: AllParticipants,
+            boughtTicket:boughtTicket,
+            isOwner:isOwner,
             ticketPrice: object.properties.ticketPrice.description,
             reached: totalRaised,
             amountOfNFTs: allEventNFTs.length,
@@ -734,12 +746,12 @@ export function PolkadotProvider({ children }) {
         let totalJoinedCount = Number(await api._query.events.ticketIds());
         let arr = [];
         for (let i = 0; i < totalJoinedCount; i++) {
-          const element = await api._query.events.TicketById(i);
+          const element = await api._query.events.ticketById(i);
           let newElm = {
-            id: element['__internal__raw'].id.toString(),
-            userId: element['__internal__raw'].userId.toString(),
-            eventId: element['__internal__raw'].eventId.toString(),
-            daoId: element['__internal__raw'].daoId.toString(),
+            id: Number(element['__internal__raw'].id),
+            userId: Number(element['__internal__raw'].userId),
+            eventId: Number(element['__internal__raw'].eventId),
+            daoId: Number(element['__internal__raw'].daoId),
             date: element['__internal__raw'].date.toString()
           };
           arr.push(newElm);

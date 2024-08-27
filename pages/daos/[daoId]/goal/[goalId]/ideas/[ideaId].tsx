@@ -19,8 +19,8 @@ import { Idea } from '../../../../../../data-model/idea';
 
 export default function GrantIdeas() {
   const { api, showToast, getUserInfoById, userInfo, userWalletPolkadot, userSigner, GetAllVotes, GetAllDaos, GetAllGoals, GetAllJoined, GetAllIdeas, PolkadotLoggedIn } = usePolkadotContext();
-  const [ideaId, setIdeasId] = useState('');
-  const [goalId, setGoalId] = useState('');
+  const [ideaId, setIdeasId] = useState(0);
+  const [goalId, setGoalId] = useState(0);
   const [PollIndex, setPollIndex] = useState(-1);
   const [imageList, setimageList] = useState([]);
   const [isJoined, setIsJoined] = useState(false);
@@ -64,14 +64,14 @@ export default function GrantIdeas() {
     }
   ]);
 
-  let id = ''; //Ideas id from url
-  let Goalid = ''; //Goal id
+  let id = -1; //Ideas id from url
+  let Goalid = -1; //Goal id
 
   useEffect(() => {
-    setGoalId(router.query.goalId as string);
-    setIdeasId(router.query.ideaId as string);
-    id = router.query.ideaId as string;
-    Goalid = router.query.goalId as string;
+    setGoalId(Number(router.query.goalId as string));
+    setIdeasId(Number(router.query.ideaId as string));
+    id = Number(router.query.ideaId as string);
+    Goalid = Number(router.query.goalId as string);
 
     fetchContractData();
   }, [api]);
@@ -84,7 +84,7 @@ export default function GrantIdeas() {
     setLoading(true);
 
     try {
-      if (id != '' && Goalid != '' && api) {
+      if (id != -1 && Goalid != -1 && api) {
         let allIdeas = await GetAllIdeas();
         let currentIdea = allIdeas.filter((e) => e.ideasId == id)[0];
 
@@ -100,8 +100,8 @@ export default function GrantIdeas() {
 
         setCurrentDAO(currentDao);
         let allJoined = await GetAllJoined();
-        let currentJoined = allJoined.filter((e) => e?.daoId == currentGoal.daoId.toString());
-        let joinedInfo = currentJoined.filter((e) => e?.user_id.toString() == window.userid.toString());
+        let currentJoined = allJoined.filter((e) => Number(e?.daoId) ==Number( currentGoal.daoId));
+        let joinedInfo = currentJoined.filter((e) => Number( e?.user_id) ==  Number(window.userid));
         if (joinedInfo.length > 0) {
           setIsJoined(true);
         } else {
@@ -146,10 +146,7 @@ export default function GrantIdeas() {
   }
 
   async function VoteIdea() {
-    if (IdeasURI.Referenda != 0) {
-      setVotingShow(true);
-      return;
-    }
+   
     setVoting(true);
     const ToastId = toast.loading('Voting ...');
     const showBadgesAmount = [10, 50, 100, 150, 200, 250, 500];
@@ -181,23 +178,6 @@ export default function GrantIdeas() {
           onSuccess();
         });
       });
-    } else {
-      try {
-        toast.update(ToastId, {
-          render: 'Voted Successfully!',
-          type: 'success',
-          isLoading: false,
-          autoClose: 1000,
-          closeButton: true,
-          closeOnClick: true,
-          draggable: true
-        });
-        onSuccess();
-      } catch (error) {
-        console.error(error);
-        setVoting(false);
-        return;
-      }
     }
   }
 
@@ -252,7 +232,7 @@ export default function GrantIdeas() {
 
   function closeDonateModal(event) {
     if (event && event.amount) {
-      setIdeasURI({ ...IdeasURI, donation: IdeasURI.donation + event.amount });
+      setIdeasURI({ ...IdeasURI, donation: Number(IdeasURI.donation) + Number(event.amount) });
     }
 
     setDonateModalShow(false);
@@ -357,7 +337,7 @@ export default function GrantIdeas() {
               height={500}
             />
           </div>{' '}
-          {/* <div className="full-w">
+           <div className="full-w">
             <form onSubmit={PostComment} className="full-w flex flex-col gap-2">
               {CommentInput}
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -367,7 +347,7 @@ export default function GrantIdeas() {
               </div>
             </form>
           </div>
-          <div className="flex flex-col gap-6 pb-8">{uniqueAndSort(CommentsList).map((listItem: any, index) => (listItem.address !== '' ? <CommentBox user_info={listItem.user_info} address={listItem.address} MessageID={listItem.id} MessageIndex={index} date={listItem.date} sendReply={sendReply} message={listItem.message} replies={listItem.replies} key={listItem.id} /> : <></>))}</div> */}
+          <div className="flex flex-col gap-6 pb-8">{uniqueAndSort(CommentsList).map((listItem: any, index) => (listItem.address !== '' ? <CommentBox user_info={listItem.user_info} address={listItem.address} MessageID={listItem.id} MessageIndex={index} date={listItem.date} sendReply={sendReply} message={listItem.message} replies={listItem.replies} key={listItem.id} /> : <></>))}</div> 
         </div>
       </div>
 

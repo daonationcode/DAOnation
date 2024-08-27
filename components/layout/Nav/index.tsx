@@ -75,7 +75,7 @@ export function Nav(): JSX.Element {
     if (acc !== '') {
       running = false;
     }
-  }, [count, router.pathname]);
+  }, [count,api,userInfo, router.pathname]);
 
   useEffect(() => {
     changedPath = true;

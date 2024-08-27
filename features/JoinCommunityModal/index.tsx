@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 
 declare let window;
 
-export default function JoinCommunityModal({ SubsPrice, show, onHide, address, recieveWallet, recievetype, title, daoId }) {
+export default function JoinCommunityModal({ SubsPrice, show, onHide, address, recieveWallet, recievetype, title, daoId,customUrl }) {
   const [Balance, setBalance] = useState(0);
   const [Token, setToken] = useState('');
   const [isLoading, setisLoading] = useState(false);
@@ -15,11 +15,6 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
   const [Coin, setCoin] = useState('');
   const router = useRouter();
 
-  let alertBox = null;
-  const [transaction, setTransaction] = useState({
-    link: '',
-    token: ''
-  });
 
   const { userInfo, PolkadotLoggedIn, userWalletPolkadot, userSigner, showToast, api } = usePolkadotContext();
 
@@ -36,7 +31,7 @@ export default function JoinCommunityModal({ SubsPrice, show, onHide, address, r
       name: userInfo?.fullName?.toString()
     });
     async function onSuccess() {
-      router.push(`/daos/${daoId}`);
+      router.push(`${location.protocol}//${customUrl}.${location.host}/daos/${daoId}`);
       LoadData();
       setisLoading(false);
       onHide({ success: true });

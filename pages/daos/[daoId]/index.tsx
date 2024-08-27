@@ -23,10 +23,11 @@ import GenerateHomepageModal from '../../../features/GenerateHomepageModal';
 import { CommunityService } from '../../../services/communityService';
 import BuyTicketModal from '../../../features/BuyTicketModal';
 import useEnvironment from '../../../contexts/EnvironmentContext';
+import { toast } from 'react-toastify';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
-  const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals, GetAllEvents } = usePolkadotContext();
+  const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals,userWalletPolkadot,userSigner,showToast, GetAllEvents } = usePolkadotContext();
   const [DaoURI, setDaoURI] = useState({ Title: '', Description: '', SubsPrice: null, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', allFiles: [], isOwner: false, daoId: null, user_id: null, user_info: null, brandingColor: '', customUrl: '' } as Dao);
 
   const [daoId, setDaoID] = useState(-1);
@@ -243,11 +244,37 @@ export default function DAO() {
     setShowDonateCoinModal(true);
   }
 
-  function openBuyTicketModal(eventid, eventName, eventWallet) {
-    setSelectedEventId(eventid);
-    setSelectedEventName(eventName);
-    setSelectedEventReceiveWallet(eventWallet);
+  async function buyTicketHandle(eventid) {
+  
+    console.log('======================>Buying Ticket');
+    const ToastId = toast.loading('Buying Ticket ...');
 
+    async function onSuccess() {
+     
+      openBuyTicketModal(eventid)
+
+    }
+
+    try {
+      // Buy Ticket
+
+      const txs = [api._extrinsics.events.buyTicket(Number(window.userid), Number(eventid), Number(daoId), new Date().toLocaleDateString())];
+
+      await api.tx.utility.batch(txs).signAndSend(userWalletPolkadot, { signer: userSigner }, (status) => {
+        showToast(status, ToastId, 'Bought Ticket Successfully!', () => {
+          onSuccess();
+        });
+      });
+
+
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function openBuyTicketModal(SelectedEventId) {
+
+    setSelectedEventId(SelectedEventId);
     setShowBuyTicketModal(true);
   }
 
@@ -356,7 +383,7 @@ export default function DAO() {
             <Loader
               element={
                 AuctionEvents.length > 0 ? (
-                  AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} openBuyTicketModal={openBuyTicketModal} />)
+                  AuctionEvents.map((event, index) => <EventCard item={event} key={index} openDonateNFTModal={openDonateNFTModal} openDonateCoinModal={openDonateCoinModal} openBuyTicketModal={buyTicketHandle} />)
                 ) : (
                   <EmptyState buttonLabel="Create event" onButtonClick={openCreateEventModal} icon={<SportDarts className="text-moon-48" />} label="This charity doesn’t have any events yet." />
                 )

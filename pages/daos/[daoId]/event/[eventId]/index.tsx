@@ -17,6 +17,7 @@ import { Dao } from '../../../../../data-model/dao';
 import { toast } from 'react-toastify';
 import BuyTicketModal from '../../../../../features/BuyTicketModal';
 import LivestreamEmbed from '../../../../../components/components/LivestreamEmbed';
+import { el } from 'date-fns/locale';
 
 declare let window;
 export default function Events() {
@@ -95,6 +96,8 @@ export default function Events() {
         let allEvents = await GetAllEvents();
         let eventURIFull = allEvents.filter((e) => Number(e?.eventId) === eventId)[0];
 
+       
+
         setNfts(eventURIFull.NFTS);
 
 
@@ -104,8 +107,7 @@ export default function Events() {
 
         let user_info = await getUserInfoById(Number(eventURIFull.UserId));
         eventURIFull.user_info = user_info;
-        eventURIFull.isOwner = eventURIFull.UserId == Number(window.userid);
-
+       
         setEventURI(eventURIFull);
 
         setLoading(false);

@@ -7,7 +7,7 @@ import useEnvironment from '../../../contexts/EnvironmentContext';
 import { CharityEvent } from '../../../data-model/event';
 import Card from '../Card';
 
-const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal, openBuyTicketModal, preview }: { item: CharityEvent; preview?: boolean; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) => void; openDonateNFTModal?: (eventid, eventName, eventWallet) => void; openBuyTicketModal?: (eventid, eventName, eventWallet) => void }) => {
+const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTModal, openBuyTicketModal, preview }: { item: CharityEvent; preview?: boolean; className?: string; openDonateCoinModal?: (eventid, eventName, eventWallet) => void; openDonateNFTModal?: (eventid, eventName, eventWallet) => void; openBuyTicketModal?: (eventid) => void }) => {
   const [showPlaceholder, setShowPlaceholder] = useState(false);
   const { getCurrency } = useEnvironment();
 
@@ -83,13 +83,13 @@ const EventCard = ({ item, className = '', openDonateCoinModal, openDonateNFTMod
               </>
             )}
 
-            {isLivestream() && item.status !== 'ended' && !preview && (
+            {isLivestream() && item.status !== 'ended' &&  (!item.boughtTicket && !item.isOwner ) && !preview && (
               <>
                 <Button
                   variant="secondary"
                   iconLeft={<ShopWallet />}
                   onClick={() => {
-                    openBuyTicketModal(item.eventId, item.Title, item.wallet);
+                    openBuyTicketModal(item.eventId);
                   }}
                 >
                   Buy ticket

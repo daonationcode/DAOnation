@@ -17,10 +17,11 @@ function MyApp({ Component, pageProps }) {
     <IPFSProvider>
       <Web3OnboardProvider web3Onboard={web3Onboard}>
         <PolkadotProvider>
+        <ToastContainer hideProgressBar={false}  position="top-right" autoClose={3000} newestOnTop={false} closeOnClick rtl={false} draggable pauseOnHover theme="light"/ >
           <EnvironmentProvider>
             <Header />
             <Component {...pageProps} />
-            <ToastContainer hideProgressBar={false} position="top-right" autoClose={3000} newestOnTop={false} closeOnClick rtl={false} draggable pauseOnHover theme="light" />
+
           </EnvironmentProvider>
         </PolkadotProvider>
       </Web3OnboardProvider>

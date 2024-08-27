@@ -403,7 +403,15 @@ export default function DesignDao() {
 
     await CommunityService.updateByPolkadotReferenceId(daoId, { template });
 
-    toast.update(toastId, { type: 'success', render: 'Homepage updated successfully!', autoClose: 1000, isLoading: false });
+    toast.update(toastId, {
+      
+      type: 'success',
+      isLoading: false,
+      autoClose: 1000,
+      closeButton: true,
+      closeOnClick: true,
+      draggable: true,
+      render: 'Homepage updated successfully!'});
 
     router.push(`/daos/${daoId}`);
   }
