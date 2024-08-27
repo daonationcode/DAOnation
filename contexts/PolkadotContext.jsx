@@ -586,9 +586,9 @@ export function PolkadotProvider({ children }) {
             LiveStarted = isPast(LiveDate)
           }
           let AllParticipants = allLiveEventJoined.filter((e)=>e.eventId == eventId)
-          let UserJoined = AllParticipants.findIndex((p)=>p.userId == window.userid)
+          let UserJoined = AllParticipants.findIndex((p)=>p.userId === Number(window.userid))
          let boughtTicket = false;
-          if (UserJoined > -1){
+          if (UserJoined != -1){
             boughtTicket =(true)  
           }
           let  isOwner = Number(element['__internal__raw'].userId) === Number(window.userid);

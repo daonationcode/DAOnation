@@ -96,7 +96,7 @@ export default function Events() {
         let allEvents = await GetAllEvents();
         let eventURIFull = allEvents.filter((e) => Number(e?.eventId) === eventId)[0];
 
-       
+        setBoughtTicket(eventURIFull.boughtTicket)
 
         setNfts(eventURIFull.NFTS);
 
