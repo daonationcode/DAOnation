@@ -32,7 +32,7 @@ export default function DAO() {
         setAboutTemplate(template);
       }
     })();
-  }, []);
+  }, [router]);
 
   return (
     <>

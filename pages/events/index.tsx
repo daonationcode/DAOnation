@@ -125,8 +125,8 @@ export default function Events() {
         {isSubdomain() && (
           <div className="flex justify-between items-center container !mt-10 !mb-4">
             <div className="ml-10 w-[240px]">
-              <Search className="bg-white" onChangeOpen={() => {}} search={search} isOpen={false} onChangeSearch={setSearch}>
-                <Search.Input>
+              <Search className="bg-white" onChangeOpen={() => {}}  search={search} isOpen={false} onChangeSearch={setSearch}>
+                <Search.Input >
                   <Search.Input.Icon className="text-trunks" />
                   <Search.Input.Input className="placeholder:text-trunks" placeholder="Search events" />
                 </Search.Input>

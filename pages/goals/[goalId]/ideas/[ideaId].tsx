@@ -18,7 +18,7 @@ import { Goal } from '../../../../data-model/goal';
 import { Idea } from '../../../../data-model/idea';
 
 export default function GrantIdeas() {
-  const { api, showToast, getUserInfoById, userInfo, userWalletPolkadot, userSigner, GetAllVotes, GetAllDaos, GetAllGoals, GetAllJoined, GetAllIdeas, PolkadotLoggedIn } = usePolkadotContext();
+  const { api, showToast, getUserInfoById, GetAllComments, userInfo, userWalletPolkadot, userSigner, GetAllVotes, GetAllDaos, GetAllGoals, GetAllJoined, GetAllIdeas, PolkadotLoggedIn } = usePolkadotContext();
   const [ideaId, setIdeasId] = useState(-1);
   const [goalId, setGoalId] = useState(-1);
   const [PollIndex, setPollIndex] = useState(-1);
@@ -43,7 +43,7 @@ export default function GrantIdeas() {
     id: '',
     name: 'comment',
     rows: 1,
-    minHeight: 54
+    minHeight: 60
   });
   const [emptydata, setemptydata] = useState([]);
 
@@ -121,11 +121,13 @@ export default function GrantIdeas() {
 
         setAccountAddress(currentIdea.wallet);
         setIdeasURI(currentIdea);
-
+        let allComments = await GetAllComments();
+        let currentIdeasComments = allComments.filter((item)=> item.ideasId == id);
+        setCommentsList(currentIdeasComments)
         setimageList(currentIdea.allfiles);
         setLoading(false);
 
-        let totalComments = [];
+
       }
     } catch (error) {
       console.error(error);
@@ -210,9 +212,9 @@ export default function GrantIdeas() {
       replies: [],
       user_info: {}
     };
-    await saveMessage(newComment);
     newComment.replies = [];
     newComment.user_info = userInfo;
+    await saveMessage(newComment);
     setCommentsList([...CommentsList, newComment] as any);
     setComment('');
     setCommenting(false);
@@ -220,9 +222,24 @@ export default function GrantIdeas() {
   }
 
   async function saveMessage(newComment) {
-    removeElementFromArrayBYID(emptydata, 0, setemptydata);
+    const pro = new Promise(async (resolve) => {
+      const toastId = toast.loading('Posting comment ...');
+      function onSuccess() {
+        resolve("sent!");
+        removeElementFromArrayBYID(emptydata, 0, setemptydata);
+      };
+
+      await api._extrinsics.comments.sendMsg(ideaId, goalId, CurrentDAO.daoId,JSON.stringify(newComment), Number(window.userid)).signAndSend(userWalletPolkadot, { signer: userSigner }, async (status) => {
+        showToast(status, toastId, 'Commented Successfully!', onSuccess);
+      });
+    })
+    await pro;
+
   }
 
+  function isInvalid() {
+    return !(Comment);
+  }
   async function sendReply(replyText, MessageId, MessageIndex) {
     removeElementFromArrayBYID(emptydata, 0, setemptydata);
   }
@@ -340,7 +357,7 @@ export default function GrantIdeas() {
             <form onSubmit={PostComment} className="full-w flex flex-col gap-2">
               {CommentInput}
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button animation={commenting} data-element-id="btn_donate" style={{ width: '135px' }} data-analytic-event-listener="true" type="submit">
+                <Button animation={commenting ? 'progress' : false} disabled={commenting || isInvalid()} data-element-id="btn_donate" style={{ width: '135px' }} data-analytic-event-listener="true" type="submit">
                   Post Comment
                 </Button>
               </div>
