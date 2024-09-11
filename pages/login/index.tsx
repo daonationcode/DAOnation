@@ -25,7 +25,7 @@ export default function Login() {
       if (isSubdomain()) {
         window.location.href = `/daos/${getCommunityBranding().polkadotReferenceId}`;
       } else {
-        window.location.href = '/joined';
+        // window.location.href = '/joined';
       }
     }
   }, [isConnected, router]); // Dependency array

@@ -27,7 +27,7 @@ import { toast } from 'react-toastify';
 
 export default function DAO() {
   const [goalsList, setGoalsList] = useState([]);
-  const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals,userWalletPolkadot,userSigner,showToast, GetAllEvents } = usePolkadotContext();
+  const { api, getUserInfoById, GetAllVotes, GetAllIdeas, GetAllJoined, GetAllGoals, userWalletPolkadot, userSigner, showToast, GetAllEvents } = usePolkadotContext();
   const [DaoURI, setDaoURI] = useState({ Title: '', Description: '', SubsPrice: null, Start_Date: '', End_Date: '', logo: '', wallet: '', typeimg: '', allFiles: [], isOwner: false, daoId: null, user_id: null, user_info: null, brandingColor: '', customUrl: '' } as Dao);
 
   const [daoId, setDaoID] = useState(-1);
@@ -52,7 +52,6 @@ export default function DAO() {
   const [SelectedEventRecieveWallet, setSelectedEventReceiveWallet] = useState('');
 
   const router = useRouter();
-  const { isSubdomain } = useEnvironment();
 
   useEffect(() => {
     getDaoID();
@@ -97,7 +96,7 @@ export default function DAO() {
     }
   }
 
-  async function updateDaoData(dao_uri, template_html) {
+  async function updateDaoData(dao_uri) {
     const daoURI = JSON.parse(dao_uri); //Getting dao URI
 
     setIsOwner(daoURI.properties?.user_id?.description.toString() === window?.userid?.toString() ? true : false);
@@ -153,7 +152,7 @@ export default function DAO() {
             setAboutTemplate(template);
           }
 
-          updateDaoData(daoURI, template);
+          updateDaoData(daoURI);
         } catch (e) {}
       }
     }
@@ -245,14 +244,11 @@ export default function DAO() {
   }
 
   async function buyTicketHandle(eventid) {
-  
     console.log('======================>Buying Ticket');
     const ToastId = toast.loading('Buying Ticket ...');
 
     async function onSuccess() {
-     
-      openBuyTicketModal(eventid)
-
+      openBuyTicketModal(eventid);
     }
 
     try {
@@ -265,15 +261,12 @@ export default function DAO() {
           onSuccess();
         });
       });
-
-
     } catch (e) {
       console.error(e);
     }
   }
 
   function openBuyTicketModal(SelectedEventId) {
-
     setSelectedEventId(SelectedEventId);
     setShowBuyTicketModal(true);
   }
@@ -408,7 +401,7 @@ export default function DAO() {
       </div>
 
       <GenerateHomepageModal open={showGenerateHomepageModal} onClose={closeGenerateHomepageModal} item={DaoURI} />
-      <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} item={DaoURI} daoId={daoId.toString()} />
+      <CreateGoalModal open={showCreateGoalModal} onClose={closeCreateGoalModal} daoId={daoId.toString()} />
       <CreateEventModal open={showCreateEventModal} onClose={closeCreateEventModal} daoId={daoId} />
       <DonateCoinToEventModal open={!!showDonateCoinModal} onClose={() => setShowDonateCoinModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} recieveWallet={SelectedEventRecieveWallet} />
       <DonateNFTModal daoid={daoId} open={!!showDonateNftModal} onClose={() => setShowDonateNFTModal(null)} eventid={SelectedEventId} eventName={SelectedEventName} />

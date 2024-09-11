@@ -25,7 +25,7 @@ export function Nav(): JSX.Element {
   const [communityBranding, setCommunityBranding] = useState<ApiCommunity>(null);
   const [showCreateDaoModal, setShowCreateDaoModal] = useState(false);
   const [hasJoinedCommunities, setHasJoinedCommunities] = useState(true);
-  const { getCurrency, setCurrency, isServer, getCommunityBranding } = useEnvironment();
+  const { getCurrency, setCurrency, isServer, getCommunityBranding, isSubdomain } = useEnvironment();
 
   const router = useRouter();
 
@@ -75,7 +75,7 @@ export function Nav(): JSX.Element {
     if (acc !== '') {
       running = false;
     }
-  }, [count,api,userInfo, router.pathname]);
+  }, [count, api, userInfo, router.pathname]);
 
   useEffect(() => {
     changedPath = true;
@@ -114,6 +114,16 @@ export function Nav(): JSX.Element {
               <NavItem highlight={router.pathname === '/daos'} link="/daos" label="Charities" />
               <NavItem label="Create Your Charity" onClick={openModal} />
               <NavItem highlight={router.pathname === '/events'} link="/events" label="All events" />
+            </span>
+          )}
+
+          {isSigned && isSubdomain() && (
+            <span className="hidden sm:inline-flex">
+              <NavItem highlight={router.pathname === `/daos/${getCommunityBranding().polkadotReferenceId}`} link={`/daos/${getCommunityBranding().polkadotReferenceId}`} label="Home" />
+              <NavItem highlight={router.pathname.includes('/feed')} link={`/daos/${getCommunityBranding().polkadotReferenceId}/feed`} label="Feed" />
+              <NavItem highlight={router.pathname.includes('/goals')} link={`/goals`} label="Goals" />
+              <NavItem highlight={router.pathname.includes('/events')} link={`/events`} label="Events" />
+              <NavItem highlight={router.pathname.includes('/members')} link={`/daos/${getCommunityBranding().polkadotReferenceId}/members`} label="Members" />
             </span>
           )}
 
