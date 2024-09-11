@@ -8,9 +8,8 @@ import { AiService } from '../../services/aiService';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import { CommunityService } from '../../services/communityService';
-import { Dao } from '../../data-model/dao';
 
-export default function GenerateHomepageModal({ open, onClose, item }: { open: boolean; onClose; item: Dao }) {
+export default function GenerateHomepageModal({ open, onClose }: { open: boolean; onClose }) {
   const [eventType, setEventType] = useState<'layout1' | 'layout2'>('layout1');
   const [isLoading, setIsLoading] = useState(false);
 
