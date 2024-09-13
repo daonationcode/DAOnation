@@ -19,6 +19,7 @@ const AppContext = createContext({
   PolkadotLoggedIn: false,
   EasyToast: (message, type, UpdateType = false, ToastId = '', isLoading = false) => { },
   GetAllDaos: async () => [],
+  LoadDataOnPageLoad: async () => object,
   GetAllJoined: async () => [],
   GetAllGoals: async (cache = false) => [],
 
@@ -115,30 +116,31 @@ export function PolkadotProvider({ children }) {
   useEffect(() => {
     updateCurrentUser();
   }, [wallet])
+  async function LoadDataOnPageLoad(){
+    try {
+      const wsProvider = new WsProvider(polkadotConfig.chain_rpc);
+      const _api = await ApiPromise.create({ provider: wsProvider });
+      await _api.isReady;
+
+      setApi(_api);
+
+      const keyring = new Keyring({ type: 'sr25519' });
+      const newPair = keyring.addFromUri(polkadotConfig.derive_acc);
+      setDeriveAcc(newPair);
+
+      if (Cookies.get('loggedin') == 'true') {
+        let userid = Cookies.get('user_id');
+        window.userid = userid;
+        const userInformation = await _api.query.users.userById(userid);
+        setUserInfo(userInformation);
+        return userInformation;
+
+      }
+      console.log('Done');
+    } catch (e) { }
+  }
   useEffect(() => {
-    (async function () {
-      try {
-        const wsProvider = new WsProvider(polkadotConfig.chain_rpc);
-        const _api = await ApiPromise.create({ provider: wsProvider });
-        await _api.isReady;
-
-        setApi(_api);
-
-        const keyring = new Keyring({ type: 'sr25519' });
-        const newPair = keyring.addFromUri(polkadotConfig.derive_acc);
-        setDeriveAcc(newPair);
-
-        if (Cookies.get('loggedin') == 'true') {
-          let userid = Cookies.get('user_id');
-          window.userid = userid;
-          const userInformation = await _api.query.users.userById(userid);
-          setUserInfo(userInformation);
-
-
-        }
-        console.log('Done');
-      } catch (e) { }
-    })();
+    LoadDataOnPageLoad();
   }, []);
 
   //One Time Counter
@@ -812,7 +814,7 @@ export function PolkadotProvider({ children }) {
     return arr;
   }
 
-  return <AppContext.Provider value={{ api: api, deriveAcc: deriveAcc, GetAllComments:GetAllComments,GetAllEvents: GetAllEvents,GetAllJoinedLiveEvent:GetAllJoinedLiveEvent, GetAllNfts: GetAllNfts, GetAllBids: GetAllBids, GetAllGoals: GetAllGoals, GetAllIdeas: GetAllIdeas, GetAllVotes: GetAllVotes, GetAllFeeds: GetAllFeeds, GetAllDonations: GetAllDonations, GetAllUserDonations: GetAllUserDonations, updateCurrentUser: updateCurrentUser, GetAllDaos: GetAllDaos, GetAllJoined: GetAllJoined, showToast: showToast, EasyToast: EasyToast, getUserInfoById: getUserInfoById, userWalletPolkadot: userWalletPolkadot, userSigner: userSigner, PolkadotLoggedIn: PolkadotLoggedIn, userInfo: userInfo }}>{children}</AppContext.Provider>;
+  return <AppContext.Provider value={{ api: api, deriveAcc: deriveAcc, LoadDataOnPageLoad:LoadDataOnPageLoad,GetAllComments:GetAllComments,GetAllEvents: GetAllEvents,GetAllJoinedLiveEvent:GetAllJoinedLiveEvent, GetAllNfts: GetAllNfts, GetAllBids: GetAllBids, GetAllGoals: GetAllGoals, GetAllIdeas: GetAllIdeas, GetAllVotes: GetAllVotes, GetAllFeeds: GetAllFeeds, GetAllDonations: GetAllDonations, GetAllUserDonations: GetAllUserDonations, updateCurrentUser: updateCurrentUser, GetAllDaos: GetAllDaos, GetAllJoined: GetAllJoined, showToast: showToast, EasyToast: EasyToast, getUserInfoById: getUserInfoById, userWalletPolkadot: userWalletPolkadot, userSigner: userSigner, PolkadotLoggedIn: PolkadotLoggedIn, userInfo: userInfo }}>{children}</AppContext.Provider>;
 }
 
 export const usePolkadotContext = () => useContext(AppContext);

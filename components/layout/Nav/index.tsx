@@ -1,4 +1,5 @@
-import { Avatar, Button, Dropdown, MenuItem } from '@heathmont/moon-core-tw';
+import Image from 'next/legacy/image';
+import { Avatar, Button, Dropdown, MenuItem} from '@heathmont/moon-core-tw';
 import { useEffect, useState } from 'react';
 import NavItem from '../../components/NavItem';
 import Link from 'next/link';
@@ -16,7 +17,7 @@ let running = false;
 let changedPath = true;
 
 export function Nav(): JSX.Element {
-  const { api, userInfo, userWalletPolkadot } = usePolkadotContext();
+  const { api, userInfo, userWalletPolkadot,LoadDataOnPageLoad } = usePolkadotContext();
   const [acc, setAcc] = useState('');
   const [isOwner, setIsOwner] = useState(false);
   const [logo, setLogo] = useState('');
@@ -34,16 +35,20 @@ export function Nav(): JSX.Element {
   async function fetchInfo() {
     if (Cookies.get('loggedin') === 'true') {
       try {
-        if (userWalletPolkadot && api && userInfo?.fullName) {
+        if (userWalletPolkadot && api ) {
           const { nonce, data: balance } = await api.query.system.account(userWalletPolkadot);
 
           setCurrency('DOT');
 
           setBalance(Number(balance.free.toString()) / 1e12 + ' DOT');
           if (!isSigned) setSigned(true);
+          let user_info  = userInfo;
+          if (userInfo?.fullName === undefined){
+            user_info = await LoadDataOnPageLoad();
 
-          setAcc(userInfo?.fullName?.toString());
-          setLogo(userInfo?.imgIpfs?.toString());
+          }
+          setAcc(user_info?.fullName?.toString());
+          setLogo(user_info?.imgIpfs?.toString());
           setUser_id(window.userid);
 
           window.document.getElementById('withoutSign').style.display = 'none';
@@ -102,7 +107,7 @@ export function Nav(): JSX.Element {
     const daoId = getCommunityBranding()?.polkadotReferenceId;
 
     try {
-      console.log('ping');
+      if (daoId === undefined) return;
       const element = await api._query.daos.daoById(Number(daoId));
       const daoObject = JSON.parse(element['__internal__raw'].daoUri.toString());
 
@@ -170,7 +175,8 @@ export function Nav(): JSX.Element {
                   <Dropdown value={null} onChange={null}>
                     <Dropdown.Trigger>
                       {logo ? (
-                        <Avatar imageUrl={logo} size="lg" className="rounded-full border-2 border-piccolo"></Avatar>
+                        <img src={logo} className='relative overflow-hidden uppercase font-medium flex items-center justify-center bg-cover text-bulma bg-goku h-12 w-12 text-moon-16 [&_.status]:w-4 [&_.status]:h-4 [&_.status]:border-2 rounded-full border-2 border-piccolo' />
+                        // <Avatar imageUrl={logo} size="lg" className="rounded-full border-2 border-piccolo"></Avatar>
                       ) : (
                         <Avatar size="lg" className="rounded-full border-2 border-piccolo">
                           {' '}
