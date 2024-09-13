@@ -81,7 +81,7 @@ export default function Goals() {
           <Search className="bg-white" onChangeOpen={() => {}} search={search} isOpen={false} onChangeSearch={setSearch}>
             <Search.Input>
               <Search.Input.Icon className="text-trunks" />
-              <Search.Input.Input className="placeholder:text-trunks" placeholder="Search goals" />
+              <Search.Input.Input className="placeholder:text-trunks" placeholder="Search goals" {...({ placeholder: 'Search goals' } as any)} />
             </Search.Input>
           </Search>
         </div>

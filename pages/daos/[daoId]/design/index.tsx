@@ -478,7 +478,7 @@ export default function DesignDao() {
         <title>Customize {DaoURI.Title}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div id="editor" className="min-h-[calc(100vh-86px)]">
+      <div id="editor" className="min-h-[calc(100vh-86px)] mt-1">
         {brandColor && (
           <div className="pt-6 relative" style={{ '--piccolo': brandColor } as any}>
             <div id="dao-container" className="template-container" dangerouslySetInnerHTML={{ __html: template }}></div>
