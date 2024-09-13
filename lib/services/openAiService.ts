@@ -1,22 +1,53 @@
 import OpenAI from 'openai';
 import { UnsplashService } from './unsplashService';
 import { IdeaSuggestion } from '../../data-model/idea-suggestion';
+import { TemplateType } from '../../data-model/template-type';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
 export class OpenAiService {
-  static async generateTemplate(description: string) {
-    const unsplashImageUrl = await UnsplashService.searchImages(description).then((images) => images[0].urls.full);
+  static async generateTemplate(description: string, templateType: TemplateType) {
+    const randomImageIndex = Math.floor(Math.random() * 9);
+
+    let unsplashImageUrl;
+    let instructions: string;
+
+    switch (templateType) {
+      case 'Mission statement':
+        unsplashImageUrl = await UnsplashService.searchImages(description).then((images) => images[randomImageIndex].urls.full);
+        instructions = `Generate a HTML template with an img tag above for the following url ${unsplashImageUrl}, then an h2 header of "Our mission" and 2 paragraphs for a DAO based on the following description: ${description}. Have it wrapped in a div with the class mission-statement`;
+        break;
+      case 'Impact stories':
+        const portrait1 = 'https://images.unsplash.com/photo-1604604557577-4e27a33e57da?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+        const portrait2 = 'https://images.unsplash.com/photo-1675117496904-abe33ddd1513?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+        const portrait3 = 'https://images.unsplash.com/photo-1479936343636-73cdc5aae0c3?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+
+        instructions = `Generate a HTML template with an h2 header of "Impact stories" and 3 blocks that have each have an example personal story, with a short first name, job title or tagline (like but not exactly as mother of 2, army veteran, employee,...), img and the story itself which should be around 80 words, by a person in contact with the charity for a DAO based on the following description: ${description}.
+                        Each block should follow the following structure: <div class="impact-story><div><img/><h3>{name}</h3><h4>tagline</h4></div><p>{story}</p> </div>"
+                        The first should be female and have ${portrait1} as the img href, the middle one should be male and have ${portrait2} as the img href. The last one should be a female employee and have ${portrait3} as the img href.
+                        Have it wrapped in a div with the class impact-stories`;
+
+        break;
+      case 'Charity activities':
+        instructions = `Generate a HTML template with a header and 2 paragraphs for a DAO based on the following description: ${description}. Also add an img tag above for the following url ${unsplashImageUrl}`;
+        break;
+      case 'Contact information':
+        instructions = `Generate a HTML template with a header and 2 paragraphs for a DAO based on the following description: ${description}. Also add an img tag above for the following url ${unsplashImageUrl}`;
+        break;
+
+      default:
+        instructions = templateType;
+    }
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'You are a HTML generation assistant. You only return HTML content. This content does not require html, head or body tags as those are already added manually.' },
+        { role: 'system', content: 'You are a HTML generation assistant. You only return HTML content, no markdown or anything else. This content does not require html, head or body tags as those are already added manually.' },
         {
           role: 'user',
-          content: `Generate a HTML template with a header and 2 paragraphs for a DAO based on the following description: ${description}. Also add an img tag underneath for the following url ${unsplashImageUrl}`
+          content: instructions
         }
       ]
     });

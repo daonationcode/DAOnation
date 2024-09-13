@@ -6,10 +6,11 @@ import { useRouter } from 'next/router';
 import CreateDaoModal from '../../../features/CreateDaoModal';
 import { usePolkadotContext } from '../../../contexts/PolkadotContext';
 import useEnvironment from '../../../contexts/EnvironmentContext';
-import { GenericLogOut, GenericUser, ShopWallet } from '@heathmont/moon-icons-tw';
+import { GenericEdit, GenericLogOut, GenericUser, ShopWallet } from '@heathmont/moon-icons-tw';
 import { ApiCommunity } from '../../../data-model/api-community';
 import Cookies from 'js-cookie';
 import PolkadotConfig from '../../../contexts/json/polkadot-config.json';
+import { Dao } from '../../../data-model/dao';
 
 let running = false;
 let changedPath = true;
@@ -17,6 +18,7 @@ let changedPath = true;
 export function Nav(): JSX.Element {
   const { api, userInfo, userWalletPolkadot } = usePolkadotContext();
   const [acc, setAcc] = useState('');
+  const [isOwner, setIsOwner] = useState(false);
   const [logo, setLogo] = useState('');
   const [user_id, setUser_id] = useState('-1');
   const [Balance, setBalance] = useState('');
@@ -83,6 +85,7 @@ export function Nav(): JSX.Element {
 
   useEffect(() => {
     setCommunityBranding(getCommunityBranding());
+    fetchContractData();
   }, [getCommunityBranding()]);
 
   setInterval(() => {
@@ -92,6 +95,20 @@ export function Nav(): JSX.Element {
       }
     }
   }, 1000);
+
+  async function fetchContractData() {
+    const daoId = getCommunityBranding()?.polkadotReferenceId;
+
+    try {
+      console.log('ping');
+      const element = await api._query.daos.daoById(Number(daoId));
+      const daoObject = JSON.parse(element['__internal__raw'].daoUri.toString());
+
+      setIsOwner(Number(daoObject.properties.user_id.description) === Number(window.userid));
+
+      return element['__internal__raw'].daoUri.toString();
+    } catch (e) {}
+  }
 
   function onClickDisConnect() {
     router.push('/logout');
@@ -177,12 +194,24 @@ export function Nav(): JSX.Element {
                           </MenuItem>
                         </Link>
                       </Dropdown.Option>
-                      <Dropdown.Option>
-                        <MenuItem>
-                          <GenericLogOut className="text-moon-24" />
-                          <MenuItem.Title>Leave this charity</MenuItem.Title>
-                        </MenuItem>
-                      </Dropdown.Option>
+                      {isOwner && (
+                        <Dropdown.Option>
+                          <Link href={`/daos/${communityBranding.polkadotReferenceId}/design`}>
+                            <MenuItem>
+                              <GenericEdit className="text-moon-24" />
+                              <MenuItem.Title>Edit this charity</MenuItem.Title>
+                            </MenuItem>
+                          </Link>
+                        </Dropdown.Option>
+                      )}
+                      {!isOwner && (
+                        <Dropdown.Option>
+                          <MenuItem>
+                            <GenericLogOut className="text-moon-24" />
+                            <MenuItem.Title>Leave this charity</MenuItem.Title>
+                          </MenuItem>
+                        </Dropdown.Option>
+                      )}
                       <Dropdown.Option>
                         <MenuItem onClick={onClickDisConnect}>
                           <GenericLogOut className="text-moon-24" />

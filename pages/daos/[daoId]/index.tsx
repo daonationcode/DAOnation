@@ -58,7 +58,7 @@ export default function DAO() {
           </div>
         )}
       </div>
-      <div className="template-container container !pt-10" dangerouslySetInnerHTML={{ __html: aboutTemplate }}></div>
+      <div dangerouslySetInnerHTML={{ __html: aboutTemplate }}></div>
       <GenerateHomepageModal open={showGenerateHomepageModal} onClose={() => setShowGenerateHomepageModal(false)} />
     </>
   );
