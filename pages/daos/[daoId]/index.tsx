@@ -14,7 +14,6 @@ export default function DAO() {
   const [aboutTemplate, setAboutTemplate] = useState('');
   const [daoName, setDaoName] = useState('');
   const [daoID, setDaoID] = useState('');
-  const [hasNoTemplate, setHasNoTemplate] = useState(false);
 
   const router = useRouter();
 
@@ -25,12 +24,7 @@ export default function DAO() {
 
       setDaoName(name);
       setDaoID(daoId);
-
-      if (!template || template === '[object Object]') {
-        setHasNoTemplate(true);
-      } else {
-        setAboutTemplate(template);
-      }
+      setAboutTemplate(template);
     })();
   }, [router]);
 
@@ -42,7 +36,7 @@ export default function DAO() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={`flex items-center flex-col gap-8 relative`}>
-        {hasNoTemplate && (
+        {!aboutTemplate && (
           <div className="h-full w-full left-0 bg-goku flex flex-col gap-4 justify-center items-center">
             <EmptyState icon={<GenericHome className="text-moon-48" />} label="This charity doesn’t have a homepage yet." />{' '}
             <div className="flex flex-col gap-2">
