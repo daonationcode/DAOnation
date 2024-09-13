@@ -53,7 +53,7 @@ export const Header = () => {
   }
 
   return (
-    <header className={`w-full px-8 py-4 gap-4 flex justify-between items-center ${styles.header}`}>
+    <header className={`w-full px-8 py-4 gap-4 flex justify-between z-5 items-center ${styles.header}`}>
       <Link href={linkTarget}>
         {!isLoading && !communityLogo && (
           <div className="min-w-[200px]">

@@ -45,8 +45,8 @@ export default function GenerateTemplate({ onClose, onGenerate, isLoading, showC
           <div className="flex gap-2 flex-wrap">
             <TemplateOption label="Mission statement" selected={templateType === 'Mission statement'} onClick={() => setTemplateType('Mission statement')} />
             <TemplateOption label="Impact stories" selected={templateType === 'Impact stories'} onClick={() => setTemplateType('Impact stories')} />
-            <TemplateOption label="Charity acitivies" selected={templateType === 'Charity Activities'} onClick={() => setTemplateType('Charity Activities')} />
-            <TemplateOption label="Contact information" selected={templateType === 'Contact Information'} onClick={() => setTemplateType('Contact Information')} />
+            <TemplateOption label="Charity activities" selected={templateType === 'Charity activities'} onClick={() => setTemplateType('Charity activities')} />
+            <TemplateOption label="Contact information" selected={templateType === 'Contact information'} onClick={() => setTemplateType('Contact information')} />
           </div>
         </div>
 

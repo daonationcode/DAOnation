@@ -84,9 +84,11 @@ export function Nav(): JSX.Element {
   }, [router.pathname]);
 
   useEffect(() => {
-    setCommunityBranding(getCommunityBranding());
-    fetchContractData();
-  }, [getCommunityBranding()]);
+    if (api) {
+      setCommunityBranding(getCommunityBranding());
+      fetchContractData();
+    }
+  }, [getCommunityBranding(), api]);
 
   setInterval(() => {
     if (!isServer()) {
@@ -152,7 +154,7 @@ export function Nav(): JSX.Element {
                 </Button>
               </Link>
               <Link href="/login">
-                <Button className="bg-dodoria w-32">Log in</Button>
+                <Button className="bg-piccolo w-32">Log in</Button>
               </Link>
             </div>
 
