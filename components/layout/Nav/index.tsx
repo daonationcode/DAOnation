@@ -17,7 +17,7 @@ let running = false;
 let changedPath = true;
 
 export function Nav(): JSX.Element {
-  const { api, userInfo, userWalletPolkadot,LoadDataOnPageLoad } = usePolkadotContext();
+  const { api, userInfo, userWalletPolkadot,LoadCurrentUserInfo } = usePolkadotContext();
   const [acc, setAcc] = useState('');
   const [isOwner, setIsOwner] = useState(false);
   const [logo, setLogo] = useState('');
@@ -44,7 +44,7 @@ export function Nav(): JSX.Element {
           if (!isSigned) setSigned(true);
           let user_info  = userInfo;
           if (userInfo?.fullName === undefined){
-            user_info = await LoadDataOnPageLoad();
+            user_info = await LoadCurrentUserInfo(api);
 
           }
           setAcc(user_info?.fullName?.toString());

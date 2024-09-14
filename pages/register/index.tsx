@@ -88,7 +88,7 @@ export default function Register() {
     Cookies.remove('user_id'); // covers localhost
 
       setTimeout(() => {
-        router.push('/login');
+        window.location.href = '/login';
       }, 1000);
     };
     // const txs = [api._extrinsics.users.registerUser(Fullname, Email, Password, metadata), api._extrinsics.identity.setIdentity([], )];

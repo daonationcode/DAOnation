@@ -337,7 +337,7 @@ export default function Goal() {
         )}
       </div>
       <CreateIdeaModal show={showCreateIdeaModal} onClose={closeCreateIdeaModal} goalId={goalId} daoId={GoalURI.daoId} goal={GoalURI} dao={GoalDAOURI} />
-      <DonateCoinModal recievetype="" ideasid={selectedIdeasId} daoId={router.query.daoId} goalURI={GoalURI} show={DonatemodalShow} onHide={closeDonateModal} address={selectedIdeasWallet} recieveWallet={selectedIdeasRecieveWallet} />
+      <DonateCoinModal recievetype="" goalId={goalId} ideasid={selectedIdeasId} daoId={router.query.daoId} goalURI={GoalURI} show={DonatemodalShow} onHide={closeDonateModal} address={selectedIdeasWallet} recieveWallet={selectedIdeasRecieveWallet} />
     </>
   );
 }

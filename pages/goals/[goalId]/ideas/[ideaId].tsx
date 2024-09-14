@@ -85,10 +85,10 @@ export default function GrantIdeas() {
 
     try {
       if (id != -1 && Goalid != -1 && api) {
-        let allIdeas = await GetAllIdeas();
+        let allIdeas = await GetAllIdeas(true);
         let currentIdea = allIdeas.filter((e) => e.ideasId == id)[0];
 
-        let allGoals = await GetAllGoals();
+        let allGoals = await GetAllGoals(true);
         let currentGoal = allGoals.filter((e) => e.goalId == Goalid)[0];
 
         currentIdea.End_Date = currentGoal.End_Date;
@@ -367,7 +367,7 @@ export default function GrantIdeas() {
         </div>
       </div>
 
-      <DonateCoinModal ideasid={ideaId} daoId={router.query.daoId} goalURI={IdeasURI?.goalURI} show={DonatemodalShow} onHide={closeDonateModal} address={AccountAddress} recieveWallet={IdeasURI.recieve_wallet} recievetype={IdeasURI.recievetype} />
+      <DonateCoinModal ideasid={ideaId} goalId={goalId} daoId={router.query.daoId} goalURI={IdeasURI?.goalURI} show={DonatemodalShow} onHide={closeDonateModal} address={AccountAddress} recieveWallet={IdeasURI.recieve_wallet} recievetype={IdeasURI.recievetype} />
     </>
   );
 }
