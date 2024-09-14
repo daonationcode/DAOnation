@@ -15,11 +15,11 @@ const AppContext = createContext({
 });
 export async function MakeShortUrl(url) {
 
-  let output = await (await fetch("http://tny.im/yourls-api.php?action=shorturl&url=" + encodeURIComponent(url) + "&format=json&username=zakirhossen&password=zakir%%$", {
+  let output = await (await fetch("https://tny.im/yourls-api.php?action=shorturl&url=" + encodeURIComponent(url) + "&format=json&username=zakirhossen&password=zakir%%$", {
     method: "GET",
 
   })).json();
-  return output.shorturl;
+  return output.shorturl.replace("http",'https');
 
 }
 export function IPFSProvider({ children }) {
