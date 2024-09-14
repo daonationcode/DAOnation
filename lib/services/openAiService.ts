@@ -16,14 +16,13 @@ export class OpenAiService {
 
     switch (templateType) {
       case 'Mission statement':
-        unsplashImageUrl = '/images/mission.png';
-        // unsplashImageUrl = await UnsplashService.searchImages(description).then((images) => images[randomImageIndex].urls.full);
+        unsplashImageUrl = await UnsplashService.searchImages(description).then((images) => images[randomImageIndex].urls.full);
         instructions = `Generate a HTML template with an img tag above for the following url ${unsplashImageUrl}, then an h2 header of "Our mission" and 2 paragraphs for a DAO based on the following description: ${description}. Have it wrapped in a div with the class mission-statement`;
         break;
       case 'Impact stories':
-        const portrait1 = 'https://images.unsplash.com/photo-1604604557577-4e27a33e57da?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-        const portrait2 = 'https://images.unsplash.com/photo-1675117496904-abe33ddd1513?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-        const portrait3 = 'https://images.unsplash.com/photo-1479936343636-73cdc5aae0c3?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+        const portrait1 = await UnsplashService.searchImages('face female', 1).then((images) => images[0].urls.small);
+        const portrait2 = await UnsplashService.searchImages('face male', 1).then((images) => images[0].urls.small);
+        const portrait3 = await UnsplashService.searchImages('face female', 3).then((images) => images[1].urls.small);
 
         instructions = `Generate a HTML template with an h2 header of "Impact stories" and 3 blocks that have each have an example personal story, with a short first name, job title or tagline (like but not exactly as mother of 2, army veteran, employee,...), img and the story itself which should be around 80 words, by a person in contact with the charity for a DAO based on the following description: ${description}.
                         Each block should follow the following structure: <div class="impact-story><div><img/><h3>{name}</h3><h4>tagline</h4></div><p>{story}</p> </div>"
@@ -32,14 +31,10 @@ export class OpenAiService {
 
         break;
       case 'Charity activities':
-        const image1 = '/images/activity-1.png';
-        const image2 = '/images/activity-2.png';
-        const image3 = '/images/activity-3.png';
-        const image4 = '/images/activity-4.png';
-        // const image1 = await UnsplashService.searchImages(description, 1).then((images) => images[0].urls.small);
-        // const image2 = await UnsplashService.searchImages(description, 2).then((images) => images[1].urls.small);
-        // const image3 = await UnsplashService.searchImages(description, 3).then((images) => images[2].urls.small);
-        // const image4 = await UnsplashService.searchImages(description, 4).then((images) => images[3].urls.small);
+        const image1 = await UnsplashService.searchImages(description, 1).then((images) => images[0].urls.small);
+        const image2 = await UnsplashService.searchImages(description, 2).then((images) => images[1].urls.small);
+        const image3 = await UnsplashService.searchImages(description, 3).then((images) => images[2].urls.small);
+        const image4 = await UnsplashService.searchImages(description, 4).then((images) => images[3].urls.small);
 
         instructions = `Generate a HTML template with an h2 header of "Our activities" and 4 that each describe an activity with a name and activity description for a DAO based on the following description: ${description}.
                         Each block should follow the following structure: <div class="activity"><div><h3>{name}</h3><p>{activity description}</p></div><img /></div>

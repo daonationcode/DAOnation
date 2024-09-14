@@ -14,11 +14,12 @@ interface UnsplashSearchResponse {
 
 export class UnsplashService {
   static async searchImages(query: string, perPage: number = 10): Promise<UnsplashImage[]> {
-    const categories = await OpenAiService.generateCategories(query);
+    let categories: string;
+    if (query.length > 50) {
+      categories = await OpenAiService.generateCategories(query);
+    }
 
-    console.log('CATS', categories);
-
-    const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(categories)}&per_page=${perPage}`, {
+    const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(categories ?? query)}&per_page=${perPage}`, {
       headers: {
         Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`
       }
