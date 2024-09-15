@@ -146,7 +146,7 @@ export default function Profile() {
             Title: allIdeas.filter((item)=>item.ideasId == element.data.ideasid)[0].Title,
             Id: element.data.ideasid,
             Amount: element.data.donated,
-            date:element.date.toLocaleString(),
+            date:element.date,
             url:`/goals/${element.data.goalId}/ideas/${element.data.ideasid}`
           }
           AllTransactionArray.push(feed)
