@@ -46,7 +46,7 @@ const TransactionsPanel = ({ transactions }) => {
             "
           </span>
         ),
-        date: element.date,
+        date:  element.date.toLocaleDateString(),
         subscriptionAmount: `${getCurrency()} ${element.Amount}`
       },)
     }
